@@ -74,10 +74,10 @@ class critic(tf.keras.Model):
             tf.keras.layers.GlobalAveragePooling2D(),
             tf.keras.layers.Flatten(),
             #tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(128, activation='relu'),
+            #tf.keras.layers.Dense(128, activation='relu'),
             #tf.keras.layers.Dropout(0.5),
             #tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(64, activation='relu'),
+            #tf.keras.layers.Dense(64, activation='relu'),
             #tf.keras.layers.Dropout(0.5),
             #tf.keras.layers.BatchNormalization(),
             #tf.keras.layers.Dense(num_classes, activation='softmax')
