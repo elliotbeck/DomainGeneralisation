@@ -102,7 +102,7 @@ def _train_step(model_classifier, features, optimizer, global_step, config):
         global_step.assign_add(1)
 
 
-def train_one_epoch(model_classifier, model_ , train_input, optimizer, global_step, config):
+def train_one_epoch(model_classifier, train_input, optimizer, global_step, config):
     for _input in train_input:
         _train_step(model_classifier, _input, optimizer, global_step, config)
 
@@ -255,8 +255,8 @@ def main():
 
     # Get model
     model_classifier = get_model(config.name_classifier, config)
-    model_critic = get_model(config.name_critic, config)
-    model_generator = get_model(config.name_generator, config)
+    #model_critic = get_model(config.name_critic, config)
+    #model_generator = get_model(config.name_generator, config)
 
     # Get datasets
     if DEBUG:
