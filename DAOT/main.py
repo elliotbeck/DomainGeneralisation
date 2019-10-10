@@ -63,11 +63,10 @@ def loss_fn_classifier(model_classifier, model_generator, features, config, trai
     label_generated = label
     #inputs_all = tf.concat([inputs, inputs_generated], 0)
     label_all = tf.concat([label, label_generated], 0)
-
     # L2 regularizers
     l2_regularizer = tf.add_n([tf.nn.l2_loss(v) for v in 
         model_classifier.trainable_variables if 'bias' not in v.name])
-
+    # get label predictions
     model_classifier_output_original = model_classifier(inputs, training=training)
     model_classifier_output_generated = model_classifier(inputs_generated, 
                                             training=training)
@@ -82,8 +81,8 @@ def loss_fn_classifier(model_classifier, model_generator, features, config, trai
         model_classifier_output_generated, from_logits=False)
     mean_classification_loss_generated = tf.reduce_mean(classification_loss_generated)
     # get weighted total loss
-    mean_classification_loss_weighted = (1-config.alpha)*mean_classification_loss_original+
-                                        config.alpha*mean_classification_loss_generated
+    mean_classification_loss_weighted = (1-config.alpha)*mean_classification_loss_original + \
+        config.alpha*mean_classification_loss_generated
 
     accuracy = tf.reduce_mean(
         tf.where(tf.equal(label_all, tf.argmax(tf.concat([model_classifier_output_original,
@@ -118,8 +117,8 @@ def loss_fn_critic(model_critic, model_generator, features, config, training):
 
 def _train_step(model_classifier, features, optimizer, global_step, config):
     with tf.GradientTape() as tape_src:
-        mean_classification_loss_weighted, l2_regularizer, accuracy, _ = loss_fn_classifier(model_classifier, 
-            model_generator ,features=features, config=config, training=True)
+        mean_classification_loss_weighted, l2_regularizer, accuracy, _ = loss_fn_classifier(
+            model_classifier, model_generator ,features=features, config=config, training=True)
 
         tf.summary.scalar("binary_crossentropy", mean_classification_loss, 
             step=global_step)
