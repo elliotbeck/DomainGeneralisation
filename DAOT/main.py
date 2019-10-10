@@ -63,6 +63,7 @@ def loss_fn_classifier(model_classifier, model_generator, features, config, trai
     label_generated = label
     #inputs_all = tf.concat([inputs, inputs_generated], 0)
     label_all = tf.concat([label, label_generated], 0)
+    
     # L2 regularizers
     l2_regularizer = tf.add_n([tf.nn.l2_loss(v) for v in 
         model_classifier.trainable_variables if 'bias' not in v.name])
@@ -83,7 +84,7 @@ def loss_fn_classifier(model_classifier, model_generator, features, config, trai
     # get weighted total loss
     mean_classification_loss_weighted = (1-config.alpha)*mean_classification_loss_original + \
         config.alpha*mean_classification_loss_generated
-
+    # calculate accuracy 
     accuracy = tf.reduce_mean(
         tf.where(tf.equal(label_all, tf.argmax(tf.concat([model_classifier_output_original,
                     model_classifier_output_generated], 0), axis=-1)),
@@ -139,15 +140,15 @@ def train_one_epoch(model_classifier, train_input, optimizer, global_step, confi
 
 
 # compute the mean of all examples for a specific set (eval, validation, out-of-distribution, etc)
-def eval_one_epoch(model_classifier, dataset, summary_directory, global_step, config, training):
+def eval_one_epoch(model_classifier, model_generator, dataset, summary_directory, global_step, config, training):
     classification_loss = tf.metrics.Mean("binary_crossentropy")
     accuracy = tf.metrics.Mean("accuracy")
 
     # losses = []
     # accuracies = []
     for _input in dataset:
-        _, _, _accuracy, _classification_loss = loss_fn_classifier(model_classifier, features=_input, 
-            config=config, training=training)
+        _, _, _accuracy, _classification_loss = loss_fn_classifier(model_classifier, model_generator,
+        features=_input, config=config, training=training)
         # losses.append(_classification_loss.numpy())
         # accuracies.append(_accuracy.numpy())
 

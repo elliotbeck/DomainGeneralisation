@@ -58,12 +58,12 @@ def compute_optimal_transport(M, r, c, lam, epsilon=1e-8):
 
 
     n, m = M.shape
-    P = np.exp(- lam * M)
+    P = tf.exp(- lam * M)
     P /= P.sum()
-    u = np.zeros(n)
+    u = tf.zeros(n)
     # normalize this matrix
-    while np.max(np.abs(u - P.sum(1))) > epsilon:
+    while tf.maximum(tf.abs(u - P.sum(1))) > epsilon:
         u = P.sum(1)
         P *= (r / u).reshape((-1, 1))
         P *= (c / P.sum(0)).reshape((1, -1))
-    return P, np.sum(P * M)
+    return P, tf.reduce_sum(P * M)
