@@ -81,7 +81,24 @@ def loss_fn_classifier(model_classifier, features, config, training):
 # loss function for generator
 
 # loss function for critic
+def loss_fn_critic(model_critic, model_generator, features, config, training):
+    inputs = features["image"]
+    label = tf.squeeze(features["label"])
 
+    X_generated = model_generator(inputs, training=training)
+    X_critic_true = model_critic(inputs, training=training)
+    X_critic_generated = model_critic(X_generated, training=training)
+
+    # compute M (cost_matrix)
+    norms_true = tf.norm(X_critic_true,2, axis=1)
+    norms_generated = tf.norm(X_critic_generated,2, axis=1)
+    matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
+    matrix_critic = tf.tensordot(X_critic_true,X_critic_generated.T, axes=1)
+    cost_matrix = 1 - matrix_critic/matrix_norms
+    
+    _ , sinkhorn_dist = util.compute_optimal_transport(cost_matrix,?;?;?)
+
+    return sinkhorn_dist
 
 
 def _train_step(model_classifier, features, optimizer, global_step, config):
@@ -255,8 +272,8 @@ def main():
 
     # Get model
     model_classifier = get_model(config.name_classifier, config)
-    #model_critic = get_model(config.name_critic, config)
-    #model_generator = get_model(config.name_generator, config)
+    model_critic = get_model(config.name_critic, config)
+    model_generator = get_model(config.name_generator, config)
 
     # Get datasets
     if DEBUG:

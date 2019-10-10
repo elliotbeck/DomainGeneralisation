@@ -5,6 +5,7 @@ from shutil import make_archive
 from datetime import datetime
 import os
 import tensorflow as tf
+import numpy as np
 
 import local_settings
 
@@ -31,7 +32,6 @@ def get_config(config_path):
 
     return config
 
-
 def update_config(config, args):
     for entry in config:
         if hasattr(args, entry):
@@ -39,3 +39,31 @@ def update_config(config, args):
                 config[entry] = eval("args.{}".format(entry))
     return config
 
+def compute_optimal_transport(M, r, c, lam, epsilon=1e-8):
+    """
+    Computes the optimal transport matrix and Slinkhorn distance using the
+    Sinkhorn-Knopp algorithm
+
+    Inputs:
+        - M : cost matrix (n x m)
+        - r : vector of marginals (n, )
+        - c : vector of marginals (m, )
+        - lam : strength of the entropic regularization
+        - epsilon : convergence parameter
+
+    Outputs:
+        - P : optimal transport matrix (n x m)
+        - dist : Sinkhorn distance
+    """
+
+
+    n, m = M.shape
+    P = np.exp(- lam * M)
+    P /= P.sum()
+    u = np.zeros(n)
+    # normalize this matrix
+    while np.max(np.abs(u - P.sum(1))) > epsilon:
+        u = P.sum(1)
+        P *= (r / u).reshape((-1, 1))
+        P *= (c / P.sum(0)).reshape((1, -1))
+    return P, np.sum(P * M)
