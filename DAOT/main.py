@@ -53,30 +53,45 @@ parser.add_argument('--overwrite_configs', type=int,
     help='Flag whether to overwrite configs.')
 parser.add_argument('--dropout_rate', type=float, help='Dropout rate.')
 parser.add_argument('--use_dropout', type=int, help='Flag whether to use dropout.')
-
+parser.add_argument('--alpha', type=float, help='weighting factor of classification loss.')
 
 # loss funtion for classifier
-def loss_fn_classifier(model_classifier, features, config, training):
+def loss_fn_classifier(model_classifier, model_generator, features, config, training):
     inputs = features["image"]
     label = tf.squeeze(features["label"])
+    inputs_generated = model_generator(inputs, training=training)
+    label_generated = label
+    #inputs_all = tf.concat([inputs, inputs_generated], 0)
+    label_all = tf.concat([label, label_generated], 0)
 
     # L2 regularizers
     l2_regularizer = tf.add_n([tf.nn.l2_loss(v) for v in 
         model_classifier.trainable_variables if 'bias' not in v.name])
 
-    model_classifier_output = model_classifier(inputs, training=training)
-    
-    classification_loss = tf.losses.binary_crossentropy(
+    model_classifier_output_original = model_classifier(inputs, training=training)
+    model_classifier_output_generated = model_classifier(inputs_generated, 
+                                            training=training)
+    # get mean classification loss on original data                                        
+    classification_loss_original = tf.losses.binary_crossentropy(
         tf.one_hot(label, axis=-1, depth=config.num_classes),
-        model_classifier_output, from_logits=False)
-    mean_classification_loss = tf.reduce_mean(classification_loss) 
+        model_classifier_output_original, from_logits=False)
+    mean_classification_loss_original = tf.reduce_mean(classification_loss_original)
+    # get mean classification loss on generated data
+    classification_loss_generated = tf.losses.binary_crossentropy(
+        tf.one_hot(label_generated, axis=-1, depth=config.num_classes),
+        model_classifier_output_generated, from_logits=False)
+    mean_classification_loss_generated = tf.reduce_mean(classification_loss_generated)
+    # get weighted total loss
+    mean_classification_loss_weighted = (1-config.alpha)*mean_classification_loss_original+
+                                        config.alpha*mean_classification_loss_generated
 
     accuracy = tf.reduce_mean(
-        tf.where(tf.equal(label, tf.argmax(model_classifier_output, axis=-1)),
-                    tf.ones_like(label, dtype=tf.float32),
-                    tf.zeros_like(label, dtype=tf.float32)))
+        tf.where(tf.equal(label_all, tf.argmax(tf.concat([model_classifier_output_original,
+                    model_classifier_output_generated], 0), axis=-1)),
+                    tf.ones_like(label_all, dtype=tf.float32),
+                    tf.zeros_like(label_all, dtype=tf.float32)))
 
-    return mean_classification_loss, l2_regularizer, accuracy, classification_loss
+    return mean_classification_loss_weighted, l2_regularizer, accuracy, classification_loss
 
 # loss function for generator
 
@@ -96,21 +111,21 @@ def loss_fn_critic(model_critic, model_generator, features, config, training):
     matrix_critic = tf.tensordot(X_critic_true,X_critic_generated.T, axes=1)
     cost_matrix = 1 - matrix_critic/matrix_norms
     
-    _ , sinkhorn_dist = util.compute_optimal_transport(cost_matrix,?;?;?)
+    _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix,?;?;?)
 
     return sinkhorn_dist
 
 
 def _train_step(model_classifier, features, optimizer, global_step, config):
     with tf.GradientTape() as tape_src:
-        mean_classification_loss, l2_regularizer, accuracy, _ = loss_fn_classifier(model_classifier, 
-            features=features, config=config, training=True)
+        mean_classification_loss_weighted, l2_regularizer, accuracy, _ = loss_fn_classifier(model_classifier, 
+            model_generator ,features=features, config=config, training=True)
 
         tf.summary.scalar("binary_crossentropy", mean_classification_loss, 
             step=global_step)
         tf.summary.scalar("accuracy", accuracy, step=global_step)
 
-        total_loss = mean_classification_loss + \
+        total_loss = mean_classification_loss_weighted + \
             config.l2_penalty_weight*l2_regularizer
 
         grads = tape_src.gradient(total_loss, model_classifier.trainable_variables)
