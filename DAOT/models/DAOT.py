@@ -1,4 +1,5 @@
 import tensorflow as tf
+import util
 
 
 class ResNet50(tf.keras.Model):
@@ -53,7 +54,7 @@ class generator(tf.keras.Model):
 
     def call(self, inputs, training=None, mask=None):
         X_shortcut = inputs
-        return self.model(inputs, training, mask) + X_shortcut
+        return self.model(inputs, training, mask)*config.lambda + X_shortcut
 
     @property
     def input_shape(self):

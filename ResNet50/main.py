@@ -28,7 +28,7 @@ import experiment_repo as repo
 import util
 import local_settings
 
-DEBUG = False
+DEBUG = True
 
 parser = argparse.ArgumentParser(description='Train my model.')
 parser.add_argument('--config', type=str, 
@@ -97,7 +97,19 @@ def _train_step(model, features, optimizer, global_step, config):
         global_step.assign_add(1)
 
 
+# # choose two domains of train_input
+# def predicate(x, allowed_domains=tf.constant(["cartoon", "sketch"])):
+#     domain = x["domain"]
+#     isallowed = tf.equal(allowed_domains, domain)
+#     reduced = tf.reduce_sum(tf.cast(isallowed, tf.float32))
+#     return tf.greater(reduced, tf.constant(0.))
+
+
 def train_one_epoch(model, train_input, optimizer, global_step, config):
+
+    # train_input = train_input.filter(lambda x: predicate(x))
+    # print(train_input)
+
     for _input in train_input:
         _train_step(model, _input, optimizer, global_step, config)
 
@@ -136,6 +148,7 @@ def _preprocess_exampe(model, example, dataset_name):
     example["image"] = tf.image.resize(example["image"], 
         size=(model.input_shape[0], model.input_shape[1]))
     example["label"] = example["attributes"]["label"]
+    example["domain"] = example["attributes"]["domain"]
     return example
 
 

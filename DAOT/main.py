@@ -54,6 +54,7 @@ parser.add_argument('--overwrite_configs', type=int,
 parser.add_argument('--dropout_rate', type=float, help='Dropout rate.')
 parser.add_argument('--use_dropout', type=int, help='Flag whether to use dropout.')
 parser.add_argument('--alpha', type=float, help='weighting factor of classification loss.')
+parser.add_argument('--lambda', type=float, help='weighting factor of generator.')
 
 # loss funtion for classifier
 def loss_fn_classifier(model_classifier, model_generator, features, config, training):
@@ -63,7 +64,7 @@ def loss_fn_classifier(model_classifier, model_generator, features, config, trai
     label_generated = label
     #inputs_all = tf.concat([inputs, inputs_generated], 0)
     label_all = tf.concat([label, label_generated], 0)
-    
+
     # L2 regularizers
     l2_regularizer = tf.add_n([tf.nn.l2_loss(v) for v in 
         model_classifier.trainable_variables if 'bias' not in v.name])
@@ -82,8 +83,8 @@ def loss_fn_classifier(model_classifier, model_generator, features, config, trai
         model_classifier_output_generated, from_logits=False)
     mean_classification_loss_generated = tf.reduce_mean(classification_loss_generated)
     # get weighted total loss
-    mean_classification_loss_weighted = (1-config.alpha)*mean_classification_loss_original + \
-        config.alpha*mean_classification_loss_generated
+    mean_classification_loss_weighted = (1-config.alpha) * mean_classification_loss_original + \
+        config.alpha * mean_classification_loss_generated
     # calculate accuracy 
     accuracy = tf.reduce_mean(
         tf.where(tf.equal(label_all, tf.argmax(tf.concat([model_classifier_output_original,
@@ -134,9 +135,21 @@ def _train_step(model_classifier, features, optimizer, global_step, config):
         global_step.assign_add(1)
 
 
+# # choose two domains of train_input
+# def predicate(x, allowed_domains=tf.constant(["cartoon", "sketch"])):
+#     domain = x["domain"]
+#     isallowed = tf.equal(allowed_domains, domain)
+#     reduced = tf.reduce_sum(tf.cast(isallowed, tf.float32))
+#     return tf.greater(reduced, tf.constant(0.))
+
+
 def train_one_epoch(model_classifier, train_input, optimizer, global_step, config):
+
+    # train_input = train_input.filter(lambda x: predicate(x))
+    # print(train_input)
+
     for _input in train_input:
-        _train_step(model_classifier, _input, optimizer, global_step, config)
+        _train_step(model, _input, optimizer, global_step, config)
 
 
 # compute the mean of all examples for a specific set (eval, validation, out-of-distribution, etc)
@@ -173,6 +186,7 @@ def _preprocess_exampe(model_classifier, example, dataset_name):
     example["image"] = tf.image.resize(example["image"], 
         size=(model_classifier.input_shape[0], model_classifier.input_shape[1]))
     example["label"] = example["attributes"]["label"]
+    example["domain"] = example["attributes"]["domain"]
     return example
 
 

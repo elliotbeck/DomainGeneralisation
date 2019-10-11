@@ -12,6 +12,7 @@
     "batch_size": 16,
     "num_epochs": 2,
     "alpha": 0.5,
+    "lambda": 1,
     
     "l2_penalty_weight": 1e-3,
     
