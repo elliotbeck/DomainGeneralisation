@@ -46,7 +46,7 @@ class PACSConfig(tfds.core.BuilderConfig):
         super(PACSConfig, self).__init__(
             name="{}".format("_".join(self.validation_split)),
             description="pacs dataset",
-            version="0.1.2",
+            version="0.1.3",
             **kwargs)
 
 
@@ -93,11 +93,12 @@ class PACS(tfds.core.GeneratorBasedBuilder):
         test_files = [os.path.join(local_settings.RAW_DATA_PATH, f)
                       for f in filenames]
         
-        filenames = ['pacs/photo_test.hdf5']
+        filenames = ['pacs/photo_val.hdf5']
         test_files_out = [os.path.join(local_settings.RAW_DATA_PATH, f)
             for f in filenames]
 
-        filenames = ['pacs/photo_train.hdf5']
+        filenames = ['pacs/art_painting_val.hdf5', 'pacs/sketch_val.hdf5',
+                     'pacs/cartoon_val.hdf5']
         test_files_in = [os.path.join(local_settings.RAW_DATA_PATH, f)
                        for f in filenames]
 

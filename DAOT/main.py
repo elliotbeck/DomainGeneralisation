@@ -112,7 +112,7 @@ def loss_fn_critic(model_critic, model_generator, features, config, training):
     matrix_critic = tf.tensordot(X_critic_true,X_critic_generated.T, axes=1)
     cost_matrix = 1 - matrix_critic/matrix_norms
     
-    _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix,?;?;?)
+    _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix,?;??;)
 
     return sinkhorn_dist
 
