@@ -26,13 +26,6 @@ flags.DEFINE_string(name="tfds_path", default=None, help="")
 
 flags = flags.FLAGS
 
-CELL_TYPES = {
-    "HUVEC": 0,
-    "RPE": 1,
-    "HEPG2": 2,
-    "U2OS": 3
-}
-
 VALIDATION_SPLIT = ["photo"]
 
 

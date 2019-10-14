@@ -95,6 +95,37 @@ def loss_fn_classifier(model_classifier, model_generator, features, config, trai
     return mean_classification_loss_weighted, l2_regularizer, accuracy, classification_loss
 
 # loss function for generator
+def loss_fn_generator(model_classifier, model_critic, model_generator, features, config, training):
+    inputs = features["image"]
+    label = tf.squeeze(features["label"])
+    label_generated = label
+
+    X_generated = model_generator(inputs, training=training)
+    X_critic_true = model_critic(inputs, training=training)
+    X_critic_generated = model_critic(X_generated, training=training)
+
+    # get label predictions
+    model_classifier_output_generated = model_classifier(X_generated, 
+                                            training=training)
+    # get mean classification loss on generated data
+    classification_loss_generated = tf.losses.binary_crossentropy(
+        tf.one_hot(label_generated, axis=-1, depth=config.num_classes),
+        model_classifier_output_generated, from_logits=False)
+    mean_classification_loss_generated = tf.reduce_mean(classification_loss_generated)
+
+    # compute M (cost_matrix)
+    norms_true = tf.norm(X_critic_true,2, axis=1)
+    norms_generated = tf.norm(X_critic_generated,2, axis=1)
+    matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
+    matrix_critic = tf.tensordot(X_critic_true,X_critic_generated.T, axes=1)
+    cost_matrix = 1 - matrix_critic/matrix_norms
+    
+    _, sinkhorn_dist_intra = util.compute_optimal_transport(cost_matrix,?,?,?)
+    _, sinkhorn_dist_inter = util.compute_optimal_transport(cost_matrix,?,?,?)
+
+    return mean_classification_loss_generated - sinkhorn_dist_intra - sinkhorn_dist_inter
+
+
 
 # loss function for critic
 def loss_fn_critic(model_critic, model_generator, features, config, training):
@@ -112,9 +143,10 @@ def loss_fn_critic(model_critic, model_generator, features, config, training):
     matrix_critic = tf.tensordot(X_critic_true,X_critic_generated.T, axes=1)
     cost_matrix = 1 - matrix_critic/matrix_norms
     
-    _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix,?;??;)
+    _, sinkhorn_dist_intra = util.compute_optimal_transport(cost_matrix,?,?,?)
+    _, sinkhorn_dist_inter = util.compute_optimal_transport(cost_matrix,?,?,?)
 
-    return sinkhorn_dist
+    return sinkhorn_dist_intra + sinkhorn_dist_inter
 
 
 def _train_step(model_classifier, features, optimizer, global_step, config):

@@ -26,13 +26,6 @@ flags.DEFINE_string(name="tfds_path", default=None, help="")
 
 flags = flags.FLAGS
 
-CELL_TYPES = {
-    "HUVEC": 0,
-    "RPE": 1,
-    "HEPG2": 2,
-    "U2OS": 3
-}
-
 VALIDATION_SPLIT = ["photo"]
 
 
@@ -93,11 +86,12 @@ class PACS(tfds.core.GeneratorBasedBuilder):
         test_files = [os.path.join(local_settings.RAW_DATA_PATH, f)
                       for f in filenames]
         
-        filenames = ['pacs/photo_test.hdf5']
+        filenames = ['pacs/photo_val.hdf5']
         test_files_out = [os.path.join(local_settings.RAW_DATA_PATH, f)
             for f in filenames]
 
-        filenames = ['pacs/photo_train.hdf5']
+        filenames = ['pacs/art_painting_val.hdf5', 'pacs/sketch_val.hdf5',
+                     'pacs/cartoon_val.hdf5']
         test_files_in = [os.path.join(local_settings.RAW_DATA_PATH, f)
                        for f in filenames]
 
