@@ -270,37 +270,41 @@ def main():
     else:
         num_batches = None
 
-    ds_train = _get_dataset(config.dataset, model, config.test_domain,
+    ds_train_complete = _get_dataset(config.dataset, model, config.test_domain,
         split=tfds.Split.TRAIN, batch_size=config.batch_size, 
         num_batches=num_batches)
 
-    ds_train_for_eval = _get_dataset(config.dataset, model, config.test_domain,
-        split=tfds.Split.TRAIN, batch_size=config.batch_size,
-        num_batches=10)
+    ds_train1 = _get_dataset(config.dataset, model, config.test_domain,
+        split="train1", batch_size=config.batch_size, 
+        num_batches=num_batches)
+
+    ds_train2 = _get_dataset(config.dataset, model, config.test_domain,
+        split="train2", batch_size=config.batch_size, 
+        num_batches=num_batches)
+
+    ds_train3 = _get_dataset(config.dataset, model, config.test_domain,
+        split="train3", batch_size=config.batch_size, 
+        num_batches=num_batches)
     
-    ds_val = _get_dataset(config.dataset, model, config.test_domain,
-        split=tfds.Split.VALIDATION, batch_size=config.batch_size, 
+    # ds_val = _get_dataset(config.dataset, model, config.test_domain,
+    #     split=tfds.Split.VALIDATION, batch_size=config.batch_size, 
+    #     num_batches=num_batches)
+
+    # ds_test = _get_dataset(config.dataset, model, config.test_domain,
+    #     split=tfds.Split.TEST, batch_size=config.batch_size,
+    #     num_batches=num_batches)
+
+    ds_val_in = _get_dataset(config.dataset, model, config.test_domain,
+        split="val_in", batch_size=config.batch_size,
         num_batches=num_batches)
 
     ds_val_out = _get_dataset(config.dataset, model, config.test_domain,
-        split="validation_out", batch_size=config.batch_size,
-        num_batches=num_batches)
-
-    ds_test = _get_dataset(config.dataset, model, config.test_domain,
-        split=tfds.Split.TEST, batch_size=config.batch_size,
-        num_batches=num_batches)
-
-    ds_test_in = _get_dataset(config.dataset, model, config.test_domain,
-        split="test_in", batch_size=config.batch_size,
-        num_batches=num_batches)
-
-    ds_test_out = _get_dataset(config.dataset, model, config.test_domain,
-        split="test_out", batch_size=config.batch_size,
+        split="val_out", batch_size=config.batch_size,
         num_batches=num_batches)
 
     # TODO: add test set - done
     
-    show_inputs = iter(ds_train)
+    show_inputs = iter(ds_train1)
     _ = model(next(show_inputs)["image"])
 
     # Set up checkpointing
@@ -318,38 +322,41 @@ def main():
         for epoch in range(epoch_start, config.num_epochs):
             
             start_time = time.time()
+            
+
+            random = np.array([0, 1, 2])
+            np.random.shuffle(random)
+            poss_inputs = [ds_train1, ds_train2, ds_train3]
+            
+            ds_train = poss_inputs[random[0]].concatenate(poss_inputs[random[1]])
 
             train_one_epoch(model=model, train_input=ds_train, 
                 optimizer=optimizer, global_step=global_step, config=config)
 
-            train_metr = eval_one_epoch(model=model, dataset=ds_train_for_eval,
+            train_metr = eval_one_epoch(model=model, dataset=ds_train_complete,
                 summary_directory=os.path.join(manager._directory, "train"), 
                 global_step=global_step, config=config, training=False)
-            
-            val_metr = eval_one_epoch(model=model, dataset=ds_val,
-                summary_directory=os.path.join(manager._directory, "val_rand"), 
+
+            val_out_metr = eval_one_epoch(model=model, dataset=ds_val_out,
+                summary_directory=os.path.join(manager._directory, "val_out"),
                 global_step=global_step, config=config, training=False)
 
-            test_out_metr = eval_one_epoch(model=model, dataset=ds_test_out,
-                summary_directory=os.path.join(manager._directory, "test_out"),
-                global_step=global_step, config=config, training=False)
-
-            test_in_metr = eval_one_epoch(model=model, dataset=ds_test_in,
-                summary_directory=os.path.join(manager._directory, "test_in"),
+            val_in_metr = eval_one_epoch(model=model, dataset=ds_val_in,
+                summary_directory=os.path.join(manager._directory, "val_in"),
                 global_step=global_step, config=config, training=False)
            
             if epoch == (config.num_epochs - 1):
                 # full training set
-                train_metr = eval_one_epoch(model=model, dataset=ds_train,
+                train_metr = eval_one_epoch(model=model, dataset=ds_train_complete,
                     summary_directory=os.path.join(manager._directory, "train"), 
                     global_step=global_step, config=config, training=False)
                 # full test_out set
-                test_out_metr = eval_one_epoch(model=model, dataset=ds_test_out,
-                    summary_directory=os.path.join(manager._directory, "test_out"),
+                val_out_metr = eval_one_epoch(model=model, dataset=ds_val_out,
+                    summary_directory=os.path.join(manager._directory, "val_out"),
                     global_step=global_step, config=config, training=False)
                 # full test_in set
-                test_in_metr = eval_one_epoch(model=model, dataset=ds_test_in,
-                    summary_directory=os.path.join(manager._directory, "ds_test_in"),
+                val_in_metr = eval_one_epoch(model=model, dataset=ds_val_in,
+                    summary_directory=os.path.join(manager._directory, "val_in"),
                     global_step=global_step, config=config, training=False)
 
 
@@ -360,10 +367,10 @@ def main():
             logging.info("Global step: {}".format(global_step.numpy()))
             logging.info("train_accuracy: {:2f}, train_loss: {:4f}".format(
                 train_metr['accuracy'], train_metr['loss']))
-            logging.info("test_out_accuracy: {:2f}, test_out_loss: {:4f}".format(
-                test_out_metr['accuracy'], test_out_metr['loss']))
-            logging.info("test_in_accuracy: {:2f}, test_in_loss: {:4f}".format(
-                test_in_metr['accuracy'], test_in_metr['loss']))
+            logging.info("val_out_accuracy: {:2f}, val_out_loss: {:4f}".format(
+                val_out_metr['accuracy'], val_out_metr['loss']))
+            logging.info("val_in_accuracy: {:2f}, val_in_loss: {:4f}".format(
+                val_in_metr['accuracy'], val_in_metr['loss']))
            
 
             if epoch == epoch_start:
@@ -375,8 +382,8 @@ def main():
     # TODO: add other metrics
     exp_repo.mark_experiment_as_completed(exp_id, 
         train_accuracy=train_metr['accuracy'],
-        test_out_accuracy=test_out_metr['accuracy'],
-        test_in_accuracy=test_in_metr['accuracy'])
+        val_out_accuracy=val_out_metr['accuracy'],
+        val_in_accuracy=val_in_metr['accuracy'])
 
 if __name__ == "__main__":
     main()

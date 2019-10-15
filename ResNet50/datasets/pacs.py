@@ -39,7 +39,7 @@ class PACSConfig(tfds.core.BuilderConfig):
         super(PACSConfig, self).__init__(
             name="{}".format("_".join(self.validation_split)),
             description="pacs dataset",
-            version="0.1.3",
+            version="0.1.9",
             **kwargs)
 
 
@@ -71,42 +71,72 @@ class PACS(tfds.core.GeneratorBasedBuilder):
         # TODO: remove split defined in validation_split and create separate test set for it
         # TODO: download remaining datasets and fix the filename vars below - done
 
+        filenames = ['pacs/art_painting_train.hdf5']
+        train_files1 = [os.path.join(local_settings.RAW_DATA_PATH, f) 
+            for f in filenames]
+        
+        filenames = ['pacs/sketch_train.hdf5']
+        train_files2 = [os.path.join(local_settings.RAW_DATA_PATH, f) 
+            for f in filenames]
+
+        filenames = ['pacs/sketch_train.hdf5']
+        train_files3 = [os.path.join(local_settings.RAW_DATA_PATH, f) 
+            for f in filenames]
+
         filenames = ['pacs/art_painting_train.hdf5', 'pacs/sketch_train.hdf5',
                      'pacs/cartoon_train.hdf5']
-        train_files = [os.path.join(local_settings.RAW_DATA_PATH, f) 
+        train_files_complete = [os.path.join(local_settings.RAW_DATA_PATH, f) 
             for f in filenames]
 
         filenames = ['pacs/art_painting_val.hdf5', 'pacs/sketch_val.hdf5',
                      'pacs/cartoon_val.hdf5']
-        validation_files = [os.path.join(local_settings.RAW_DATA_PATH, f) 
+        validation_files_in = [os.path.join(local_settings.RAW_DATA_PATH, f) 
+            for f in filenames]
+
+        filenames = ['pacs/photo_val.hdf5']
+        validation_files_out = [os.path.join(local_settings.RAW_DATA_PATH, f)
             for f in filenames]
 
         filenames = ['pacs/art_painting_test.hdf5', 'pacs/sketch_test.hdf5',
                      'pacs/cartoon_test.hdf5']
         test_files = [os.path.join(local_settings.RAW_DATA_PATH, f)
                       for f in filenames]
-        
-        filenames = ['pacs/photo_val.hdf5']
-        test_files_out = [os.path.join(local_settings.RAW_DATA_PATH, f)
-            for f in filenames]
-
-        filenames = ['pacs/art_painting_val.hdf5', 'pacs/sketch_val.hdf5',
-                     'pacs/cartoon_val.hdf5']
-        test_files_in = [os.path.join(local_settings.RAW_DATA_PATH, f)
-                       for f in filenames]
-
-        filenames = ['pacs/photo_val.hdf5']
-        validation_files_out = [os.path.join(local_settings.RAW_DATA_PATH, f)
-                            for f in filenames]
-
 
         return [tfds.core.SplitGenerator(
-                    name=tfds.Split.TRAIN,
+                    name="train1",
                     num_shards=30,
                     gen_kwargs=dict(
-                        split="train",
-                        files=train_files
+                        split="train1",
+                        files=train_files1
                     )),
+                tfds.core.SplitGenerator(
+                    name="train2",
+                    num_shards=30,
+                    gen_kwargs=dict(
+                        split="train2",
+                        files=train_files2
+                    )),
+                tfds.core.SplitGenerator(
+                    name="train3",
+                    num_shards=30,
+                    gen_kwargs=dict(
+                        split="train3",
+                        files=train_files3
+                    )),                   
+                tfds.core.SplitGenerator(
+                    name=tfds.Split.TRAIN,
+                    num_shards=1,
+                    gen_kwargs=dict(
+                        split="train",
+                        files=train_files_complete
+                )),
+                # tfds.core.SplitGenerator(
+                #     name=tfds.Split.VALIDATION,
+                #     num_shards=10,
+                #     gen_kwargs=dict(
+                #         split="validation",
+                #         files=validation_files
+                #     )),
                 tfds.core.SplitGenerator(
                     name=tfds.Split.TEST,
                     num_shards=1,
@@ -115,34 +145,19 @@ class PACS(tfds.core.GeneratorBasedBuilder):
                         files=test_files
                 )),
                 tfds.core.SplitGenerator(
-                    name=tfds.Split.VALIDATION,
-                    num_shards=10,
-                    gen_kwargs=dict(
-                        split="validation",
-                        files=validation_files
-                    )),
-                tfds.core.SplitGenerator(
-                    name="test_in",
+                    name="val_in",
                     num_shards=30,
                     gen_kwargs=dict(
-                        split="test_in",
-                        files=test_files_in
+                        split="val_in",
+                        files=validation_files_in
                 )),
                 tfds.core.SplitGenerator(
-                    name="test_out",
+                    name="val_out",
                     num_shards=1,
                     gen_kwargs=dict(
-                        split="test_out",
-                        files=test_files_out
-                )),
-                tfds.core.SplitGenerator(
-                    name="validation_out",
-                    num_shards=10,
-                    gen_kwargs=dict(
-                        split="validation_out",
+                        split="val_out",
                         files=validation_files_out
-                )
-                )]
+                ))]
     
 
     def _generate_examples(self, split, files):
