@@ -28,7 +28,7 @@ import experiment_repo as repo
 import util
 import local_settings
 
-DEBUG = False
+DEBUG = True
 
 parser = argparse.ArgumentParser(description='Train my model.')
 parser.add_argument('--config', type=str, 
@@ -341,19 +341,19 @@ def main():
                 summary_directory=os.path.join(manager._directory, "val_in"),
                 global_step=global_step, config=config, training=False)
            
-            if epoch == (config.num_epochs - 1):
-                # full training set
-                train_metr = eval_one_epoch(model=model, dataset=ds_train_complete,
-                    summary_directory=os.path.join(manager._directory, "train"), 
-                    global_step=global_step, config=config, training=False)
-                # full test_out set
-                val_out_metr = eval_one_epoch(model=model, dataset=ds_val_out,
-                    summary_directory=os.path.join(manager._directory, "val_out"),
-                    global_step=global_step, config=config, training=False)
-                # full test_in set
-                val_in_metr = eval_one_epoch(model=model, dataset=ds_val_in,
-                    summary_directory=os.path.join(manager._directory, "val_in"),
-                    global_step=global_step, config=config, training=False)
+            # if epoch == (config.num_epochs - 1):
+            #     # full training set
+            #     train_metr = eval_one_epoch(model=model, dataset=ds_train_complete,
+            #         summary_directory=os.path.join(manager._directory, "train"), 
+            #         global_step=global_step, config=config, training=False)
+            #     # full test_out set
+            #     val_out_metr = eval_one_epoch(model=model, dataset=ds_val_out,
+            #         summary_directory=os.path.join(manager._directory, "val_out"),
+            #         global_step=global_step, config=config, training=False)
+            #     # full test_in set
+            #     val_in_metr = eval_one_epoch(model=model, dataset=ds_val_in,
+            #         summary_directory=os.path.join(manager._directory, "val_in"),
+            #         global_step=global_step, config=config, training=False)
 
 
             manager.save()
