@@ -54,7 +54,7 @@ class generator(tf.keras.Model):
 
     def call(self, inputs, training=None, mask=None):
         X_shortcut = inputs
-        return self.model(inputs, training, mask)*config.lambda + X_shortcut
+        return self.model(inputs, training, mask)*1 + X_shortcut # have to replace 1 with lambda from config
 
     @property
     def input_shape(self):
@@ -87,3 +87,7 @@ class critic(tf.keras.Model):
 
     def call(self, inputs, training=None, mask=None):
         return self.model(inputs, training, mask)
+
+    @property
+    def input_shape(self):
+        return generator.INPUT_SHAPE

@@ -28,7 +28,7 @@ import experiment_repo as repo
 import util
 import local_settings
 
-DEBUG = True
+DEBUG = False
 
 parser = argparse.ArgumentParser(description='Train my model.')
 parser.add_argument('--config', type=str, 
@@ -57,9 +57,15 @@ parser.add_argument('--alpha', type=float, help='weighting factor of classificat
 parser.add_argument('--lambda', type=float, help='weighting factor of generator.')
 
 # loss funtion for classifier
-def loss_fn_classifier(model_classifier, model_generator, features, config, training):
-    inputs = features["image"]
-    label = tf.squeeze(features["label"])
+def loss_fn_classifier(model_classifier, model_generator, features1, features2, config, training):
+    # save features and labels from the two random training domains and concat them
+    inputs1 = features1["image"]
+    label1 = tf.squeeze(features1["label"])
+    inputs2 = features2["image"]
+    label2 = tf.squeeze(features2["label"])
+    inputs = tf.concat([inputs1, inputs2], 0)
+    label = tf.concat([label1, label2], 0)
+    # get generated inputs, labels stay the same
     inputs_generated = model_generator(inputs, training=training)
     label_generated = label
     #inputs_all = tf.concat([inputs, inputs_generated], 0)
@@ -83,78 +89,171 @@ def loss_fn_classifier(model_classifier, model_generator, features, config, trai
         model_classifier_output_generated, from_logits=False)
     mean_classification_loss_generated = tf.reduce_mean(classification_loss_generated)
     # get weighted total loss
+    classification_loss = classification_loss_original + classification_loss_generated
     mean_classification_loss_weighted = (1-config.alpha) * mean_classification_loss_original + \
         config.alpha * mean_classification_loss_generated
     # calculate accuracy 
     accuracy = tf.reduce_mean(
-        tf.where(tf.equal(label_all, tf.argmax(tf.concat([model_classifier_output_original,
-                    model_classifier_output_generated], 0), axis=-1)),
-                    tf.ones_like(label_all, dtype=tf.float32),
-                    tf.zeros_like(label_all, dtype=tf.float32)))
+        tf.where(tf.equal(label, tf.argmax(model_classifier_output_original, axis=-1)),
+                    tf.ones_like(label, dtype=tf.float32),
+                    tf.zeros_like(label, dtype=tf.float32)))
 
     return mean_classification_loss_weighted, l2_regularizer, accuracy, classification_loss
 
 # loss function for generator
-def loss_fn_generator(model_classifier, model_critic, model_generator, features, config, training):
-    inputs = features["image"]
-    label = tf.squeeze(features["label"])
-    label_generated = label
+def loss_fn_generator(model_classifier, model_critic, model_generator, features1, 
+        features2, config, training):
+    inputs1 = features1["image"]
+    label1 = tf.squeeze(features1["label"])
+    inputs2 = features2["image"]
+    label2 = tf.squeeze(features2["label"])
+    label_generated1 = label1
+    label_generated2 = label2
 
-    X_generated = model_generator(inputs, training=training)
-    X_critic_true = model_critic(inputs, training=training)
-    X_critic_generated = model_critic(X_generated, training=training)
+    X_generated1 = model_generator(inputs1, training=training)
+    X_generated2 = model_generator(inputs2, training=training)
+    X_critic_true1 = model_critic(inputs1, training=training)
+    X_critic_true2 = model_critic(inputs2, training=training)
+    X_critic_generated1 = model_critic(X_generated1, training=training)
+    X_critic_generated2 = model_critic(X_generated2, training=training)
 
     # get label predictions
-    model_classifier_output_generated = model_classifier(X_generated, 
+    model_classifier_output_generated1 = model_classifier(X_generated1, 
                                             training=training)
+    model_classifier_output_generated2 = model_classifier(X_generated2, 
+                                            training=training)
+
     # get mean classification loss on generated data
     classification_loss_generated = tf.losses.binary_crossentropy(
-        tf.one_hot(label_generated, axis=-1, depth=config.num_classes),
-        model_classifier_output_generated, from_logits=False)
+        tf.one_hot(tf.concat([label_generated1, label_generated2], 0), axis=-1, depth=config.num_classes),
+        tf.concat([model_classifier_output_generated1, model_classifier_output_generated2], 0), from_logits=False)
     mean_classification_loss_generated = tf.reduce_mean(classification_loss_generated)
 
-    # compute M (cost_matrix)
-    norms_true = tf.norm(X_critic_true,2, axis=1)
-    norms_generated = tf.norm(X_critic_generated,2, axis=1)
+    # compute M1 (cost_matrix)
+    norms_true = tf.norm(X_critic_true1,2, axis=1)
+    norms_generated = tf.norm(X_critic_generated1,2, axis=1)
     matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
-    matrix_critic = tf.tensordot(X_critic_true,X_critic_generated.T, axes=1)
+    matrix_critic = tf.tensordot(X_critic_true1,X_critic_generated1.T, axes=1)
     cost_matrix = 1 - matrix_critic/matrix_norms
     
-    _, sinkhorn_dist_intra = util.compute_optimal_transport(cost_matrix,?,?,?)
-    _, sinkhorn_dist_inter = util.compute_optimal_transport(cost_matrix,?,?,?)
+    # compute sinkhorn distances for M1
+    sinkhorn_dist_intra1 = []
+    for _input1, _input2 in zip(X_critic_true1, X_critic_generated1):
+        _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
+        sinkhorn_dist_intra1.append(sinkhorn_dist)
+
+    # compute M2 (cost_matrix)
+    norms_true = tf.norm(X_critic_true2,2, axis=1)
+    norms_generated = tf.norm(X_critic_generated2,2, axis=1)
+    matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
+    matrix_critic = tf.tensordot(X_critic_true2,X_critic_generated2.T, axes=1)
+    cost_matrix = 1 - matrix_critic/matrix_norms
+    
+    # compute sinkhorn distances for M2
+    sinkhorn_dist_intra2 = []
+    for _input1, _input2 in zip(X_critic_true2, X_critic_generated2):
+        _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
+        sinkhorn_dist_intra2.append(sinkhorn_dist)
+    
+    sinkhorn_dist_intra = np.sum(sinkhorn_dist_intra1)+np.sum(sinkhorn_dist_intra2)
+
+    # compute M3 (cost_matrix)
+    norms_true = tf.norm(X_critic_true2,2, axis=1)
+    norms_generated = tf.norm(X_critic_generated1,2, axis=1)
+    matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
+    matrix_critic = tf.tensordot(X_critic_true2,X_critic_generated1.T, axes=1)
+    cost_matrix = 1 - matrix_critic/matrix_norms
+    
+    # compute sinkhorn distances for M3
+    sinkhorn_dist_inter1 = []
+    for _input1, _input2 in zip(X_critic_true2, X_critic_generated1):
+        _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
+        sinkhorn_dist_inter1.append(sinkhorn_dist)
+    
+    # compute M4 (cost_matrix)
+    norms_true = tf.norm(X_critic_true1,2, axis=1)
+    norms_generated = tf.norm(X_critic_generated2,2, axis=1)
+    matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
+    matrix_critic = tf.tensordot(X_critic_true1,X_critic_generated2.T, axes=1)
+    cost_matrix = 1 - matrix_critic/matrix_norms
+    
+    # compute sinkhorn distances for M4
+    sinkhorn_dist_inter2 = []
+    for _input1, _input2 in zip(X_critic_true1, X_critic_generated2):
+        _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
+        sinkhorn_dist_inter2.append(sinkhorn_dist)
+
+    sinkhorn_dist_inter = np.sum(sinkhorn_dist_inter1)+np.sum(sinkhorn_dist_inter2)
 
     return mean_classification_loss_generated - sinkhorn_dist_intra - sinkhorn_dist_inter
 
 
-
 # loss function for critic
-def loss_fn_critic(model_critic, model_generator, features, config, training):
-    inputs = features["image"]
-    label = tf.squeeze(features["label"])
+def loss_fn_critic(model_critic, model_generator, features1, features2, config, training):
+    inputs1 = features1["image"]
+    label1 = tf.squeeze(features1["label"])
+    inputs2 = features2["image"]
+    label2 = tf.squeeze(features2["label"])
+    label_generated1 = label1
+    label_generated2 = label2
 
-    X_generated = model_generator(inputs, training=training)
-    X_critic_true = model_critic(inputs, training=training)
-    X_critic_generated = model_critic(X_generated, training=training)
+    X_generated1 = model_generator(inputs1, training=training)
+    X_generated2 = model_generator(inputs2, training=training)
+    X_critic_true1 = model_critic(inputs1, training=training)
+    X_critic_true2 = model_critic(inputs2, training=training)
+    X_critic_generated1 = model_critic(X_generated1, training=training)
+    X_critic_generated2 = model_critic(X_generated2, training=training)
 
-    # compute M (cost_matrix)
-    norms_true = tf.norm(X_critic_true,2, axis=1)
-    norms_generated = tf.norm(X_critic_generated,2, axis=1)
+    # compute M1 (cost_matrix)
+    norms_true = tf.norm(X_critic_true1,2, axis=1)
+    norms_generated = tf.norm(X_critic_generated1,2, axis=1)
     matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
-    matrix_critic = tf.tensordot(X_critic_true,X_critic_generated.T, axes=1)
+    matrix_critic = tf.tensordot(X_critic_true1,X_critic_generated1.T, axes=1)
     cost_matrix = 1 - matrix_critic/matrix_norms
     
-    _, sinkhorn_dist_intra = util.compute_optimal_transport(cost_matrix,?,?,?)
-    _, sinkhorn_dist_inter = util.compute_optimal_transport(cost_matrix,?,?,?)
+    # compute sinkhorn distances for M1
+    sinkhorn_dist_intra1 = []
+    for _input1, _input2 in zip(X_critic_true1, X_critic_generated1):
+        _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
+        sinkhorn_dist_intra1.append(sinkhorn_dist)
+
+    # compute M2 (cost_matrix)
+    norms_true = tf.norm(X_critic_true2,2, axis=1)
+    norms_generated = tf.norm(X_critic_generated2,2, axis=1)
+    matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
+    matrix_critic = tf.tensordot(X_critic_true2,X_critic_generated2.T, axes=1)
+    cost_matrix = 1 - matrix_critic/matrix_norms
+    
+    # compute sinkhorn distances for M2
+    sinkhorn_dist_intra2 = []
+    for _input1, _input2 in zip(X_critic_true2, X_critic_generated2):
+        _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
+        sinkhorn_dist_intra2.append(sinkhorn_dist)
+    
+    sinkhorn_dist_intra = np.sum(sinkhorn_dist_intra1)+np.sum(sinkhorn_dist_intra2)
+
+    # compute M3 (cost_matrix)
+    norms_true1 = tf.norm(X_critic_true1,2, axis=1)
+    norms_true2 = tf.norm(X_critic_true2,2, axis=1)
+    matrix_norms = tf.tensordot(norms_true1,norms_true2, axes=0)
+    matrix_critic = tf.tensordot(X_critic_true1, X_critic_true2.T, axes=1)
+    cost_matrix = 1 - matrix_critic/matrix_norms
+    
+    # compute sinkhorn distances for M3
+    sinkhorn_dist_inter = []
+    for _input1, _input2 in zip(X_critic_true1, X_critic_true2):
+        _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
+        sinkhorn_dist_inter.append(sinkhorn_dist)
 
     return sinkhorn_dist_intra + sinkhorn_dist_inter
 
 
-def _train_step(model_classifier, features, optimizer, global_step, config):
+def _train_step(model_classifier, model_generator, features1, features2, optimizer, global_step, config):
     with tf.GradientTape() as tape_src:
         mean_classification_loss_weighted, l2_regularizer, accuracy, _ = loss_fn_classifier(
-            model_classifier, model_generator ,features=features, config=config, training=True)
+            model_classifier, model_generator, features1, features2, config=config, training=True)
 
-        tf.summary.scalar("binary_crossentropy", mean_classification_loss, 
+        tf.summary.scalar("binary_crossentropy", mean_classification_loss_weighted, 
             step=global_step)
         tf.summary.scalar("accuracy", accuracy, step=global_step)
 
@@ -167,21 +266,10 @@ def _train_step(model_classifier, features, optimizer, global_step, config):
         global_step.assign_add(1)
 
 
-# # choose two domains of train_input
-# def predicate(x, allowed_domains=tf.constant(["cartoon", "sketch"])):
-#     domain = x["domain"]
-#     isallowed = tf.equal(allowed_domains, domain)
-#     reduced = tf.reduce_sum(tf.cast(isallowed, tf.float32))
-#     return tf.greater(reduced, tf.constant(0.))
-
-
-def train_one_epoch(model_classifier, train_input, optimizer, global_step, config):
-
-    # train_input = train_input.filter(lambda x: predicate(x))
-    # print(train_input)
-
-    for _input in train_input:
-        _train_step(model, _input, optimizer, global_step, config)
+def train_one_epoch(model_classifier, model_generator, train_input1, train_input2, optimizer, global_step, config):
+    
+    for _input1, _input2 in zip(train_input1, train_input2):
+        _train_step(model_classifier, model_generator, _input1, _input2, optimizer, global_step, config)
 
 
 # compute the mean of all examples for a specific set (eval, validation, out-of-distribution, etc)
@@ -189,11 +277,12 @@ def eval_one_epoch(model_classifier, model_generator, dataset, summary_directory
     classification_loss = tf.metrics.Mean("binary_crossentropy")
     accuracy = tf.metrics.Mean("accuracy")
 
+    dataset1, dataset2 = dataset.shard(2, 0), dataset.shard(2, 1)
     # losses = []
     # accuracies = []
-    for _input in dataset:
+    for _input1, _input2 in zip(dataset1,dataset2):
         _, _, _accuracy, _classification_loss = loss_fn_classifier(model_classifier, model_generator,
-        features=_input, config=config, training=training)
+        features1=_input1, features2=_input2, config=config, training=training)
         # losses.append(_classification_loss.numpy())
         # accuracies.append(_accuracy.numpy())
 
@@ -333,8 +422,8 @@ def main():
 
     # Get model
     model_classifier = get_model(config.name_classifier, config)
-    model_critic = get_model(config.name_critic, config)
     model_generator = get_model(config.name_generator, config)
+    model_critic = get_model(config.name_critic, config)
 
     # Get datasets
     if DEBUG:
@@ -342,37 +431,41 @@ def main():
     else:
         num_batches = None
 
-    ds_train = _get_dataset(config.dataset, model_classifier, config.test_domain,
-        split=tfds.Split.TRAIN, batch_size=config.batch_size, 
+    ds_train_complete = _get_dataset(config.dataset, model_classifier, config.test_domain,
+        split=tfds.Split.TRAIN, batch_size=tf.cast(config.batch_size/2, tf.int64), 
         num_batches=num_batches)
 
-    ds_train_for_eval = _get_dataset(config.dataset, model_classifier, config.test_domain,
-        split=tfds.Split.TRAIN, batch_size=config.batch_size,
+    ds_train1 = _get_dataset(config.dataset, model_classifier, config.test_domain,
+        split="train1", batch_size=tf.cast(config.batch_size/2, tf.int64),
         num_batches=10)
     
-    ds_val = _get_dataset(config.dataset, model_classifier, config.test_domain,
-        split=tfds.Split.VALIDATION, batch_size=config.batch_size, 
+    ds_train2 = _get_dataset(config.dataset, model_classifier, config.test_domain,
+        split="train2", batch_size=tf.cast(config.batch_size/2, tf.int64), 
+        num_batches=num_batches)
+
+    ds_train3 = _get_dataset(config.dataset, model_classifier, config.test_domain,
+        split="train3", batch_size=tf.cast(config.batch_size/2, tf.int64),
+        num_batches=num_batches)
+
+    # ds_val = _get_dataset(config.dataset, model_classifier, config.test_domain,
+    #     split=tfds.Split.VALIDATION, batch_size=config.batch_size, 
+    #     num_batches=num_batches)
+
+    # ds_test = _get_dataset(config.dataset, model_classifier, config.test_domain,
+    #     split=tfds.Split.TEST, batch_size=config.batch_size,
+    #     num_batches=num_batches)
+
+    ds_val_in = _get_dataset(config.dataset, model_classifier, config.test_domain,
+        split="val_in", batch_size=tf.cast(config.batch_size/2, tf.int64),
         num_batches=num_batches)
 
     ds_val_out = _get_dataset(config.dataset, model_classifier, config.test_domain,
-        split="validation_out", batch_size=config.batch_size,
-        num_batches=num_batches)
-
-    ds_test = _get_dataset(config.dataset, model_classifier, config.test_domain,
-        split=tfds.Split.TEST, batch_size=config.batch_size,
-        num_batches=num_batches)
-
-    ds_test_in = _get_dataset(config.dataset, model_classifier, config.test_domain,
-        split="test_in", batch_size=config.batch_size,
-        num_batches=num_batches)
-
-    ds_test_out = _get_dataset(config.dataset, model_classifier, config.test_domain,
-        split="test_out", batch_size=config.batch_size,
+        split="val_out", batch_size=tf.cast(config.batch_size/2, tf.int64),
         num_batches=num_batches)
 
     # TODO: add test set - done
     
-    show_inputs = iter(ds_train)
+    show_inputs = iter(ds_train1)
     _ = model_classifier(next(show_inputs)["image"])
 
     # Set up checkpointing
@@ -391,38 +484,38 @@ def main():
             
             start_time = time.time()
 
-            train_one_epoch(model_classifier=model_classifier, train_input=ds_train, 
-                optimizer=optimizer, global_step=global_step, config=config)
+            random = np.array([0, 1, 2])
+            np.random.shuffle(random)
+            rand_inputs = [ds_train1, ds_train2, ds_train3]
 
-            train_metr = eval_one_epoch(model_classifier=model_classifier, dataset=ds_train_for_eval,
+            train_one_epoch(model_classifier=model_classifier, model_generator= model_generator, train_input1=rand_inputs[random[0]], 
+                train_input2=rand_inputs[random[1]], optimizer=optimizer, global_step=global_step, config=config)
+
+            train_metr = eval_one_epoch(model_classifier=model_classifier, model_generator=model_generator, dataset=ds_train_complete,
                 summary_directory=os.path.join(manager._directory, "train"), 
                 global_step=global_step, config=config, training=False)
             
-            val_metr = eval_one_epoch(model_classifier=model_classifier, dataset=ds_val,
-                summary_directory=os.path.join(manager._directory, "val_rand"), 
+            val_out_metr = eval_one_epoch(model_classifier=model_classifier, model_generator=model_generator, dataset=ds_val_out,
+                summary_directory=os.path.join(manager._directory, "val_out"), 
                 global_step=global_step, config=config, training=False)
 
-            test_out_metr = eval_one_epoch(model_classifier=model_classifier, dataset=ds_test_out,
-                summary_directory=os.path.join(manager._directory, "test_out"),
-                global_step=global_step, config=config, training=False)
-
-            test_in_metr = eval_one_epoch(model_classifier=model_classifier, dataset=ds_test_in,
-                summary_directory=os.path.join(manager._directory, "test_in"),
+            val_in_metr = eval_one_epoch(model_classifier=model_classifier, model_generator=model_generator, dataset=ds_val_in,
+                summary_directory=os.path.join(manager._directory, "val_in"),
                 global_step=global_step, config=config, training=False)
            
-            if epoch == (config.num_epochs - 1):
-                # full training set
-                train_metr = eval_one_epoch(model_classifier=model_classifier, dataset=ds_train,
-                    summary_directory=os.path.join(manager._directory, "train"), 
-                    global_step=global_step, config=config, training=False)
-                # full test_out set
-                test_out_metr = eval_one_epoch(model_classifier=model_classifier, dataset=ds_test_out,
-                    summary_directory=os.path.join(manager._directory, "test_out"),
-                    global_step=global_step, config=config, training=False)
-                # full test_in set
-                test_in_metr = eval_one_epoch(model_classifier=model_classifier, dataset=ds_test_in,
-                    summary_directory=os.path.join(manager._directory, "ds_test_in"),
-                    global_step=global_step, config=config, training=False)
+            # if epoch == (config.num_epochs - 1):
+            #     # full training set
+            #     train_metr = eval_one_epoch(model_classifier=model_classifier, dataset=ds_train_complete,
+            #         summary_directory=os.path.join(manager._directory, "train"), 
+            #         global_step=global_step, config=config, training=False)
+            #     # full test_out set
+            #     test_out_metr = eval_one_epoch(model_classifier=model_classifier, dataset=ds_val_out,
+            #         summary_directory=os.path.join(manager._directory, "val_out"),
+            #         global_step=global_step, config=config, training=False)
+            #     # full test_in set
+            #     test_in_metr = eval_one_epoch(model_classifier=model_classifier, dataset=ds_val_in,
+            #         summary_directory=os.path.join(manager._directory, "val_in"),
+            #         global_step=global_step, config=config, training=False)
 
 
             manager.save()
@@ -432,10 +525,10 @@ def main():
             logging.info("Global step: {}".format(global_step.numpy()))
             logging.info("train_accuracy: {:2f}, train_loss: {:4f}".format(
                 train_metr['accuracy'], train_metr['loss']))
-            logging.info("test_out_accuracy: {:2f}, test_out_loss: {:4f}".format(
-                test_out_metr['accuracy'], test_out_metr['loss']))
-            logging.info("test_in_accuracy: {:2f}, test_in_loss: {:4f}".format(
-                test_in_metr['accuracy'], test_in_metr['loss']))
+            logging.info("val_out_accuracy: {:2f}, val_out_loss: {:4f}".format(
+                val_out_metr['accuracy'], val_out_metr['loss']))
+            logging.info("val_in_accuracy: {:2f}, val_in_loss: {:4f}".format(
+                val_in_metr['accuracy'], val_in_metr['loss']))
            
 
             if epoch == epoch_start:
@@ -444,11 +537,11 @@ def main():
 
     
     # Mark experiment as completed
-    # TODO: add other metrics
+    # TODO: add other metrics - done
     exp_repo.mark_experiment_as_completed(exp_id, 
         train_accuracy=train_metr['accuracy'],
-        test_out_accuracy=test_out_metr['accuracy'],
-        test_in_accuracy=test_in_metr['accuracy'])
+        val_out_accuracy=val_out_metr['accuracy'],
+        val_in_accuracy=val_in_metr['accuracy'])
 
 if __name__ == "__main__":
     main()
