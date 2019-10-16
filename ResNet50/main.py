@@ -28,7 +28,7 @@ import experiment_repo as repo
 import util
 import local_settings
 
-DEBUG = True
+DEBUG = False
 
 parser = argparse.ArgumentParser(description='Train my model.')
 parser.add_argument('--config', type=str, 
@@ -56,9 +56,15 @@ parser.add_argument('--use_dropout', type=int, help='Flag whether to use dropout
 
 
 
-def loss_fn(model, features, config, training):
-    inputs = features["image"]
-    label = tf.squeeze(features["label"])
+def loss_fn(model, features1, features2, config, training):
+    # print(features1["domain"])
+    # print(features2["domain"])
+    inputs1 = features1["image"]
+    label1 = tf.squeeze(features1["label"])
+    inputs2 = features2["image"]
+    label2 = tf.squeeze(features2["label"])
+    inputs = tf.concat([inputs1, inputs2], 0)
+    label = tf.concat([label1, label2], 0)
 
     # L2 regularizers
     l2_regularizer = tf.add_n([tf.nn.l2_loss(v) for v in 
@@ -79,10 +85,10 @@ def loss_fn(model, features, config, training):
     return mean_classification_loss, l2_regularizer, accuracy, classification_loss
 
 
-def _train_step(model, features, optimizer, global_step, config):
+def _train_step(model, features1, features2, optimizer, global_step, config):
     with tf.GradientTape() as tape_src:
         mean_classification_loss, l2_regularizer, accuracy, _ = loss_fn(model, 
-            features=features, config=config, training=True)
+            features1=features1, features2=features2, config=config, training=True)
 
         tf.summary.scalar("binary_crossentropy", mean_classification_loss, 
             step=global_step)
@@ -97,22 +103,10 @@ def _train_step(model, features, optimizer, global_step, config):
         global_step.assign_add(1)
 
 
-# # choose two domains of train_input
-# def predicate(x, allowed_domains=tf.constant(["cartoon", "sketch"])):
-#     domain = x["domain"]
-#     isallowed = tf.equal(allowed_domains, domain)
-#     reduced = tf.reduce_sum(tf.cast(isallowed, tf.float32))
-#     return tf.greater(reduced, tf.constant(0.))
+def train_one_epoch(model, train_input1, train_input2, optimizer, global_step, config):
 
-
-def train_one_epoch(model, train_input, optimizer, global_step, config):
-
-    # train_input = train_input.filter(lambda x: predicate(x))
-    # print(train_input)
-
-    for _input in train_input:
-        print(_input["domain"])
-        _train_step(model, _input, optimizer, global_step, config)
+    for _input1, _input2 in zip(train_input1, train_input2):
+        _train_step(model, _input1, _input2, optimizer, global_step, config)
 
 
 # compute the mean of all examples for a specific set (eval, validation, out-of-distribution, etc)
@@ -120,10 +114,11 @@ def eval_one_epoch(model, dataset, summary_directory, global_step, config, train
     classification_loss = tf.metrics.Mean("binary_crossentropy")
     accuracy = tf.metrics.Mean("accuracy")
 
+    dataset1, dataset2 = dataset.shard(2, 0), dataset.shard(2, 1)
     # losses = []
     # accuracies = []
-    for _input in dataset:
-        _, _, _accuracy, _classification_loss = loss_fn(model, features=_input, 
+    for _input1, _input2 in zip(dataset1,dataset2):
+        _, _, _accuracy, _classification_loss = loss_fn(model, features1=_input1, features2=_input2,
             config=config, training=training)
         # losses.append(_classification_loss.numpy())
         # accuracies.append(_accuracy.numpy())
@@ -272,19 +267,19 @@ def main():
         num_batches = None
 
     ds_train_complete = _get_dataset(config.dataset, model, config.test_domain,
-        split=tfds.Split.TRAIN, batch_size=config.batch_size, 
+        split=tfds.Split.TRAIN, batch_size=tf.cast(config.batch_size/2, tf.int64), 
         num_batches=num_batches)
 
     ds_train1 = _get_dataset(config.dataset, model, config.test_domain,
-        split="train1", batch_size=config.batch_size, 
+        split="train1", batch_size=tf.cast(config.batch_size/2, tf.int64), 
         num_batches=num_batches)
 
     ds_train2 = _get_dataset(config.dataset, model, config.test_domain,
-        split="train2", batch_size=config.batch_size, 
+        split="train2", batch_size=tf.cast(config.batch_size/2, tf.int64), 
         num_batches=num_batches)
 
     ds_train3 = _get_dataset(config.dataset, model, config.test_domain,
-        split="train3", batch_size=config.batch_size, 
+        split="train3", batch_size=tf.cast(config.batch_size/2, tf.int64), 
         num_batches=num_batches)
     
     # ds_val = _get_dataset(config.dataset, model, config.test_domain,
@@ -296,11 +291,11 @@ def main():
     #     num_batches=num_batches)
 
     ds_val_in = _get_dataset(config.dataset, model, config.test_domain,
-        split="val_in", batch_size=config.batch_size,
+        split="val_in", batch_size=tf.cast(config.batch_size/2, tf.int64),
         num_batches=num_batches)
 
     ds_val_out = _get_dataset(config.dataset, model, config.test_domain,
-        split="val_out", batch_size=config.batch_size,
+        split="val_out", batch_size=tf.cast(config.batch_size/2, tf.int64),
         num_batches=num_batches)
 
     # TODO: add test set - done
@@ -327,12 +322,12 @@ def main():
 
             random = np.array([0, 1, 2])
             np.random.shuffle(random)
-            poss_inputs = [ds_train1, ds_train2, ds_train3]
+            rand_inputs = [ds_train1, ds_train2, ds_train3]
             
-            ds_train = poss_inputs[random[0]].concatenate(poss_inputs[random[1]])
+            # ds_train = poss_inputs[random[0]].concatenate(poss_inputs[random[1]])
 
-            train_one_epoch(model=model, train_input=ds_train, 
-                optimizer=optimizer, global_step=global_step, config=config)
+            train_one_epoch(model=model, train_input1=rand_inputs[random[0]], 
+                train_input2=rand_inputs[random[1]],optimizer=optimizer, global_step=global_step, config=config)
 
             train_metr = eval_one_epoch(model=model, dataset=ds_train_complete,
                 summary_directory=os.path.join(manager._directory, "train"), 
