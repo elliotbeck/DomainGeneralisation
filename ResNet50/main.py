@@ -111,6 +111,7 @@ def train_one_epoch(model, train_input, optimizer, global_step, config):
     # print(train_input)
 
     for _input in train_input:
+        print(_input["domain"])
         _train_step(model, _input, optimizer, global_step, config)
 
 
