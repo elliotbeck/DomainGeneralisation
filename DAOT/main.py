@@ -440,7 +440,7 @@ def main():
 
     ds_train1 = _get_dataset(config.dataset, model_classifier, config.test_domain,
         split="train1", batch_size=tf.cast(config.batch_size/2, tf.int64),
-        num_batches=10)
+        num_batches=num_batches)
     
     ds_train2 = _get_dataset(config.dataset, model_classifier, config.test_domain,
         split="train2", batch_size=tf.cast(config.batch_size/2, tf.int64), 
