@@ -39,7 +39,7 @@ def update_config(config, args):
                 config[entry] = eval("args.{}".format(entry))
     return config
 
-def compute_optimal_transport(M, r, c, lam=1, epsilon=1e-8):
+def compute_optimal_transport(M, r, c, lam=10, epsilon=1e-3):
     """
     Computes the optimal transport matrix and Slinkhorn distance using the
     Sinkhorn-Knopp algorithm
@@ -57,13 +57,21 @@ def compute_optimal_transport(M, r, c, lam=1, epsilon=1e-8):
     """
 
 
-    n, m = M.shape
-    P = tf.exp(- lam * M)
-    P /= P.sum()
+    n, m = tf.shape(M)
+    P = tf.math.exp(- lam * M)
+    P /= tf.math.reduce_sum(P)
     u = tf.zeros(n)
     # normalize this matrix
-    while tf.maximum(tf.abs(u - P.sum(1))) > epsilon:
-        u = P.sum(1)
-        P *= (r / u).reshape((-1, 1))
-        P *= (c / P.sum(0)).reshape((1, -1))
-    return P, tf.reduce_sum(P * M)
+    while tf.math.reduce_max(tf.math.abs(u - tf.math.reduce_sum(P, axis=1))) > epsilon:
+        u = tf.math.reduce_sum(P, axis=1)
+        P *= tf.reshape(r/u,[-1, 1])
+        P *= tf.reshape(c/tf.math.reduce_sum(P, axis=0),[1, -1])
+    return P, tf.math.reduce_sum(P * M)
+    
+def compute_cost_matrix(input1, input2):
+        norms_true = tf.norm(input1,2)
+        norms_generated = tf.norm(input2,2)
+        matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
+        matrix_critic = tf.tensordot(input1,input2, axes=0)
+        cost_matrix = 1 - matrix_critic/matrix_norms
+        return cost_matrix

@@ -82,22 +82,21 @@ def loss_fn_classifier(model_classifier, model_generator, features1, features2, 
     classification_loss_original = tf.losses.binary_crossentropy(
         tf.one_hot(label, axis=-1, depth=config.num_classes),
         model_classifier_output_original, from_logits=False)
-    mean_classification_loss_original = tf.reduce_mean(classification_loss_original)
+    mean_classification_loss_original = tf.math.reduce_mean(classification_loss_original)
     # get mean classification loss on generated data
     classification_loss_generated = tf.losses.binary_crossentropy(
         tf.one_hot(label_generated, axis=-1, depth=config.num_classes),
         model_classifier_output_generated, from_logits=False)
-    mean_classification_loss_generated = tf.reduce_mean(classification_loss_generated)
+    mean_classification_loss_generated = tf.math.reduce_mean(classification_loss_generated)
     # get weighted total loss
     classification_loss = classification_loss_original + classification_loss_generated
     mean_classification_loss_weighted = (1-config.alpha) * mean_classification_loss_original + \
         config.alpha * mean_classification_loss_generated
     # calculate accuracy 
-    accuracy = tf.reduce_mean(
+    accuracy = tf.math.reduce_mean(
         tf.where(tf.equal(label, tf.argmax(model_classifier_output_original, axis=-1)),
                     tf.ones_like(label, dtype=tf.float32),
                     tf.zeros_like(label, dtype=tf.float32)))
-
     return mean_classification_loss_weighted, l2_regularizer, accuracy, classification_loss
 
 # loss function for generator
@@ -127,65 +126,49 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
     classification_loss_generated = tf.losses.binary_crossentropy(
         tf.one_hot(tf.concat([label_generated1, label_generated2], 0), axis=-1, depth=config.num_classes),
         tf.concat([model_classifier_output_generated1, model_classifier_output_generated2], 0), from_logits=False)
-    mean_classification_loss_generated = tf.reduce_mean(classification_loss_generated)
-
-    # compute M1 (cost_matrix)
-    norms_true = tf.norm(X_critic_true1,2, axis=1)
-    norms_generated = tf.norm(X_critic_generated1,2, axis=1)
-    matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
-    matrix_critic = tf.tensordot(X_critic_true1,X_critic_generated1.T, axes=1)
-    cost_matrix = 1 - matrix_critic/matrix_norms
+    mean_classification_loss_generated = tf.math.reduce_mean(classification_loss_generated)
     
     # compute sinkhorn distances for M1
     sinkhorn_dist_intra1 = []
     for _input1, _input2 in zip(X_critic_true1, X_critic_generated1):
+        # compute M1 (cost_matrix)
+        cost_matrix = util.compute_cost_matrix(_input1, _input2)
+        # calulate sinkhorn distance
         _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
         sinkhorn_dist_intra1.append(sinkhorn_dist)
-
-    # compute M2 (cost_matrix)
-    norms_true = tf.norm(X_critic_true2,2, axis=1)
-    norms_generated = tf.norm(X_critic_generated2,2, axis=1)
-    matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
-    matrix_critic = tf.tensordot(X_critic_true2,X_critic_generated2.T, axes=1)
-    cost_matrix = 1 - matrix_critic/matrix_norms
     
     # compute sinkhorn distances for M2
     sinkhorn_dist_intra2 = []
     for _input1, _input2 in zip(X_critic_true2, X_critic_generated2):
+        # compute M2 (cost_matrix)
+        cost_matrix = util.compute_cost_matrix(_input1, _input2)
+        # calulate sinkhorn distance
         _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
         sinkhorn_dist_intra2.append(sinkhorn_dist)
     
-    sinkhorn_dist_intra = np.sum(sinkhorn_dist_intra1)+np.sum(sinkhorn_dist_intra2)
-
-    # compute M3 (cost_matrix)
-    norms_true = tf.norm(X_critic_true2,2, axis=1)
-    norms_generated = tf.norm(X_critic_generated1,2, axis=1)
-    matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
-    matrix_critic = tf.tensordot(X_critic_true2,X_critic_generated1.T, axes=1)
-    cost_matrix = 1 - matrix_critic/matrix_norms
+    sinkhorn_dist_intra = tf.math.reduce_sum(sinkhorn_dist_intra1)+tf.math.reduce_sum(sinkhorn_dist_intra2)
     
     # compute sinkhorn distances for M3
     sinkhorn_dist_inter1 = []
     for _input1, _input2 in zip(X_critic_true2, X_critic_generated1):
+        # compute M3 (cost_matrix)
+        cost_matrix = util.compute_cost_matrix(_input1, _input2)
+        # calulate sinkhorn distance
         _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
         sinkhorn_dist_inter1.append(sinkhorn_dist)
-    
-    # compute M4 (cost_matrix)
-    norms_true = tf.norm(X_critic_true1,2, axis=1)
-    norms_generated = tf.norm(X_critic_generated2,2, axis=1)
-    matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
-    matrix_critic = tf.tensordot(X_critic_true1,X_critic_generated2.T, axes=1)
-    cost_matrix = 1 - matrix_critic/matrix_norms
-    
+        
     # compute sinkhorn distances for M4
     sinkhorn_dist_inter2 = []
     for _input1, _input2 in zip(X_critic_true1, X_critic_generated2):
+        # compute M4 (cost_matrix)
+        cost_matrix = util.compute_cost_matrix(_input1, _input2)
+        # calulate sinkhorn distance
         _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
         sinkhorn_dist_inter2.append(sinkhorn_dist)
 
-    sinkhorn_dist_inter = np.sum(sinkhorn_dist_inter1)+np.sum(sinkhorn_dist_inter2)
-
-    return mean_classification_loss_generated - sinkhorn_dist_intra - sinkhorn_dist_inter
+    sinkhorn_dist_inter = tf.math.reduce_sum(sinkhorn_dist_inter1)+tf.math.reduce_sum(sinkhorn_dist_inter2)
+    loss_generator = mean_classification_loss_generated - sinkhorn_dist_intra - sinkhorn_dist_inter
+    return -loss_generator
 
 
 # loss function for critic
@@ -202,54 +185,52 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
     X_critic_true1 = model_critic(inputs1, training=training)
     X_critic_true2 = model_critic(inputs2, training=training)
     X_critic_generated1 = model_critic(X_generated1, training=training)
+    # print(tf.shape(X_critic_generated1))
     X_critic_generated2 = model_critic(X_generated2, training=training)
 
-    # compute M1 (cost_matrix)
-    norms_true = tf.norm(X_critic_true1,2, axis=1)
-    norms_generated = tf.norm(X_critic_generated1,2, axis=1)
-    matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
-    matrix_critic = tf.tensordot(X_critic_true1,X_critic_generated1.T, axes=1)
-    cost_matrix = 1 - matrix_critic/matrix_norms
+    # # compute M1 (cost_matrix)
+    # norms_true = tf.norm(X_critic_true1,2, axis=1)
+    # norms_generated = tf.norm(X_critic_generated1,2, axis=1)
+    # matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
+    # matrix_critic = tf.tensordot(X_critic_true1,tf.transpose(X_critic_generated1), axes=1)
+    # cost_matrix = 1 - matrix_critic/matrix_norms
     
     # compute sinkhorn distances for M1
     sinkhorn_dist_intra1 = []
     for _input1, _input2 in zip(X_critic_true1, X_critic_generated1):
+        # compute M1 (cost_matrix)
+        cost_matrix = util.compute_cost_matrix(_input1, _input2)
+        # calulate sinkhorn distance
         _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
         sinkhorn_dist_intra1.append(sinkhorn_dist)
-
-    # compute M2 (cost_matrix)
-    norms_true = tf.norm(X_critic_true2,2, axis=1)
-    norms_generated = tf.norm(X_critic_generated2,2, axis=1)
-    matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
-    matrix_critic = tf.tensordot(X_critic_true2,X_critic_generated2.T, axes=1)
-    cost_matrix = 1 - matrix_critic/matrix_norms
     
     # compute sinkhorn distances for M2
     sinkhorn_dist_intra2 = []
     for _input1, _input2 in zip(X_critic_true2, X_critic_generated2):
+        # compute M2 (cost_matrix)
+        cost_matrix = util.compute_cost_matrix(_input1, _input2)
+        # calulate sinkhorn distance
         _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
         sinkhorn_dist_intra2.append(sinkhorn_dist)
     
-    sinkhorn_dist_intra = np.sum(sinkhorn_dist_intra1)+np.sum(sinkhorn_dist_intra2)
-
-    # compute M3 (cost_matrix)
-    norms_true1 = tf.norm(X_critic_true1,2, axis=1)
-    norms_true2 = tf.norm(X_critic_true2,2, axis=1)
-    matrix_norms = tf.tensordot(norms_true1,norms_true2, axes=0)
-    matrix_critic = tf.tensordot(X_critic_true1, X_critic_true2.T, axes=1)
-    cost_matrix = 1 - matrix_critic/matrix_norms
-    
+    sinkhorn_dist_intra = tf.math.reduce_sum(sinkhorn_dist_intra1)+tf.math.reduce_sum(sinkhorn_dist_intra2)
+   
     # compute sinkhorn distances for M3
     sinkhorn_dist_inter = []
     for _input1, _input2 in zip(X_critic_true1, X_critic_true2):
+        # compute M3 (cost_matrix)
+        cost_matrix = util.compute_cost_matrix(_input1, _input2)
+        # calulate sinkhorn distance
         _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
         sinkhorn_dist_inter.append(sinkhorn_dist)
+    loss_critic = sinkhorn_dist_intra - tf.math.reduce_sum(sinkhorn_dist_inter)
+    return loss_critic
 
-    return sinkhorn_dist_intra + sinkhorn_dist_inter
 
-
-def _train_step(model_classifier, model_generator, features1, features2, optimizer, global_step, config):
+def _train_step(model_classifier, model_generator, model_critic, features1, features2, 
+                optimizer1, optimizer2, optimizer3, global_step, config):
     with tf.GradientTape() as tape_src:
+        # get loss of classifier
         mean_classification_loss_weighted, l2_regularizer, accuracy, _ = loss_fn_classifier(
             model_classifier, model_generator, features1, features2, config=config, training=True)
 
@@ -259,17 +240,37 @@ def _train_step(model_classifier, model_generator, features1, features2, optimiz
 
         total_loss = mean_classification_loss_weighted + \
             config.l2_penalty_weight*l2_regularizer
-
+        
+        # update weights of classifier
         grads = tape_src.gradient(total_loss, model_classifier.trainable_variables)
-        optimizer.apply_gradients(zip(grads, model_classifier.trainable_variables))
+        optimizer1.apply_gradients(zip(grads, model_classifier.trainable_variables))
+
+    with tf.GradientTape() as tape_src:
+        # get loss of critic
+        loss_critic = loss_fn_critic(model_critic, model_generator, features1, features2, config, training=True)
+
+        # update weights of critic
+        grads = tape_src.gradient(loss_critic, model_critic.trainable_variables)
+        optimizer2.apply_gradients(zip(grads, model_critic.trainable_variables))
+
+    with tf.GradientTape() as tape_src:
+        # get loss of generator 
+        loss_generator = loss_fn_generator(model_classifier, model_critic, model_generator, features1, 
+            features2, config, training=True)
+
+        # update weights of generator
+        grads = tape_src.gradient(loss_generator, model_generator.trainable_variables)
+        optimizer3.apply_gradients(zip(grads, model_generator.trainable_variables))
 
         global_step.assign_add(1)
 
 
-def train_one_epoch(model_classifier, model_generator, train_input1, train_input2, optimizer, global_step, config):
+def train_one_epoch(model_classifier, model_generator, model_critic, train_input1, train_input2,
+                    optimizer1, optimizer2, optimizer3, global_step, config):
     
     for _input1, _input2 in zip(train_input1, train_input2):
-        _train_step(model_classifier, model_generator, _input1, _input2, optimizer, global_step, config)
+        _train_step(model_classifier, model_generator, model_critic, _input1, _input2, optimizer1,
+        optimizer2, optimizer3, global_step, config)
 
 
 # compute the mean of all examples for a specific set (eval, validation, out-of-distribution, etc)
@@ -406,8 +407,10 @@ def main():
     learning_rate = tf.keras.optimizers.schedules.ExponentialDecay(
         config.learning_rate, config.decay_every, 
         config.decay_base, staircase=True)
-    optimizer = tf.keras.optimizers.Adam(learning_rate)
-    
+    optimizer1 = tf.keras.optimizers.Adam(learning_rate)
+    optimizer2 = tf.keras.optimizers.Adam(learning_rate)
+    optimizer3 = tf.keras.optimizers.Adam(learning_rate)
+
     if args.reload_ckpt != "None":
         # TODO: fix this hack
         epoch_start = int(sorted([f for f in os.listdir(checkpoint_dir) 
@@ -488,8 +491,10 @@ def main():
             np.random.shuffle(random)
             rand_inputs = [ds_train1, ds_train2, ds_train3]
 
-            train_one_epoch(model_classifier=model_classifier, model_generator= model_generator, train_input1=rand_inputs[random[0]], 
-                train_input2=rand_inputs[random[1]], optimizer=optimizer, global_step=global_step, config=config)
+            train_one_epoch(model_classifier=model_classifier, model_generator= model_generator, 
+                model_critic = model_critic, train_input1=rand_inputs[random[0]], 
+                train_input2=rand_inputs[random[1]], optimizer1=optimizer1, optimizer2=optimizer2,
+                optimizer3=optimizer3, global_step=global_step, config=config)
 
             train_metr = eval_one_epoch(model_classifier=model_classifier, model_generator=model_generator, dataset=ds_train_complete,
                 summary_directory=os.path.join(manager._directory, "train"), 
