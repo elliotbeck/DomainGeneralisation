@@ -6,15 +6,15 @@
     
     "local_json_dir_name": "tmp",
     
-    "learning_rate": 1e-4,
+    "learning_rate": 1e-5,
     "decay_every": 5000,
     "decay_base": 0.96,
     "batch_size": 16,
-    "num_epochs": 5,
+    "num_epochs": 2,
     "alpha": 0.5,
 
     
-    "l2_penalty_weight": 1e-3,
+    "l2_penalty_weight": 1e-5,
     
     "eval_every_n_epochs": 5,
     "save_summary_steps": 500,

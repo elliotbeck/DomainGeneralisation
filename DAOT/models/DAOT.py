@@ -16,13 +16,13 @@ class ResNet50(tf.keras.Model):
                                                         weights=resnet_weights, input_shape=in_shape),
             tf.keras.layers.GlobalAveragePooling2D(),
             tf.keras.layers.Flatten(),
-            #tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(128, activation='relu'),
-            #tf.keras.layers.Dropout(0.5),
-            #tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.Dropout(0.5),
+            tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(64, activation='relu'),
-            #tf.keras.layers.Dropout(0.5),
-            #tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.Dropout(0.5),
+            tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(num_classes, activation='softmax')
         ])
         self.model.build([None] + self.input_shape + [3])  # Batch input shape.
@@ -46,15 +46,15 @@ class generator(tf.keras.Model):
 
         self.model = tf.keras.Sequential([
             tf.keras.layers.Conv2D(kernel_size=(1), filters=3 ,strides=(1), input_shape=in_shape, padding="same",
-                                        activation="relu"),
+                                        kernel_initializer=tf.keras.initializers.TruncatedNormal(mean=0.0, stddev=0.0001), activation="relu"),
             tf.keras.layers.Conv2D(kernel_size=(1), filters=3,strides=(1), padding="same",
-                                        activation="tanh")
+                                        kernel_initializer=tf.keras.initializers.TruncatedNormal(mean=0.0, stddev=0.0001), activation="tanh")
         ])
         self.model.build([None] + self.input_shape + [3])  # Batch input shape.
 
     def call(self, inputs, training=None, mask=None):
         X_shortcut = inputs
-        return self.model(inputs, training, mask)*1 + X_shortcut # have to replace 1 with lambda from config
+        return tf.math.add(self.model(inputs, training, mask), X_shortcut) # have to replace 1 with lambda from config
 
     @property
     def input_shape(self):
@@ -90,4 +90,4 @@ class critic(tf.keras.Model):
 
     @property
     def input_shape(self):
-        return generator.INPUT_SHAPE
+        return critic.INPUT_SHAPE

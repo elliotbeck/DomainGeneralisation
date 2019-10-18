@@ -68,6 +68,7 @@ def compute_optimal_transport(M, r, c, lam=10, epsilon=1e-3):
         P *= tf.reshape(c/tf.math.reduce_sum(P, axis=0),[1, -1])
     return P, tf.math.reduce_sum(P * M)
     
+    
 def compute_cost_matrix(input1, input2):
         norms_true = tf.norm(input1,2)
         norms_generated = tf.norm(input2,2)

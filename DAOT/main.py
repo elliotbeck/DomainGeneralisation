@@ -28,7 +28,7 @@ import experiment_repo as repo
 import util
 import local_settings
 
-DEBUG = False
+DEBUG = True
 
 parser = argparse.ArgumentParser(description='Train my model.')
 parser.add_argument('--config', type=str, 
@@ -66,7 +66,7 @@ def loss_fn_classifier(model_classifier, model_generator, features1, features2, 
     inputs = tf.concat([inputs1, inputs2], 0)
     label = tf.concat([label1, label2], 0)
     # get generated inputs, labels stay the same
-    inputs_generated = model_generator(inputs, training=training)
+    inputs_generated = model_generator(inputs, training=False)
     label_generated = label
     #inputs_all = tf.concat([inputs, inputs_generated], 0)
     label_all = tf.concat([label, label_generated], 0)
@@ -111,16 +111,16 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
 
     X_generated1 = model_generator(inputs1, training=training)
     X_generated2 = model_generator(inputs2, training=training)
-    X_critic_true1 = model_critic(inputs1, training=training)
+    X_critic_true1 = model_critic(inputs1, training=False)
     X_critic_true2 = model_critic(inputs2, training=training)
-    X_critic_generated1 = model_critic(X_generated1, training=training)
-    X_critic_generated2 = model_critic(X_generated2, training=training)
+    X_critic_generated1 = model_critic(X_generated1, training=False)
+    X_critic_generated2 = model_critic(X_generated2, training=False)
 
     # get label predictions
     model_classifier_output_generated1 = model_classifier(X_generated1, 
-                                            training=training)
+                                            training=False)
     model_classifier_output_generated2 = model_classifier(X_generated2, 
-                                            training=training)
+                                            training=False)
 
     # get mean classification loss on generated data
     classification_loss_generated = tf.losses.binary_crossentropy(
@@ -136,7 +136,6 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
         # calulate sinkhorn distance
         _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
         sinkhorn_dist_intra1.append(sinkhorn_dist)
-    
     # compute sinkhorn distances for M2
     sinkhorn_dist_intra2 = []
     for _input1, _input2 in zip(X_critic_true2, X_critic_generated2):
@@ -147,7 +146,6 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
         sinkhorn_dist_intra2.append(sinkhorn_dist)
     
     sinkhorn_dist_intra = tf.math.reduce_sum(sinkhorn_dist_intra1)+tf.math.reduce_sum(sinkhorn_dist_intra2)
-    
     # compute sinkhorn distances for M3
     sinkhorn_dist_inter1 = []
     for _input1, _input2 in zip(X_critic_true2, X_critic_generated1):
@@ -180,8 +178,8 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
     label_generated1 = label1
     label_generated2 = label2
 
-    X_generated1 = model_generator(inputs1, training=training)
-    X_generated2 = model_generator(inputs2, training=training)
+    X_generated1 = model_generator(inputs1, training=False)
+    X_generated2 = model_generator(inputs2, training=False)
     X_critic_true1 = model_critic(inputs1, training=training)
     X_critic_true2 = model_critic(inputs2, training=training)
     X_critic_generated1 = model_critic(X_generated1, training=training)
@@ -203,7 +201,6 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
         # calulate sinkhorn distance
         _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
         sinkhorn_dist_intra1.append(sinkhorn_dist)
-    
     # compute sinkhorn distances for M2
     sinkhorn_dist_intra2 = []
     for _input1, _input2 in zip(X_critic_true2, X_critic_generated2):
@@ -214,7 +211,6 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
         sinkhorn_dist_intra2.append(sinkhorn_dist)
     
     sinkhorn_dist_intra = tf.math.reduce_sum(sinkhorn_dist_intra1)+tf.math.reduce_sum(sinkhorn_dist_intra2)
-   
     # compute sinkhorn distances for M3
     sinkhorn_dist_inter = []
     for _input1, _input2 in zip(X_critic_true1, X_critic_true2):
