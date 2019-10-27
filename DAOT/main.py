@@ -8,6 +8,7 @@ import os
 from random import shuffle
 import matplotlib
 import sklearn
+import itertools
 
 #matplotlib.use('tkAgg')
 import matplotlib.pyplot as plt
@@ -28,7 +29,7 @@ import experiment_repo as repo
 import util
 import local_settings
 
-DEBUG = True
+DEBUG = False
 
 parser = argparse.ArgumentParser(description='Train my model.')
 parser.add_argument('--config', type=str, 
@@ -112,7 +113,7 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
     X_generated1 = model_generator(inputs1, training=training)
     X_generated2 = model_generator(inputs2, training=training)
     X_critic_true1 = model_critic(inputs1, training=False)
-    X_critic_true2 = model_critic(inputs2, training=training)
+    X_critic_true2 = model_critic(inputs2, training=False)
     X_critic_generated1 = model_critic(X_generated1, training=False)
     X_critic_generated2 = model_critic(X_generated2, training=False)
 
@@ -129,8 +130,9 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
     mean_classification_loss_generated = tf.math.reduce_mean(classification_loss_generated)
     
     # compute sinkhorn distances for M1
+    # in case computational complexity doesn't matter replace zip with itertools.product
     sinkhorn_dist_intra1 = []
-    for _input1, _input2 in zip(X_critic_true1, X_critic_generated1):
+    for _input1, _input2 in itertools.product(X_critic_true1, X_critic_generated1):
         # compute M1 (cost_matrix)
         cost_matrix = util.compute_cost_matrix(_input1, _input2)
         # calulate sinkhorn distance
@@ -138,7 +140,7 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
         sinkhorn_dist_intra1.append(sinkhorn_dist)
     # compute sinkhorn distances for M2
     sinkhorn_dist_intra2 = []
-    for _input1, _input2 in zip(X_critic_true2, X_critic_generated2):
+    for _input1, _input2 in itertools.product(X_critic_true2, X_critic_generated2):
         # compute M2 (cost_matrix)
         cost_matrix = util.compute_cost_matrix(_input1, _input2)
         # calulate sinkhorn distance
@@ -148,7 +150,7 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
     sinkhorn_dist_intra = tf.math.reduce_sum(sinkhorn_dist_intra1)+tf.math.reduce_sum(sinkhorn_dist_intra2)
     # compute sinkhorn distances for M3
     sinkhorn_dist_inter1 = []
-    for _input1, _input2 in zip(X_critic_true2, X_critic_generated1):
+    for _input1, _input2 in itertools.product(X_critic_true2, X_critic_generated1):
         # compute M3 (cost_matrix)
         cost_matrix = util.compute_cost_matrix(_input1, _input2)
         # calulate sinkhorn distance
@@ -157,7 +159,7 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
         
     # compute sinkhorn distances for M4
     sinkhorn_dist_inter2 = []
-    for _input1, _input2 in zip(X_critic_true1, X_critic_generated2):
+    for _input1, _input2 in itertools.product(X_critic_true1, X_critic_generated2):
         # compute M4 (cost_matrix)
         cost_matrix = util.compute_cost_matrix(_input1, _input2)
         # calulate sinkhorn distance
@@ -179,11 +181,12 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
     label_generated2 = label2
 
     X_generated1 = model_generator(inputs1, training=False)
+    #plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/fake1.png', X_generated1[0])
+    #plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original1.png', inputs1[0])
     X_generated2 = model_generator(inputs2, training=False)
     X_critic_true1 = model_critic(inputs1, training=training)
     X_critic_true2 = model_critic(inputs2, training=training)
     X_critic_generated1 = model_critic(X_generated1, training=training)
-    # print(tf.shape(X_critic_generated1))
     X_critic_generated2 = model_critic(X_generated2, training=training)
 
     # # compute M1 (cost_matrix)
@@ -195,7 +198,7 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
     
     # compute sinkhorn distances for M1
     sinkhorn_dist_intra1 = []
-    for _input1, _input2 in zip(X_critic_true1, X_critic_generated1):
+    for _input1, _input2 in itertools.product(X_critic_true1, X_critic_generated1):
         # compute M1 (cost_matrix)
         cost_matrix = util.compute_cost_matrix(_input1, _input2)
         # calulate sinkhorn distance
@@ -203,7 +206,7 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
         sinkhorn_dist_intra1.append(sinkhorn_dist)
     # compute sinkhorn distances for M2
     sinkhorn_dist_intra2 = []
-    for _input1, _input2 in zip(X_critic_true2, X_critic_generated2):
+    for _input1, _input2 in itertools.product(X_critic_true2, X_critic_generated2):
         # compute M2 (cost_matrix)
         cost_matrix = util.compute_cost_matrix(_input1, _input2)
         # calulate sinkhorn distance
@@ -213,7 +216,7 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
     sinkhorn_dist_intra = tf.math.reduce_sum(sinkhorn_dist_intra1)+tf.math.reduce_sum(sinkhorn_dist_intra2)
     # compute sinkhorn distances for M3
     sinkhorn_dist_inter = []
-    for _input1, _input2 in zip(X_critic_true1, X_critic_true2):
+    for _input1, _input2 in itertools.product(X_critic_true1, X_critic_true2):
         # compute M3 (cost_matrix)
         cost_matrix = util.compute_cost_matrix(_input1, _input2)
         # calulate sinkhorn distance

@@ -20,9 +20,9 @@ class ResNet50(tf.keras.Model):
             tf.keras.layers.Dense(128, activation='relu'),
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(64, activation='relu'),
-            tf.keras.layers.Dropout(0.5),
-            tf.keras.layers.BatchNormalization(),
+            #tf.keras.layers.Dense(64, activation='relu'),
+            #tf.keras.layers.Dropout(0.5),
+            #tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(num_classes, activation='softmax')
         ])
         self.model.build([None] + self.input_shape + [3])  # Batch input shape.
@@ -46,7 +46,8 @@ class generator(tf.keras.Model):
 
         self.model = tf.keras.Sequential([
             tf.keras.layers.Conv2D(kernel_size=(1), filters=3 ,strides=(1), input_shape=in_shape, padding="same",
-                                        kernel_initializer=tf.keras.initializers.TruncatedNormal(mean=0.0, stddev=0.0001), activation="relu"),
+                                        kernel_initializer=tf.keras.initializers.TruncatedNormal(mean=0.0, stddev=0.0001), 
+                                        activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
             tf.keras.layers.Conv2D(kernel_size=(1), filters=3,strides=(1), padding="same",
                                         kernel_initializer=tf.keras.initializers.TruncatedNormal(mean=0.0, stddev=0.0001), activation="tanh")
         ])
@@ -74,8 +75,8 @@ class critic(tf.keras.Model):
                                                         weights=resnet_weights, input_shape=in_shape),
             tf.keras.layers.GlobalAveragePooling2D(),
             tf.keras.layers.Flatten(),
-            #tf.keras.layers.BatchNormalization(),
-            #tf.keras.layers.Dense(128, activation='relu'),
+            tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.Dense(128, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
             #tf.keras.layers.Dropout(0.5),
             #tf.keras.layers.BatchNormalization(),
             #tf.keras.layers.Dense(64, activation='relu'),
