@@ -17,13 +17,13 @@ class ResNet50(tf.keras.Model):
             tf.keras.layers.Flatten(),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(2028, activation=tf.keras.layers.LeakyReLU(alpha=0.2)),
-            tf.keras.layers.Dropout(0.3),
+            tf.keras.layers.Dropout(0.1),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(1028, activation=tf.keras.layers.LeakyReLU(alpha=0.2)),
-            tf.keras.layers.Dropout(0.3),
+            tf.keras.layers.Dense(2028, activation=tf.keras.layers.LeakyReLU(alpha=0.2)),
+            tf.keras.layers.Dropout(0.1),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(64, activation=tf.keras.layers.LeakyReLU(alpha=0.2)),
-            tf.keras.layers.Dropout(0.3),
+            tf.keras.layers.Dropout(0.1),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(num_classes, activation='softmax')
         ])
