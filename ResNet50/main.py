@@ -28,7 +28,6 @@ import experiment_repo as repo
 import util
 import local_settings
 
-#test
 DEBUG = False
 
 parser = argparse.ArgumentParser(description='Train my model.')
