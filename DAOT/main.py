@@ -30,6 +30,7 @@ import util
 import local_settings
 
 DEBUG = False
+#test
 
 parser = argparse.ArgumentParser(description='Train my model.')
 parser.add_argument('--config', type=str, 
