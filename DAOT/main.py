@@ -407,9 +407,9 @@ def main():
     learning_rate = tf.keras.optimizers.schedules.ExponentialDecay(
         config.learning_rate, config.decay_every, 
         config.decay_base, staircase=True)
-    optimizer1 = tf.keras.optimizers.Adam(learning_rate)
-    optimizer2 = tf.keras.optimizers.Adam(learning_rate)
-    optimizer3 = tf.keras.optimizers.Adam(learning_rate)
+    optimizer1 = tf.keras.optimizers.RMSprop(learning_rate)
+    optimizer2 = tf.keras.optimizers.RMSprop(learning_rate)
+    optimizer3 = tf.keras.optimizers.RMSprop(learning_rate)
 
     if args.reload_ckpt != "None":
         # TODO: fix this hack
