@@ -145,6 +145,7 @@ def _preprocess_exampe(model, example, dataset_name):
         size=(model.input_shape[0], model.input_shape[1]))
     example["label"] = example["attributes"]["label"]
     example["domain"] = example["attributes"]["domain"]
+    example["label"] = tf.subtract(example["label"],1)
     return example
 
 
