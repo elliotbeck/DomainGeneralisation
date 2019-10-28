@@ -119,7 +119,7 @@ def eval_one_epoch(model, dataset, summary_directory, global_step, config, train
     # accuracies = []
     for _input1, _input2 in zip(dataset1,dataset2):
         _, _, _accuracy, _classification_loss = loss_fn(model, features1=_input1, features2=_input2,
-            config=config, training=training)
+            config=config, training=False)
         # losses.append(_classification_loss.numpy())
         # accuracies.append(_accuracy.numpy())
 
@@ -243,7 +243,7 @@ def main():
     learning_rate = tf.keras.optimizers.schedules.ExponentialDecay(
         config.learning_rate, config.decay_every, 
         config.decay_base, staircase=True)
-    optimizer = tf.keras.optimizers.Adam(learning_rate)
+    optimizer = tf.keras.optimizers.RMSprop(learning_rate)
     
     if args.reload_ckpt != "None":
         # TODO: fix this hack

@@ -308,6 +308,7 @@ def _preprocess_exampe(model_classifier, example, dataset_name):
         size=(model_classifier.input_shape[0], model_classifier.input_shape[1]))
     example["label"] = example["attributes"]["label"]
     example["domain"] = example["attributes"]["domain"]
+    example["label"] = tf.subtract(example["label"],1)
     return example
 
 
