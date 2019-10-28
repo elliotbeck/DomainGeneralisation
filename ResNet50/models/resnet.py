@@ -10,20 +10,16 @@ class ResNet50(tf.keras.Model):
 
         in_shape = self.input_shape + [3]
 
-        self.model = tf.keras.Sequential([
-            tf.compat.v1.keras.applications.ResNet50(include_top=False,
-                                                        weights=resnet_weights, input_shape=in_shape),
-            tf.keras.layers.GlobalAveragePooling2D(),
+        self.model = tf.keras.models.Sequential([
+            tf.keras.applications.resnet50.ResNet50(include_top=False,
+                                                    weights= resnet_weights, input_shape=in_shape),
             tf.keras.layers.Flatten(),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(2028, activation=tf.keras.layers.LeakyReLU(alpha=0.2)),
-            tf.keras.layers.Dropout(0.1),
+            tf.keras.layers.Dense(128, activation='relu'),
+            tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(2028, activation=tf.keras.layers.LeakyReLU(alpha=0.2)),
-            tf.keras.layers.Dropout(0.1),
-            tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(64, activation=tf.keras.layers.LeakyReLU(alpha=0.2)),
-            tf.keras.layers.Dropout(0.1),
+            tf.keras.layers.Dense(64, activation='relu'),
+            tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(num_classes, activation='softmax')
         ])
