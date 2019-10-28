@@ -73,7 +73,6 @@ class critic(tf.keras.Model):
         self.model = tf.keras.Sequential([
             tf.compat.v1.keras.applications.ResNet50(include_top=False,
                                                         weights=resnet_weights, input_shape=in_shape),
-            tf.keras.layers.GlobalAveragePooling2D(),
             tf.keras.layers.Flatten(),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(128, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
