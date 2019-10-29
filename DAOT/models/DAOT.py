@@ -80,7 +80,7 @@ class critic(tf.keras.Model):
             tf.keras.layers.Dense(128, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(64, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
+            tf.keras.layers.Dense(64, activation=tf.keras.layers.LeakyReLU(alpha=0.1))
             #tf.keras.layers.Dropout(0.5),
             #tf.keras.layers.BatchNormalization(),
             #tf.keras.layers.Dense(34, activation='relu')
