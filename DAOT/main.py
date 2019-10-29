@@ -67,7 +67,7 @@ def loss_fn_classifier(model_classifier, model_generator, features1, features2, 
     inputs = tf.concat([inputs1, inputs2], 0)
     label = tf.concat([label1, label2], 0)
     # get generated inputs, labels stay the same
-    inputs_generated = model_generator(inputs, training=False)
+    inputs_generated = model_generator(inputs, training=training)
     label_generated = label
     #inputs_all = tf.concat([inputs, inputs_generated], 0)
     label_all = tf.concat([label, label_generated], 0)
@@ -112,16 +112,16 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
 
     X_generated1 = model_generator(inputs1, training=training)
     X_generated2 = model_generator(inputs2, training=training)
-    X_critic_true1 = model_critic(inputs1, training=False)
-    X_critic_true2 = model_critic(inputs2, training=False)
-    X_critic_generated1 = model_critic(X_generated1, training=False)
-    X_critic_generated2 = model_critic(X_generated2, training=False)
+    X_critic_true1 = model_critic(inputs1, training=training)
+    X_critic_true2 = model_critic(inputs2, training=training)
+    X_critic_generated1 = model_critic(X_generated1, training=training)
+    X_critic_generated2 = model_critic(X_generated2, training=training)
 
     # get label predictions
     model_classifier_output_generated1 = model_classifier(X_generated1, 
-                                            training=False)
+                                            training=training)
     model_classifier_output_generated2 = model_classifier(X_generated2, 
-                                            training=False)
+                                            training=training)
 
     # get mean classification loss on generated data
     classification_loss_generated = tf.losses.binary_crossentropy(
@@ -180,10 +180,10 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
     label_generated1 = label1
     label_generated2 = label2
 
-    X_generated1 = model_generator(inputs1, training=False)
+    X_generated1 = model_generator(inputs1, training=training)
     #plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/fake1.png', X_generated1[0])
     #plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original1.png', inputs1[0])
-    X_generated2 = model_generator(inputs2, training=False)
+    X_generated2 = model_generator(inputs2, training=training)
     X_critic_true1 = model_critic(inputs1, training=training)
     X_critic_true2 = model_critic(inputs2, training=training)
     X_critic_generated1 = model_critic(X_generated1, training=training)

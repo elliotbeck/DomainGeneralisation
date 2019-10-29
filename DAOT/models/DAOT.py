@@ -50,17 +50,23 @@ class generator(tf.keras.Model):
         in_shape = self.input_shape + [3]
 
         self.model = tf.keras.Sequential([
+            tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Conv2D(kernel_size=(1), filters=3 ,strides=(1), input_shape=in_shape, padding="same",
                                         kernel_initializer=tf.keras.initializers.TruncatedNormal(mean=0.0, stddev=0.0001), 
                                         activation='relu'),
+            tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Conv2D(kernel_size=(1), filters=3,strides=(1), padding="same", 
-                                        kernel_initializer=tf.keras.initializers.TruncatedNormal(mean=0.0, stddev=0.0001), activation="tanh")
+                                        kernel_initializer=tf.keras.initializers.TruncatedNormal(mean=0.0, stddev=0.0001), 
+                                        activation='relu')
         ])
         self.model.build([None] + self.input_shape + [3])  # Batch input shape.
 
     def call(self, inputs, training=None, mask=None):
         X_shortcut = inputs
-        return tf.math.add(self.model(inputs, training, mask), X_shortcut) # have to replace 1 with lambda from config
+        output = tf.keras.layers.add([self.model(inputs, training, mask), X_shortcut])
+        output = tf.keras.activations.tanh(output)
+        return output
+        #return tf.math.add(self.model(inputs, training, mask), X_shortcut) # have to replace 1 with lambda from config
 
     @property
     def input_shape(self):
