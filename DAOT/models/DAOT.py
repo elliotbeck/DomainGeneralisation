@@ -22,9 +22,9 @@ class ResNet50(tf.keras.Model):
             tf.keras.layers.Dense(64, activation='relu'),
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(34, activation='relu'),
-            tf.keras.layers.Dropout(0.5),
-            tf.keras.layers.BatchNormalization(),
+            #tf.keras.layers.Dense(34, activation='relu'),
+            #tf.keras.layers.Dropout(0.5),
+            #tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(num_classes, activation='softmax')
         ])
         self.model.build([None] + self.input_shape + [3])  # Batch input shape.
@@ -81,9 +81,9 @@ class critic(tf.keras.Model):
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(64, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
-            tf.keras.layers.Dropout(0.5),
-            tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(34, activation='relu')
+            #tf.keras.layers.Dropout(0.5),
+            #tf.keras.layers.BatchNormalization(),
+            #tf.keras.layers.Dense(34, activation='relu')
             #tf.keras.layers.Dense(num_classes, activation='softmax')
         ])
         self.model.build([None] + self.input_shape + [3])  # Batch input shape.
