@@ -96,8 +96,8 @@ def loss_fn_classifier(model_classifier, model_generator, features1, features2, 
     # calculate accuracy 
     accuracy = tf.math.reduce_mean(
         tf.where(tf.equal(label, tf.argmax(model_classifier_output_original, axis=-1)),
-                    tf.ones_like(label, dtype=tf.float32),
-                    tf.zeros_like(label, dtype=tf.float32)))
+                    tf.ones_like(label, dtype=tf.float64),
+                    tf.zeros_like(label, dtype=tf.float64)))
     return mean_classification_loss_weighted, l2_regularizer, accuracy, classification_loss
 
 # loss function for generator
@@ -309,7 +309,7 @@ def eval_one_epoch(model_classifier, model_generator, dataset, summary_directory
 
 
 def _preprocess_exampe(model_classifier, example, dataset_name):
-    example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
+    example["image"] = tf.cast(example["image"], dtype=tf.float64)/255.
     example["image"] = tf.image.resize(example["image"], 
         size=(model_classifier.input_shape[0], model_classifier.input_shape[1]))
     example["label"] = example["attributes"]["label"]
