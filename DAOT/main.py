@@ -147,7 +147,7 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
         _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
         sinkhorn_dist_intra2.append(sinkhorn_dist)
     
-    sinkhorn_dist_intra = tf.math.reduce_sum(sinkhorn_dist_intra1)+tf.math.reduce_sum(sinkhorn_dist_intra2)
+    sinkhorn_dist_intra = tf.math.reduce_mean(sinkhorn_dist_intra1) + tf.math.reduce_mean(sinkhorn_dist_intra2)
     # compute sinkhorn distances for M3
     sinkhorn_dist_inter1 = []
     for _input1, _input2 in itertools.product(X_critic_true2, X_critic_generated1):
@@ -166,7 +166,8 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
         _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
         sinkhorn_dist_inter2.append(sinkhorn_dist)
 
-    sinkhorn_dist_inter = tf.math.reduce_sum(sinkhorn_dist_inter1)+tf.math.reduce_sum(sinkhorn_dist_inter2)
+    sinkhorn_dist_inter = tf.math.reduce_mean(sinkhorn_dist_inter1) + tf.math.reduce_mean(sinkhorn_dist_inter2)
+
     loss_generator = mean_classification_loss_generated - sinkhorn_dist_intra - sinkhorn_dist_inter
     return -loss_generator
 
@@ -217,7 +218,7 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
         _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
         sinkhorn_dist_intra2.append(sinkhorn_dist)
     
-    sinkhorn_dist_intra = tf.math.reduce_sum(sinkhorn_dist_intra1)+tf.math.reduce_sum(sinkhorn_dist_intra2)
+    sinkhorn_dist_intra = tf.math.reduce_mean(sinkhorn_dist_intra1) + tf.math.reduce_mean(sinkhorn_dist_intra2)
     # compute sinkhorn distances for M3
     sinkhorn_dist_inter = []
     for _input1, _input2 in itertools.product(X_critic_true1, X_critic_true2):
@@ -226,7 +227,8 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
         # calulate sinkhorn distance
         _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
         sinkhorn_dist_inter.append(sinkhorn_dist)
-    loss_critic = sinkhorn_dist_intra - tf.math.reduce_sum(sinkhorn_dist_inter)
+
+    loss_critic = sinkhorn_dist_intra - tf.math.reduce_mean(sinkhorn_dist_inter)
     return loss_critic
 
 
