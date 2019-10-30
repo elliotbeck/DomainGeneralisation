@@ -60,7 +60,9 @@ class generator(tf.keras.Model):
         X_shortcut = inputs
         output = tf.keras.layers.add([self.model(inputs, training, mask), X_shortcut])
         output = tf.keras.activations.tanh(output)
+        print(output)
         return output
+    
         #return tf.math.add(self.model(inputs, training, mask), X_shortcut) # have to replace 1 with lambda from config
 
     @property

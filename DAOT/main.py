@@ -265,7 +265,6 @@ def _train_step(model_classifier, model_generator, model_critic, features1, feat
             features2, config, training=True)
 
         # update weights of generator
-        import pdb; pdb.set_trace()
         grads = tape_src.gradient(loss_generator, model_generator.trainable_variables)
         optimizer3.apply_gradients(zip(grads, model_generator.trainable_variables))
 
