@@ -265,6 +265,7 @@ def _train_step(model_classifier, model_generator, model_critic, features1, feat
             features2, config, training=True)
 
         # update weights of generator
+        import pdb; pdb.set_trace()
         grads = tape_src.gradient(loss_generator, model_generator.trainable_variables)
         optimizer3.apply_gradients(zip(grads, model_generator.trainable_variables))
 
@@ -273,8 +274,6 @@ def _train_step(model_classifier, model_generator, model_critic, features1, feat
 
 def train_one_epoch(model_classifier, model_generator, model_critic, train_input1, train_input2,
                     optimizer1, optimizer2, optimizer3, global_step, config):
-                    
-    import pdb; pdb.set_trace()
 
     for _input1, _input2 in zip(train_input1, train_input2):
         _train_step(model_classifier, model_generator, model_critic, _input1, _input2, optimizer1,
