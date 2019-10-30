@@ -60,6 +60,7 @@ class generator(tf.keras.Model):
 
     def call(self, inputs, training=None, mask=None):
         X_shortcut = inputs
+        print(self.model(inputs, training, mask))
         output = tf.keras.layers.add([self.model(inputs, training, mask), X_shortcut])
         #output = tf.keras.activations.tanh(output)
         return output
