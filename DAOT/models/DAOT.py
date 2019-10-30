@@ -49,11 +49,11 @@ class generator(tf.keras.Model):
         self.model = tf.keras.Sequential([
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Conv2D(kernel_size=(1), filters=3 ,strides=(1), input_shape=in_shape, padding="same",
-                                        kernel_initializer=tf.keras.initializers.GlorotNormal(shape=(224,224,3)), 
+                                        kernel_initializer=tf.keras.initializers.GlorotNormal((224,224,3)), 
                                         activation='relu'),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Conv2D(kernel_size=(1), filters=3,strides=(1), padding="same", 
-                                        kernel_initializer=tf.keras.initializers.GlorotNormal(shape=(224,224,3)), 
+                                        kernel_initializer=tf.keras.initializers.GlorotNormal((224,224,3)), 
                                         activation='tanh')
         ])
         self.model.build([None] + self.input_shape + [3])  # Batch input shape.
