@@ -86,13 +86,13 @@ class critic(tf.keras.Model):
                                                         weights=resnet_weights, input_shape=in_shape),
             tf.keras.layers.Flatten(),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(1028, activation=tf.keras.layers.advanced_activations.LeakyReLU(alpha=0.3)),
+            tf.keras.layers.Dense(1028, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(1028, activation=tf.keras.layers.advanced_activations.LeakyReLU(alpha=0.3)),
+            tf.keras.layers.Dense(1028, activation=tf.keras.layers.LeakyReLU(alpha=0.1)),
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(34, activation=tf.keras.layers.advanced_activations.LeakyReLU(alpha=0.3))
+            tf.keras.layers.Dense(34, activation=tf.keras.layers.LeakyReLU(alpha=0.1))
             #tf.keras.layers.Dropout(0.5),
             #tf.keras.layers.BatchNormalization(),
             #tf.keras.layers.Dense(34, activation='relu')
