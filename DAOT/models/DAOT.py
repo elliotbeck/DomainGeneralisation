@@ -25,9 +25,6 @@ class ResNet50(tf.keras.Model):
             tf.keras.layers.Dense(34, activation='relu'),
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
-            #tf.keras.layers.Dense(34, activation='relu'),
-            #tf.keras.layers.Dropout(0.5),
-            #tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(num_classes, activation='softmax')
         ])
         self.model.build([None] + self.input_shape + [3])  # Batch input shape.
@@ -63,6 +60,7 @@ class generator(tf.keras.Model):
 
     def call(self, inputs, training=None, mask=None):
         X_shortcut = inputs
+        print(self.model(inputs, training, mask))
         output = tf.keras.layers.add([self.model(inputs, training, mask), X_shortcut])
         output = tf.keras.activations.tanh(output)
         return output
