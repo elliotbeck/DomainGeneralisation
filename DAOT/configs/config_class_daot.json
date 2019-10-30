@@ -1,4 +1,4 @@
-{
+5{
     "seed": 64,
     
     "dataset": "pacs",
@@ -6,7 +6,7 @@
     
     "local_json_dir_name": "tmp",
     
-    "learning_rate": 1e-12,
+    "learning_rate": 1e-15,
     "decay_every": 2000,
     "decay_base": 0.96,
     "batch_size": 8,
