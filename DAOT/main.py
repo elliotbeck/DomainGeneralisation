@@ -57,6 +57,7 @@ parser.add_argument('--use_dropout', type=int, help='Flag whether to use dropout
 parser.add_argument('--alpha', type=float, help='weighting factor of classification loss.')
 parser.add_argument('--lambda', type=float, help='weighting factor of generator.')
 
+
 # loss funtion for classifier
 def loss_fn_classifier(model_classifier, model_generator, features1, features2, config, training):
     # save features and labels from the two random training domains and concat them
@@ -272,7 +273,9 @@ def _train_step(model_classifier, model_generator, model_critic, features1, feat
 
 def train_one_epoch(model_classifier, model_generator, model_critic, train_input1, train_input2,
                     optimizer1, optimizer2, optimizer3, global_step, config):
-    
+                    
+    import pdb; pdb.set_trace()
+
     for _input1, _input2 in zip(train_input1, train_input2):
         _train_step(model_classifier, model_generator, model_critic, _input1, _input2, optimizer1,
         optimizer2, optimizer3, global_step, config)
