@@ -39,7 +39,7 @@ def update_config(config, args):
                 config[entry] = eval("args.{}".format(entry))
     return config
 
-def compute_optimal_transport(M, r, c, lam=1, epsilon=1e-3):
+def compute_optimal_transport(M, r, c, lam=1, epsilon=1e-1):
     """
     Computes the optimal transport matrix and Slinkhorn distance using the
     Sinkhorn-Knopp algorithm
