@@ -76,5 +76,4 @@ def compute_cost_matrix(input1, input2):
         matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
         matrix_critic = tf.tensordot(input1,input2, axes=0)
         cost_matrix = 1 - matrix_critic/matrix_norms
-        print(cost_matrix)
         return cost_matrix

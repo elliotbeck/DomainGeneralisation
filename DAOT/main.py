@@ -189,7 +189,7 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
     #plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/peturbation.png', X_generated1[0]-inputs1[0])
     X_generated2 = model_generator(inputs2, training=training)
     X_critic_true1 = model_critic(inputs1, training=training)
-    #print(X_critic_true1[0])
+    print(X_critic_true1[0])
     X_critic_true2 = model_critic(inputs2, training=training)
     X_critic_generated1 = model_critic(X_generated1, training=training)    
     #print(X_critic_generated1[0])
