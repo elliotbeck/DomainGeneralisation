@@ -39,7 +39,7 @@ def update_config(config, args):
                 config[entry] = eval("args.{}".format(entry))
     return config
 
-def compute_optimal_transport(M, r, c, lam=10, epsilon=1e-3):
+def compute_optimal_transport(M, r, c, lam=10, epsilon=1e-2):
     """
     Computes the optimal transport matrix and Slinkhorn distance using the
     Sinkhorn-Knopp algorithm
@@ -76,5 +76,5 @@ def compute_cost_matrix(input1, input2):
         matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
         matrix_critic = tf.tensordot(input1,input2, axes=0)
         cost_matrix = 1 - matrix_critic/matrix_norms
-        print(cost_matrix)
+        #print(cost_matrix)
         return cost_matrix
