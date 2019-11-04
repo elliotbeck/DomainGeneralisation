@@ -39,7 +39,7 @@ def update_config(config, args):
                 config[entry] = eval("args.{}".format(entry))
     return config
 
-def compute_optimal_transport(M, r, c, lam=10, epsilon=1e-1):
+def compute_optimal_transport(M, r, c, lam=1, epsilon=1e-1):
     """
     Computes the optimal transport matrix and Slinkhorn distance using the
     Sinkhorn-Knopp algorithm
@@ -65,7 +65,7 @@ def compute_optimal_transport(M, r, c, lam=10, epsilon=1e-1):
     while tf.math.reduce_max(tf.math.abs(u - tf.math.reduce_sum(P, axis=1))) > epsilon:
         u = tf.math.reduce_sum(P, axis=1)
         P *= tf.reshape(r/u,[-1, 1])
-        print(P)
+        #print(P)
         P *= tf.reshape(c/tf.math.reduce_sum(P, axis=0),[1, -1])
     return P, tf.math.reduce_sum(P * M)
     
