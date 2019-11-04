@@ -67,6 +67,7 @@ def compute_optimal_transport(M, r, c, lam=1, epsilon=1e-1):
         P *= tf.reshape(r/u,[-1, 1])
         #print(P)
         P *= tf.reshape(c/tf.math.reduce_sum(P, axis=0),[1, -1])
+    print(P)
     return P, tf.math.reduce_sum(P * M)
     
     
