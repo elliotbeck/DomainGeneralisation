@@ -14,7 +14,7 @@
     "alpha": 0.5,
 
     
-    "l2_penalty_weight": 1e-5,
+    "l2_penalty_weight": 1e-8,
     
     "eval_every_n_epochs": 5,
     "save_summary_steps": 500,
