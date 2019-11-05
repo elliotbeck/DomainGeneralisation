@@ -26,8 +26,24 @@ flags.DEFINE_string(name="tfds_path", default=None, help="")
 
 flags = flags.FLAGS
 
-VALIDATION_SPLIT = ["photo"]
-holdout_domain_path = ["pacs/photo_train.hdf5", "pacs/photo_val.hdf5"]
+with open('DAOT/configs/config_class_resnet.json', 'r') as myfile:
+    data=myfile.read()
+config_dic = json.loads(data)
+
+if config_dic["test_domain"] == ["photo"]:
+    VALIDATION_SPLIT = ["photo"]
+    holdout_domain_path = ["pacs/photo_train.hdf5", "pacs/photo_val.hdf5"]
+elif config_dic["test_domain"] == ["sketch"]:
+    VALIDATION_SPLIT = ["sketch"]
+    holdout_domain_path = ["pacs/sketch_train.hdf5", "pacs/sketch_val.hdf5"]
+elif config_dic["test_domain"] == ["cartoon"]:
+    VALIDATION_SPLIT = ["cartoon"]
+    holdout_domain_path = ["pacs/cartoon_train.hdf5", "pacs/cartoon_val.hdf5"]
+elif config_dic["test_domain"] == ["art_painting"]:
+    VALIDATION_SPLIT = ["art_painting"]
+    holdout_domain_path = ["pacs/art_painting_train.hdf5", "pacs/art_painting_val.hdf5"]
+else:
+    print("Invalid Selection") 
 
 
 
