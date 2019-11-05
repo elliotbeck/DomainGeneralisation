@@ -2,7 +2,7 @@
     "seed": 64,
     
     "dataset": "pacs",
-    "test_domain": ["sketch"], 
+    "test_domain": ["photo"], 
     
     "local_json_dir_name": "tmp",
     
