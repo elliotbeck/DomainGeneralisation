@@ -26,7 +26,7 @@ flags.DEFINE_string(name="tfds_path", default=None, help="")
 
 flags = flags.FLAGS
 
-with open('DAOT/configs/config_class_resnet.json', 'r') as myfile:
+with open('ResNet50/configs/config_class_resnet.json', 'r') as myfile:
     data=myfile.read()
 config_dic = json.loads(data)
 
