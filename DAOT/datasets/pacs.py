@@ -27,7 +27,6 @@ flags = flags.FLAGS
 
 with open('configs/config_class_daot.json', 'r') as myfile:
     data=myfile.read()
-
 config_dic = json.loads(data)
 
 if config_dic["test_domain"] == ["photo"]:
