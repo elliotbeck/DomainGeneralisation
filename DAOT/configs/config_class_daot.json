@@ -6,7 +6,7 @@
     
     "local_json_dir_name": "tmp",
     
-    "learning_rate": 1e-3,
+    "learning_rate": 1e-6,
     "decay_every": 500,
     "decay_base": 0.92,
     "batch_size": 16,
