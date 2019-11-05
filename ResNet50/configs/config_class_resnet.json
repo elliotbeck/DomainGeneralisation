@@ -3,7 +3,6 @@
     
     "dataset": "pacs",
     "test_domain": ["sketch"], 
-    "test_domain_path": ["pacs/photo_train.hdf5"],
     
     "local_json_dir_name": "tmp",
     
