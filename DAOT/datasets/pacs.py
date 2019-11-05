@@ -25,7 +25,7 @@ flags.DEFINE_string(name="tfds_path", default=None, help="")
 
 flags = flags.FLAGS
 
-with open('/cluster/home/ebeck/DomainGeneralisation/DAOT/configs/config_class_daot.json', 'r') as myfile:
+with open('DAOT/configs/config_class_daot.json', 'r') as myfile:
     data=myfile.read()
 config_dic = json.loads(data)
 
@@ -56,7 +56,7 @@ class PACSConfig(tfds.core.BuilderConfig):
         super(PACSConfig, self).__init__(
             name="{}".format("_".join(self.validation_split)),
             description="pacs dataset",
-            version="0.1.11",
+            version="0.1.1",
             **kwargs)
 
 
