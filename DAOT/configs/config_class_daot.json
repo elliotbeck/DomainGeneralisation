@@ -2,7 +2,7 @@
     "seed": 64,
     
     "dataset": "pacs",
-    "test_domain": ["sketch"], 
+    "test_domain": ["photo"], 
     
     "local_json_dir_name": "tmp",
     
@@ -10,7 +10,7 @@
     "decay_every": 500,
     "decay_base": 0.85,
     "batch_size": 16,
-    "num_epochs": 20,
+    "num_epochs": 2,
     "alpha": 0.5,
 
     

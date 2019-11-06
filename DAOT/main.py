@@ -29,7 +29,10 @@ import experiment_repo as repo
 import util
 import local_settings
 
-DEBUG = False
+import warnings
+warnings.filterwarnings("ignore", category=FutureWarning)
+
+DEBUG = True
 
 parser = argparse.ArgumentParser(description='Train my model.')
 parser.add_argument('--config', type=str, 
