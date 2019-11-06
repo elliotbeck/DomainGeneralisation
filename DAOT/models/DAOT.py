@@ -1,5 +1,10 @@
 import tensorflow as tf
 import util
+import json
+
+with open('DAOT/configs/config_class_daot.json', 'r') as myfile:
+    data=myfile.read()
+config_dic2 = json.loads(data)
 
 
 class ResNet50(tf.keras.Model):
@@ -58,7 +63,7 @@ class generator(tf.keras.Model):
 
     def call(self, inputs, training=None, mask=None):
         X_shortcut = inputs
-        output = tf.keras.layers.add([self.model(inputs, training, mask), X_shortcut])
+        output = tf.keras.layers.add([config_dic2["lambd"]*self.model(inputs, training, mask), X_shortcut])
         #output = tf.keras.activations.tanh(output)
         return output
     
