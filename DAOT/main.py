@@ -29,7 +29,7 @@ import experiment_repo as repo
 import util
 import local_settings
 
-DEBUG = False
+DEBUG = True
 
 parser = argparse.ArgumentParser(description='Train my model.')
 parser.add_argument('--config', type=str, 
@@ -469,6 +469,9 @@ def main():
     ds_val_out = _get_dataset(config.dataset, model_classifier, config.test_domain,
         split="val_out", batch_size=tf.cast(config.batch_size/2, tf.int64),
         num_batches=num_batches)
+    tf.print(tf.shape(ds_train_complete))
+    tf.print(tf.shape(ds_val_out))
+    tf.print(tf.shape(ds_val_in))
 
     # TODO: add test set - done
     

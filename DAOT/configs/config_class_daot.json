@@ -10,7 +10,7 @@
     "decay_every": 500,
     "decay_base": 0.85,
     "batch_size": 16,
-    "num_epochs": 30,
+    "num_epochs": 1,
     "alpha": 0.5,
     "lambd": 0.10,
     
