@@ -75,8 +75,7 @@ class ExperimentRepo:
                           'creation_time': creation_time,
                           'completed': False,
                           'train_accuracy': -1.0,
-                          'val_out_accuracy': -1.0,
-                          'val_in_accuracy': -1.0,
+                          'val_accuracy': -1.0,
                           }
         self.experiments[new_id] = new_experiment
         if name != '':
@@ -98,12 +97,10 @@ class ExperimentRepo:
         return new_id
 
     def mark_experiment_as_completed(self, experiment_id, 
-        train_accuracy, val_out_accuracy, val_in_accuracy):
+        train_accuracy, val_accuracy):
         assert experiment_id in self.experiments
         cur_exp = self.experiments[experiment_id]
         cur_exp['train_accuracy'] = float(train_accuracy)
-        cur_exp['val_out_accuracy'] = float(val_out_accuracy)
-        cur_exp['val_in_accuracy'] = float(val_in_accuracy)
-        
+        cur_exp['val_accuracy'] = float(val_accuracy)
         cur_exp['completed'] = True
         self.store_experiment_metadata_local()

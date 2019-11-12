@@ -136,7 +136,7 @@ def _preprocess_exampe(model, example, dataset_name):
     example["label"] = example["attributes"]["label"]
     return example
 
-def _get_dataset(dataset_name, model, validation_split, split, batch_size, 
+def _get_dataset(dataset_name, model, split, batch_size, 
     num_batches=None):
 
     dataset, info = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
@@ -249,18 +249,17 @@ def main():
     else:
         num_batches = None
 
-    ds_train = _get_dataset(config.dataset, model, config.test_domain,
-        split=tfds.Split.TRAIN, batch_size=config.batch_size, 
+    ds_train = _get_dataset(config.dataset, model,
+        split=tfds.Split.TRAIN.subsplit(tfds.percent[:67]), batch_size=config.batch_size, 
         num_batches=num_batches)
     
-    ds_val_in = _get_dataset(config.dataset, model, config.test_domain,
-        split=tfds.Split.VALIDATION, batch_size=config.batch_size, 
+    ds_val = _get_dataset(config.dataset, model,
+        split=tfds.Split.TRAIN.subsplit(tfds.percent[-33:]), batch_size=config.batch_size, 
         num_batches=num_batches)
-
-    ds_val_out = _get_dataset(config.dataset, model, config.test_domain,
-        split="validation_out", batch_size=config.batch_size,
+    
+    ds_test = _get_dataset(config.dataset, model,
+        split=tfds.Split.TEST, batch_size=config.batch_size, 
         num_batches=num_batches)
-
 
     # TODO: add test set - done
     
@@ -290,12 +289,8 @@ def main():
                 summary_directory=os.path.join(manager._directory, "train"), 
                 global_step=global_step, config=config, training=False)
             
-            val_in_metr = eval_one_epoch(model=model, dataset=ds_val_in,
-                summary_directory=os.path.join(manager._directory, "val_in"), 
-                global_step=global_step, config=config, training=False)
-
-            val_out_metr = eval_one_epoch(model=model, dataset=ds_val_out,
-                summary_directory=os.path.join(manager._directory, "val_out"),
+            val_metr = eval_one_epoch(model=model, dataset=ds_val,
+                summary_directory=os.path.join(manager._directory, "val"), 
                 global_step=global_step, config=config, training=False)
 
            
@@ -304,14 +299,11 @@ def main():
                 train_metr = eval_one_epoch(model=model, dataset=ds_train,
                     summary_directory=os.path.join(manager._directory, "train"), 
                     global_step=global_step, config=config, training=False)
-                # full test_out set
-                val_in_metr = eval_one_epoch(model=model, dataset=ds_val_in,
-                    summary_directory=os.path.join(manager._directory, "val_in"),
-                    global_step=global_step, config=config, training=False)
                 # full test_in set
-                val_out_metr = eval_one_epoch(model=model, dataset=ds_val_out,
-                    summary_directory=os.path.join(manager._directory, "val_out"),
+                val_metr = eval_one_epoch(model=model, dataset=ds_val,
+                    summary_directory=os.path.join(manager._directory, "val"),
                     global_step=global_step, config=config, training=False)
+
 
 
             manager.save()
@@ -321,11 +313,8 @@ def main():
             logging.info("Global step: {}".format(global_step.numpy()))
             logging.info("train_accuracy: {:2f}, train_loss: {:4f}".format(
                 train_metr['accuracy'], train_metr['loss']))
-            logging.info("val_in_accuracy: {:2f}, val_in_loss: {:4f}".format(
-                val_in_metr['accuracy'], val_in_metr['loss']))
-            logging.info("val_out_accuracy: {:2f}, val_out_loss: {:4f}".format(
-                val_out_metr['accuracy'], val_out_metr['loss']))
-           
+            logging.info("val_accuracy: {:2f}, val_loss: {:4f}".format(
+                val_metr['accuracy'], val_metr['loss']))
 
             if epoch == epoch_start:
                 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -336,8 +325,7 @@ def main():
     # TODO: add other metrics
     exp_repo.mark_experiment_as_completed(exp_id, 
         train_accuracy=train_metr['accuracy'],
-        val_out_accuracy=val_out_metr['accuracy'],
-        val_in_accuracy=val_in_metr['accuracy'])
+        val_accuracy=val_metr['accuracy'])
 
 if __name__ == "__main__":
     main()
