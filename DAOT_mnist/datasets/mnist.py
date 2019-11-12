@@ -56,7 +56,7 @@ class MNIST(tfds.core.GeneratorBasedBuilder):
   SUPPORTED_VERSIONS = [
       tfds.core.Version("3.0.0", "S3: www.tensorflow.org/datasets/splits"),
   ]
-
+  SKIP_REGISTERING = True
   def _info(self):
     return tfds.core.DatasetInfo(
         builder=self,
