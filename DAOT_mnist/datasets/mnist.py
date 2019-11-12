@@ -1,10 +1,14 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
 import os
+
 import numpy as np
 from six.moves import urllib
 import tensorflow as tf
 
 import tensorflow_datasets.public_api as tfds
-
 
 
 # MNIST constants
@@ -29,6 +33,19 @@ _MNIST_CITATION = """\
   year={2010}
 }
 """
+
+class MNISTConfig(tfds.core.BuilderConfig):
+    def __init__(self, version=None, **kwargs):
+
+      super(MNISTConfig, self).__init__(
+        version=tfds.core.Version(
+            version, experiments={tfds.core.Experiment.S3: False}),
+        supported_versions=[
+            tfds.core.Version(
+                "1.0.0",
+                "New split API (https://tensorflow.org/datasets/splits)"),
+        ],
+        **kwargs)
 
 class MNIST(tfds.core.GeneratorBasedBuilder):
   """MNIST."""
@@ -100,9 +117,9 @@ class MNIST(tfds.core.GeneratorBasedBuilder):
     data = list(zip(images, labels))
 
     # Using index as key since data is always loaded in same order.
-    for index, (image, label) in enumerate(data):
-      record = {"image": image, "label": label}
-      yield index, record
+    for image, label in enumerate(data):
+      example = {"image": image, "label": label}
+      yield example
 
 def _extract_mnist_images(image_filepath, num_images):
   with tf.io.gfile.GFile(image_filepath, "rb") as f:

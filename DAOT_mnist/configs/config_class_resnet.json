@@ -1,7 +1,7 @@
 {
     "seed": 64,
     
-    "dataset": "pacs",
+    "dataset": "mnist",
     "test_domain": ["photo"], 
     
     "local_json_dir_name": "tmp",
@@ -19,7 +19,7 @@
     "save_checkpoints_secs": 600,
     "log_step_count_steps": 500,
 
-    "num_classes": 7,
+    "num_classes": 10,
     "name": "ResNet50",
     "resnet_weights": "imagenet",
 
