@@ -30,7 +30,7 @@ import experiment_repo as repo
 import util
 import local_settings
 
-DEBUG = False
+DEBUG = True
 random.seed(DAOT.config_seed)
 
 parser = argparse.ArgumentParser(description='Train my model.')
