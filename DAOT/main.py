@@ -5,6 +5,7 @@ import json
 import pickle
 import math
 import os
+import random
 from random import shuffle
 import matplotlib
 import sklearn
@@ -14,7 +15,7 @@ import itertools
 import matplotlib.pyplot as plt
 import tensorflow_datasets as tfds
 
-from models import get_model
+from models import get_model, DAOT
 from util import copy_source
 
 plt.interactive(False)
@@ -30,6 +31,7 @@ import util
 import local_settings
 
 DEBUG = False
+random.seed(DAOT.config_seed)
 
 parser = argparse.ArgumentParser(description='Train my model.')
 parser.add_argument('--config', type=str, 
@@ -469,21 +471,6 @@ def main():
     ds_val_out = _get_dataset(config.dataset, model_classifier, config.test_domain,
         split="val_out", batch_size=tf.cast(config.batch_size/2, tf.int64),
         num_batches=num_batches)
-
-    num_elements = 0
-    for element in ds_train_complete:
-        num_elements += 1
-    print(num_elements)
-
-    num_elements = 0
-    for element in ds_val_out:
-        num_elements += 1
-    print(num_elements)
-
-    num_elements = 0
-    for element in ds_val_in:
-        num_elements += 1
-    print(num_elements)
 
     # TODO: add test set - done
     

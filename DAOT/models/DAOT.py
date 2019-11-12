@@ -5,6 +5,7 @@ import json
 with open('DAOT/configs/config_class_daot.json', 'r') as myfile:
     data=myfile.read()
 config_dic2 = json.loads(data)
+config_seed = config_dic2["seed"]
 
 
 class ResNet50(tf.keras.Model):

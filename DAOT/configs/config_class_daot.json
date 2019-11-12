@@ -1,5 +1,5 @@
 {
-    "seed": 64,
+    "seed": 1,
     
     "dataset": "pacs",
     "test_domain": ["photo"], 
@@ -10,7 +10,7 @@
     "decay_every": 500,
     "decay_base": 0.85,
     "batch_size": 16,
-    "num_epochs": 1,
+    "num_epochs": 30,
     "alpha": 0.5,
     "lambd": 0.10,
     
