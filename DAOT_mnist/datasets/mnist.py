@@ -34,18 +34,6 @@ _MNIST_CITATION = """\
 }
 """
 
-class MNISTConfig(tfds.core.BuilderConfig):
-    def __init__(self, version=None, **kwargs):
-
-      super(MNISTConfig, self).__init__(
-        version=tfds.core.Version(
-            version, experiments={tfds.core.Experiment.S3: False}),
-        supported_versions=[
-            tfds.core.Version(
-                "1.0.0",
-                "New split API (https://tensorflow.org/datasets/splits)"),
-        ],
-        **kwargs)
 
 class MNIST(tfds.core.GeneratorBasedBuilder):
   """MNIST."""
@@ -56,7 +44,7 @@ class MNIST(tfds.core.GeneratorBasedBuilder):
   SUPPORTED_VERSIONS = [
       tfds.core.Version("3.0.0", "S3: www.tensorflow.org/datasets/splits"),
   ]
-  SKIP_REGISTERING = True
+
   def _info(self):
     return tfds.core.DatasetInfo(
         builder=self,
