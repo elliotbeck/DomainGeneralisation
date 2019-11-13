@@ -8,7 +8,7 @@ class ResNet50(tf.keras.Model):
         super().__init__(*args, **kwargs)
         self.config = config
 
-        in_shape = self.input_shape + [3]
+        in_shape = self.input_shape + [1]
 
         self.model = tf.keras.models.Sequential([
             tf.keras.layers.Dense(128, activation='relu'),
@@ -22,7 +22,7 @@ class ResNet50(tf.keras.Model):
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(num_classes, activation='softmax')
         ])
-        self.model.build([None] + self.input_shape) + [3] # Batch input shape.
+        self.model.build([None] + self.input_shape) + [1] # Batch input shape.
 
     def call(self, inputs, training=None, mask=None):
         return self.model(inputs, training, mask)
