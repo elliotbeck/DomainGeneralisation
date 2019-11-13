@@ -261,11 +261,6 @@ def main():
         split=tfds.Split.TEST, batch_size=config.batch_size, 
         num_batches=num_batches)
 
-    # TODO: add test set - done
-    
-    show_inputs = iter(ds_train)
-    _ = model(next(show_inputs)["image"])
-
     # Set up checkpointing
     if args.reload_ckpt != "None":
         ckpt = tf.train.Checkpoint(model=model, global_step=global_step)
