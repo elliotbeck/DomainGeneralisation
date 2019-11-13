@@ -22,7 +22,7 @@ from absl import flags, app, logging
 import tensorflow as tf
 import numpy as np
 import time
-from datasets import mnist2
+#from datasets import mnist2
 import experiment_repo as repo
 
 import util
