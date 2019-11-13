@@ -35,7 +35,7 @@ _MNIST_CITATION = """\
 """
 
 
-class MNIST2(tfds.core.GeneratorBasedBuilder):
+class MNISTA(tfds.core.GeneratorBasedBuilder):
   """MNIST."""
   URL = _MNIST_URL
 

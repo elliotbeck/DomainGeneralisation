@@ -1,7 +1,7 @@
 {
     "seed": 64,
     
-    "dataset": "mnist2",
+    "dataset": "mnista",
     "test_domain": ["photo"], 
     
     "local_json_dir_name": "tmp",
