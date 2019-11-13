@@ -56,6 +56,7 @@ parser.add_argument('--use_dropout', type=int, help='Flag whether to use dropout
 
 def loss_fn(model, features, config, training):
     inputs = features["image"]
+    inputs = tf.cast(inputs, tf.float32)
     label = tf.squeeze(features["label"])
 
     # L2 regularizers
