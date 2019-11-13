@@ -140,7 +140,7 @@ def _preprocess_exampe(model, example, dataset_name):
 def _get_dataset(dataset_name, model, split, batch_size, 
     num_batches=None):
 
-    dataset, info = tfds.load(dataset_name, data_dir=local_settings.RAW_DATA_PATH, 
+    dataset, info = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
         split=split, with_info=True)
     #dataset = dataset.map(lambda x: _preprocess_exampe(model, x, dataset_name))
     dataset = dataset.shuffle(512)
