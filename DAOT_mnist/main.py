@@ -194,7 +194,7 @@ def _preprocess_exampe(model, example, dataset_name, e):
     colors = tf_xor(labels, tf_bernoulli(e, 1))
     re_colors = 1-colors
     re_colors = tf.cast(re_colors, dtype=tf.int32)
-    print(re_colors.shape)
+    print(re_colors[0].shape)
     # Apply the color to the image by zeroing out the other color channel
     images = tf.stack([example["image"], example["image"]], axis=1)
     print(images[0,0,:,:].shape)
