@@ -145,7 +145,7 @@ def _preprocess_exampe(model, example, dataset_name, e):
     # Apply the color to the image by zeroing out the other color channel
     images = tf.stack([example["image"], example["image"]], axis=0)
     images = tf.unstack(images)
-    images[(1-colors)] *= 0
+    images[1-colors] *= 0
     images = tf.stack(images)
     example['image'] = images
     example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
