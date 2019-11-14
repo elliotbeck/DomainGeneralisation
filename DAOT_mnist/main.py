@@ -148,7 +148,7 @@ def _preprocess_exampe(model, example, dataset_name, e):
     images = tf.stack([example["image"], example["image"]], axis=1)
     images = tf.unstack(images)
     colors = tf.unstack(colors)
-    colors_re = 1-np.array((colors))
+    colors_re = 1-np.array(colors)
     images[colors_re.astype(int)] *= 0
     images = tf.stack(images)
     example['image'] = images
