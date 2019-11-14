@@ -155,7 +155,7 @@ def _preprocess_exampe(model, example, dataset_name):
     example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
     example["image"] = tf.image.resize(example["image"], 
         size=(model.input_shape[0], model.input_shape[1]))
-    example["label"] = example["attributes"]["label"]
+    example["label"] = ["label"]
     return example
 
 def _get_dataset(dataset_name, model, split, batch_size, 
