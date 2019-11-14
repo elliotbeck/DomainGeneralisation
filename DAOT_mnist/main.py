@@ -142,14 +142,12 @@ def _preprocess_exampe(model, example, dataset_name, e):
     labels = tf_xor(labels, tf_bernoulli(0.25, 1))
     # Assign a color based on the label; flip the color with probability e
     colors = tf_xor(labels, tf_bernoulli(e, 1))
+    colors_re = 1-colors
     print(colors)
     print(colors.shape)
     # Apply the color to the image by zeroing out the other color channel
     images = tf.stack([example["image"], example["image"]], axis=1)
-    images = tf.unstack(images)
-    colors = tf.unstack(colors)
-    colors_re = 1-np.array(colors)
-    images[colors_re.astype(int)] *= 0
+    images[colors_re] *= 0
     images = tf.stack(images)
     example['image'] = images
     example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
