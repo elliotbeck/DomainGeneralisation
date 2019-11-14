@@ -130,40 +130,42 @@ def eval_one_epoch(model, dataset, summary_directory, global_step, config, train
     return results_dict
 
 
-# def _preprocess_exampe(model, example, dataset_name, e):
-#     def tf_bernoulli(p, size):
-#       return tf.cast([tf.random.uniform([size]) < p], dtype=tf.float32)
-#     def tf_xor(a, b):
-#       return tf.abs((a-b)) # Assumes both inputs are either 0 or 1
-#     # 2x subsample for computational convenience
-#     example["image"] = example["images"].reshape((-1, 28, 28))[:, ::2, ::2]
-#     # Assign a binary label based on the digit; flip label with probability 0.25
-#     labels = (labels < 5)
-#     labels = torch_xor(labels, torch_bernoulli(0.25, len(labels)))
+def _preprocess_exampe(model, example, dataset_name, e):
+    def tf_bernoulli(p, size):
+      return tf.cast([tf.random.uniform([size]) < p], dtype=tf.float32)
+    def tf_xor(a, b):
+      return tf.abs((a-b)) # Assumes both inputs are either 0 or 1
+    # 2x subsample for computational convenience
+    example["image"] = example["image"].reshape((-1, 28, 28))[:, ::2, ::2]
+    # Assign a binary label based on the digit; flip label with probability 0.25
+    labels = tf.cast([example["label"] < 5], dtype=tf.float32)
+    labels = tf_xor(labels, tf_bernoulli(0.25, 1))
+    # Assign a color based on the label; flip the color with probability e
+    colors = tf_xor(labels, tf_bernoulli(e, 1))
+    # Apply the color to the image by zeroing out the other color channel
+    images = tf.stack([example["image"], example["image"]], axis=0)
+    images = tf.unstack(images)
+    images[(1-colors)] *= 0
+    images = tf.stack(images)
+    example['image'] = images
+    example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
+    example['label'] = labels
+    return example
 
 
-
-
+# def _preprocess_exampe(model, example, dataset_name):
 #     example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
 #     example["image"] = tf.image.resize(example["image"], 
 #         size=(model.input_shape[0], model.input_shape[1]))
-#     example["label"] = example["attributes"]["label"]
+#     example["label"] = example["label"]
 #     return example
 
-
-def _preprocess_exampe(model, example, dataset_name):
-    example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
-    example["image"] = tf.image.resize(example["image"], 
-        size=(model.input_shape[0], model.input_shape[1]))
-    example["label"] = example["label"]
-    return example
-
-def _get_dataset(dataset_name, model, split, batch_size, 
+def _get_dataset(dataset_name, model, split, batch_size, e,
     num_batches=None):
 
     dataset, info = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
         split=split, with_info=True)
-    dataset = dataset.map(lambda x: _preprocess_exampe(model, x, dataset_name))
+    dataset = dataset.map(lambda x: _preprocess_exampe(model, x, dataset_name, e))
     dataset = dataset.shuffle(512)
     dataset = dataset.batch(batch_size)
     if num_batches is not None:
@@ -274,15 +276,15 @@ def main():
 
     ds_train = _get_dataset(config.dataset, model,
         split=tfds.Split.TRAIN.subsplit(tfds.percent[:67]), batch_size=config.batch_size, 
-        num_batches=num_batches)
+        num_batches=num_batches, e = 0.2)
     
     ds_val = _get_dataset(config.dataset, model,
         split=tfds.Split.TRAIN.subsplit(tfds.percent[-33:]), batch_size=config.batch_size, 
-        num_batches=num_batches)
+        num_batches=num_batches, e = 0.1)
     
     ds_test = _get_dataset(config.dataset, model,
         split=tfds.Split.TEST, batch_size=config.batch_size, 
-        num_batches=num_batches)
+        num_batches=num_batches, e = 0.9)
 
     # Set up checkpointing
     if args.reload_ckpt != "None":
