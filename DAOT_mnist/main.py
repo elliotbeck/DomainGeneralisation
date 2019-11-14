@@ -200,8 +200,8 @@ def _preprocess_exampe(model, example, dataset_name, e):
     images = tf.stack([example["image"], example["image"]], axis=1)
     images = tf.unstack(images, axis = 0)
     print(images[0].shape)
-    images[0][re_colors] = [np.zeros((14,14))]
-    print(images[0][re_colors].shape)
+    images[re_colors] = [np.zeros((14,14))]
+    print(images[re_colors].shape)
     images = tf.stack(images)
 
     #images[0,re_colors,:,:] = np.zeros((14,14))
