@@ -200,7 +200,8 @@ def _preprocess_exampe(model, example, dataset_name, e):
     images = tf.stack([example["image"], example["image"]], axis=1)
     print(images[0,re_colors,:,:].shape)
     K.set_value(images[0,re_colors,:,:], np.zeros((14,14)))
-
+    with tf.control_dependencies(K.set_value(images[0,re_colors,:,:], np.zeros((14,14)))):
+        return K.set_value(images[0,re_colors,:,:], np.zeros((14,14)))
 
 
     return example
