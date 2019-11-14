@@ -148,7 +148,7 @@ def _preprocess_exampe(model, example, dataset_name, e):
     images = tf.stack([example["image"], example["image"]], axis=1)
     print(images.shape)
     print(images[0,1,:,:])
-    images[1,1,:,:] *= 0
+    images[0,1,:,:] *= 0
     images = tf.stack(images)
     example['image'] = images
     example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
