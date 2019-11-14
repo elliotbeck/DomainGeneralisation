@@ -154,7 +154,7 @@ def _preprocess_exampe(model, example, dataset_name, e):
     print(a)
 
     images = tf.unstack(images)
-    images = images.numpy()
+    images = np.array(images, dtype=np.float32)
     print(images[0][0].shape)
     images[0][1] *= 0
     images = tf.stack(images)
