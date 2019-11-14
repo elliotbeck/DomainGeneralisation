@@ -136,7 +136,7 @@ def _preprocess_exampe(model, example, dataset_name, e):
     def tf_xor(a, b):
       return tf.abs((a-b)) # Assumes both inputs are either 0 or 1
     # 2x subsample for computational convenience
-    example["image"] = example["image"].reshape((-1, 28, 28))[:, ::2, ::2]
+    example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
     # Assign a binary label based on the digit; flip label with probability 0.25
     labels = tf.cast([example["label"] < 5], dtype=tf.float32)
     labels = tf_xor(labels, tf_bernoulli(0.25, 1))
