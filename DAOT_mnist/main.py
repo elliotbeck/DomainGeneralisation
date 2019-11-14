@@ -178,10 +178,8 @@ def eval_one_epoch(model, dataset, summary_directory, global_step, config, train
 #     return example
 
 
-def _preprocess_exampe(model, example, dataset_name):
+def _preprocess_exampe(model, example, dataset_name, e):
     example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
-    example["image"] = tf.image.resize(example["image"], 
-        size=(model.input_shape[0], model.input_shape[1]))
     example["label"] = example["label"]
     return example
 
@@ -190,7 +188,7 @@ def _get_dataset(dataset_name, model, split, batch_size, e,
 
     dataset, info = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
         split=split, with_info=True)
-    #dataset = dataset.map(lambda x: _preprocess_exampe(model, x, dataset_name, e))
+    dataset = dataset.map(lambda x: _preprocess_exampe(model, x, dataset_name, e))
     dataset = dataset.shuffle(512)
     dataset = dataset.batch(batch_size)
     if num_batches is not None:
