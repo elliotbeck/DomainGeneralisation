@@ -2,7 +2,7 @@ import tensorflow as tf
 
 
 class ResNet50(tf.keras.Model):
-    INPUT_SHAPE = [28, 28]
+    INPUT_SHAPE = [14, 14]
 
     def __init__(self, num_classes, resnet_weights, config, *args, **kwargs):
         super().__init__(*args, **kwargs)
