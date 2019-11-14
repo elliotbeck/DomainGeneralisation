@@ -132,23 +132,20 @@ def eval_one_epoch(model, dataset, summary_directory, global_step, config, train
 
 def _preprocess_exampe(model, example, dataset_name, e):
     def tf_bernoulli(p, size):
-      return tf.cast([np.random.uniform([size]) < p], dtype=tf.float32)
+      return tf.cast([tf.random.uniform([size]) < p], dtype=tf.float32)
     def tf_xor(a, b):
-      return np.absolute((a-b)) # Assumes both inputs are either 0 or 1
+      return tf.abs((a-b)) # Assumes both inputs are either 0 or 1
     # 2x subsample for computational convenience
-    example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
+    example["image"] = example["image"].reshape((-1, 28, 28))[:, ::2, ::2]
     # Assign a binary label based on the digit; flip label with probability 0.25
-    labels = [example["label"] < 5]*1
-    labels = np.logical_xor(labels, np.random.binomial(0.25, 1, 1))*1
+    labels = tf.cast([example["label"] < 5], dtype=tf.float32)
+    labels = tf_xor(labels, tf_bernoulli(0.25, 1))
     # Assign a color based on the label; flip the color with probability e
-    colors = np.logical_xor(labels, np.random.binomial(e, 1, 1))*1
-    colors_re = 1-colors
-    print(colors_re)
-    colors_re = tf.cast([colors_re], dtype = tf.int64)
+    colors = tf_xor(labels, tf_bernoulli(e, 1))
     # Apply the color to the image by zeroing out the other color channel
     images = tf.stack([example["image"], example["image"]], axis=0)
     images = tf.unstack(images)
-    images[colors_re] *= 0
+    images[(1-colors)] *= 0
     images = tf.stack(images)
     example['image'] = images
     example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
@@ -287,7 +284,7 @@ def main():
     
     ds_test = _get_dataset(config.dataset, model,
         split=tfds.Split.TEST, batch_size=config.batch_size, 
-        num_batches=num_batches, e = 0.9)
+        num_batches=num_batches, e= 0.9)
 
     # Set up checkpointing
     if args.reload_ckpt != "None":
