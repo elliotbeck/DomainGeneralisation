@@ -189,6 +189,8 @@ def _preprocess_exampe(model, example, dataset_name, e):
     # Assign a binary label based on the digit; flip label with probability 0.25
     labels = tf.cast([[example["label"] < 5]], dtype=tf.float32)
     labels = tf_xor(labels, tf_bernoulli(0.25, 1))
+    # Assign a color based on the label; flip the color with probability e
+    colors = tf_xor(labels, tf_bernoulli(e, 1))
 
 
 
