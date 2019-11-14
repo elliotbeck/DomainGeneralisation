@@ -130,6 +130,27 @@ def eval_one_epoch(model, dataset, summary_directory, global_step, config, train
     return results_dict
 
 
+# def _preprocess_exampe(model, example, dataset_name, e):
+#     def tf_bernoulli(p, size):
+#       return tf.cast([tf.random.uniform([size]) < p], dtype=tf.float32)
+#     def tf_xor(a, b):
+#       return tf.abs((a-b)) # Assumes both inputs are either 0 or 1
+#     # 2x subsample for computational convenience
+#     example["image"] = example["images"].reshape((-1, 28, 28))[:, ::2, ::2]
+#     # Assign a binary label based on the digit; flip label with probability 0.25
+#     labels = (labels < 5)
+#     labels = torch_xor(labels, torch_bernoulli(0.25, len(labels)))
+
+
+
+
+#     example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
+#     example["image"] = tf.image.resize(example["image"], 
+#         size=(model.input_shape[0], model.input_shape[1]))
+#     example["label"] = example["attributes"]["label"]
+#     return example
+
+
 def _preprocess_exampe(model, example, dataset_name):
     example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
     example["image"] = tf.image.resize(example["image"], 
@@ -142,7 +163,7 @@ def _get_dataset(dataset_name, model, split, batch_size,
 
     dataset, info = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
         split=split, with_info=True)
-    #dataset = dataset.map(lambda x: _preprocess_exampe(model, x, dataset_name))
+    dataset = dataset.map(lambda x: _preprocess_exampe(model, x, dataset_name))
     dataset = dataset.shuffle(512)
     dataset = dataset.batch(batch_size)
     if num_batches is not None:
@@ -151,6 +172,7 @@ def _get_dataset(dataset_name, model, split, batch_size,
     # dataset = dataset.prefetch(2)
 
     return dataset
+
 
 def main():
     # parse args and get configs
