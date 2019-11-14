@@ -199,10 +199,14 @@ def _preprocess_exampe(model, example, dataset_name, e):
     # Apply the color to the image by zeroing out the other color channel
     images = tf.stack([example["image"], example["image"]], axis=1)
     images = tf.unstack(images, axis = 0)
+
+    image = []
+    image.append(images)
+    image[0][re_colors] = [np.zeros((14,14))]
     print(images[0].shape)
-    images[re_colors] = [np.zeros((14,14))]
+    #images[re_colors] = [np.zeros((14,14))]
     print(images[re_colors].shape)
-    images = tf.stack(images)
+    #images = tf.stack(images)
 
     #images[0,re_colors,:,:] = np.zeros((14,14))
     #K.set_value(images[0,re_colors,:,:], np.zeros((14,14)))
