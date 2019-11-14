@@ -172,7 +172,7 @@ def _preprocess_exampe(model, example, dataset_name, e):
     # 2x subsample for computational convenience
     example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
     # Assign a binary label based on the digit; flip label with probability 0.25
-    labels = ([example["label"] < 5])*1
+    labels = tf.cast([[example["label"] < 5]], dtype=tf.int32)
     print(labels)
     labels = np_xor(labels, np_bernoulli(0.25, 1))
     # Assign a color based on the label; flip the color with probability e
