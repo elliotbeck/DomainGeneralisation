@@ -170,7 +170,7 @@ def _preprocess_exampe(model, example, dataset_name, e):
     def np_xor(a, b):
       return np.absolute((a-b)) # Assumes both inputs are either 0 or 1
     # 2x subsample for computational convenience
-    example["image"] = np.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
+    example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
     # Assign a binary label based on the digit; flip label with probability 0.25
     labels = ([example["label"] < 5])*1
     labels = np_xor(labels, np_bernoulli(0.25, 1))
