@@ -149,7 +149,7 @@ def _preprocess_exampe(model, example, dataset_name, e):
     images = tf.unstack(images)
     colors = tf.unstack(colors)
     colors_re = 1-np.array((colors))
-    images[colors_re] *= 0
+    images[colors_re.astype(int)] *= 0
     images = tf.stack(images)
     example['image'] = images
     example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
