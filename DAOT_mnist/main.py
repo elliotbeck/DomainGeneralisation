@@ -137,15 +137,14 @@ def _preprocess_exampe(model, example, dataset_name, e):
       return tf.abs((a-b)) # Assumes both inputs are either 0 or 1
     # 2x subsample for computational convenience
     example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
-    print(example["image"].shape)
     # Assign a binary label based on the digit; flip label with probability 0.25
     labels = tf.cast([example["label"] < 5], dtype=tf.float32)
     labels = tf_xor(labels, tf_bernoulli(0.25, 1))
     # Assign a color based on the label; flip the color with probability e
     colors = tf_xor(labels, tf_bernoulli(e, 1))
+    colors = tf.cast([colors], dtype=tf.int16 )
     # Apply the color to the image by zeroing out the other color channel
     images = tf.stack([example["image"], example["image"]], axis=1)
-    print(images.shape)
     images = tf.unstack(images)
     images[(1-colors)] *= 0
     images = tf.stack(images)
