@@ -146,10 +146,10 @@ def _preprocess_exampe(model, example, dataset_name, e):
     colors_re = tf.cast([colors_re], dtype=tf.int32)
     print(colors_re)
     # Apply the color to the image by zeroing out the other color channel
-    images = tf.stack([example["image"], example["image"]], axis=1)
+    #images = tf.stack([example["image"], example["image"]], axis=1)
 
-    example['image'] = images
-    example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
+    #example['image'] = images
+    #example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
     example['label'] = labels
     return example
 
