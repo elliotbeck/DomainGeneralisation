@@ -180,6 +180,7 @@ def eval_one_epoch(model, dataset, summary_directory, global_step, config, train
 
 def _preprocess_exampe(model, example, dataset_name, e):
     example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
+    example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
     example["label"] = example["label"]
     return example
 
