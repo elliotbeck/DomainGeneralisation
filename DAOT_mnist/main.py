@@ -132,7 +132,7 @@ def eval_one_epoch(model, dataset, summary_directory, global_step, config, train
 
 def _preprocess_exampe(model, example, dataset_name, e):
     def tf_bernoulli(p, size):
-      return tf.cast([tf.random.uniform([size]) < p], dtype=tf.float32)
+      return tf.cast([np.random.uniform([size]) < p], dtype=tf.float32)
     def tf_xor(a, b):
       return np.absolute((a-b)) # Assumes both inputs are either 0 or 1
     # 2x subsample for computational convenience
