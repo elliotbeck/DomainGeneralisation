@@ -144,6 +144,7 @@ def _preprocess_exampe(model, example, dataset_name, e):
     colors = tf_xor(labels, tf_bernoulli(e, 1))
     # Apply the color to the image by zeroing out the other color channel
     images = tf.stack([example["image"], example["image"]], axis=0)
+    print(tf.shape(images))
     images = tf.unstack(images)
     images[(1-colors)] *= 0
     images = tf.stack(images)
