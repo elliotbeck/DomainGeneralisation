@@ -20,6 +20,7 @@ plt.interactive(False)
 
 from absl import flags, app, logging
 import tensorflow as tf
+import tensorflow.keras.backend as K
 import numpy as np
 import time
 #from datasets import mnist2
@@ -191,9 +192,10 @@ def _preprocess_exampe(model, example, dataset_name, e):
     labels = tf_xor(labels, tf_bernoulli(0.25, 1))
     # Assign a color based on the label; flip the color with probability e
     colors = tf_xor(labels, tf_bernoulli(e, 1))
+    re_colors = 1-colors
     # Apply the color to the image by zeroing out the other color channel
     images = tf.stack([example["image"], example["image"]], axis=1)
-    print(images.shape)
+    K.set_value(images[0,re_colors,:,:],np.zeros((14,14)))
 
 
 
