@@ -136,7 +136,7 @@ def _preprocess_exampe(model, example, dataset_name, e):
     def tf_xor(a, b):
       return tf.abs((a-b)) # Assumes both inputs are either 0 or 1
     # 2x subsample for computational convenience
-    example["image"] = example["image"].reshape((-1, 28, 28))[:, ::2, ::2]
+    example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
     # Assign a binary label based on the digit; flip label with probability 0.25
     labels = tf.cast([example["label"] < 5], dtype=tf.float32)
     labels = tf_xor(labels, tf_bernoulli(0.25, 1))
@@ -284,7 +284,7 @@ def main():
     
     ds_test = _get_dataset(config.dataset, model,
         split=tfds.Split.TEST, batch_size=config.batch_size, 
-        num_batches=num_batches, e= 0.9)
+        num_batches=num_batches, e = 0.9)
 
     # Set up checkpointing
     if args.reload_ckpt != "None":
