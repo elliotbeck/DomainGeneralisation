@@ -139,9 +139,9 @@ def _preprocess_exampe(model, example, dataset_name, e):
     example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
     # Assign a binary label based on the digit; flip label with probability 0.25
     labels = tf.cast([example["label"] < 5], dtype=tf.float32)
-    labels = tf_xor(labels, np.random.binomial(0.25, 1, 1))
+    labels = np.logical_xor(labels, np.random.binomial(0.25, 1, 1))*1
     # Assign a color based on the label; flip the color with probability e
-    colors = tf_xor(labels, np.random.binomial(e, 1, 1))
+    colors = np.logical_xor(labels, np.random.binomial(e, 1, 1))*1
     colors_re = 1-colors
     print(colors_re)
     colors_re = tf.cast([colors_re], dtype = tf.int64)
