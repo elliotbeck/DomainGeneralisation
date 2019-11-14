@@ -130,62 +130,54 @@ def eval_one_epoch(model, dataset, summary_directory, global_step, config, train
     return results_dict
 
 
+def _preprocess_exampe(model, example, dataset_name, e):
+    def tf_bernoulli(p, size):
+      return tf.cast([tf.random.uniform([size]) < p], dtype=tf.float32)
+    def tf_xor(a, b):
+      return tf.abs((a-b)) # Assumes both inputs are either 0 or 1
+    # 2x subsample for computational convenience
+    example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
+    # Assign a binary label based on the digit; flip label with probability 0.25
+    labels = tf.cast([example["label"] < 5], dtype=tf.float32)
+    labels = tf_xor(labels, tf_bernoulli(0.25, 1))
+    # Assign a color based on the label; flip the color with probability e
+    colors = tf_xor(labels, tf_bernoulli(e, 1))
+    colors_re = 1-colors
+    colors_re = tf.cast([colors_re], dtype=tf.int32)
+    print(colors_re)
+    # Apply the color to the image by zeroing out the other color channel
+    images = tf.stack([example["image"], example["image"]], axis=1)
+
+    example['image'] = images
+    example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
+    example['label'] = labels
+    return example
+
+
 # def _preprocess_exampe(model, example, dataset_name, e):
-#     def tf_bernoulli(p, size):
-#       return tf.cast([tf.random.uniform([size]) < p], dtype=tf.float32)
-#     def tf_xor(a, b):
-#       return tf.abs((a-b)) # Assumes both inputs are either 0 or 1
+#     def np_bernoulli(p, size):
+#       return (np.random.uniform(size = size) < p) *1
+#     def np_xor(a, b):
+#       return np.absolute((a-b)) # Assumes both inputs are either 0 or 1
 #     # 2x subsample for computational convenience
 #     example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
 #     # Assign a binary label based on the digit; flip label with probability 0.25
-#     labels = tf.cast([example["label"] < 5], dtype=tf.float32)
-#     labels = tf_xor(labels, tf_bernoulli(0.25, 1))
+#     labels = tf.cast([[example["label"] < 5]], dtype=tf.int32)
+#     print(labels)
+#     labels = np_xor(labels, np_bernoulli(0.25, 1))
 #     # Assign a color based on the label; flip the color with probability e
-#     colors = tf_xor(labels, tf_bernoulli(e, 1))
+#     colors = np_xor(labels, np_bernoulli(e, 1))
 #     colors_re = 1-colors
-#     colors_re = tf.cast([colors_re], dtype=tf.int32)
 #     # Apply the color to the image by zeroing out the other color channel
 #     images = tf.stack([example["image"], example["image"]], axis=1)
-    
-#     if colors_re == 1:
-#         a = 1
-#     else: 
-#         a = 0
-#     print(a)
+#     print(images.shape)
 
-#     images = tf.unstack(images)
-#     images = np.asarray(images, dtype=np.float32)
-#     print(images[0][0].shape)
-#     images[0][1] *= 0
-#     images = tf.stack(images)
 #     example['image'] = images
 #     example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
 #     example['label'] = labels
 #     return example
 
 
-def _preprocess_exampe(model, example, dataset_name, e):
-    def np_bernoulli(p, size):
-      return (np.random.uniform(size = size) < p) *1
-    def np_xor(a, b):
-      return np.absolute((a-b)) # Assumes both inputs are either 0 or 1
-    # 2x subsample for computational convenience
-    example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
-    # Assign a binary label based on the digit; flip label with probability 0.25
-    labels = tf.cast([[example["label"] < 5]], dtype=tf.int32)
-    print(labels)
-    labels = np_xor(labels, np_bernoulli(0.25, 1))
-    # Assign a color based on the label; flip the color with probability e
-    colors = np_xor(labels, np_bernoulli(e, 1))
-    colors_re = 1-colors
-    # Apply the color to the image by zeroing out the other color channel
-    images = tf.stack([example["image"], example["image"]], axis=1)
-    print(images.shape)
-
-    example['image'] = images
-    example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
-    example['label'] = labels
-    return example
 # def _preprocess_exampe(model, example, dataset_name):
 #     example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
 #     example["image"] = tf.image.resize(example["image"], 
