@@ -130,28 +130,28 @@ def eval_one_epoch(model, dataset, summary_directory, global_step, config, train
     return results_dict
 
 
-def _preprocess_exampe(model, example, dataset_name, e):
-    def tf_bernoulli(p, size):
-      return tf.cast([tf.random.uniform([size]) < p], dtype=tf.float32)
-    def tf_xor(a, b):
-      return tf.abs((a-b)) # Assumes both inputs are either 0 or 1
-    # 2x subsample for computational convenience
-    example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
-    # Assign a binary label based on the digit; flip label with probability 0.25
-    labels = tf.cast([example["label"] < 5], dtype=tf.float32)
-    labels = tf_xor(labels, tf_bernoulli(0.25, 1))
-    # Assign a color based on the label; flip the color with probability e
-    colors = tf_xor(labels, tf_bernoulli(e, 1))
-    colors_re = 1-colors
-    colors_re = tf.cast([colors_re], dtype=tf.int32)
-    print(colors_re)
-    # Apply the color to the image by zeroing out the other color channel
-    #images = tf.stack([example["image"], example["image"]], axis=1)
+# def _preprocess_exampe(model, example, dataset_name, e):
+#     def tf_bernoulli(p, size):
+#       return tf.cast([tf.random.uniform([size]) < p], dtype=tf.float32)
+#     def tf_xor(a, b):
+#       return tf.abs((a-b)) # Assumes both inputs are either 0 or 1
+#     # 2x subsample for computational convenience
+#     example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
+#     # Assign a binary label based on the digit; flip label with probability 0.25
+#     labels = tf.cast([example["label"] < 5], dtype=tf.float32)
+#     labels = tf_xor(labels, tf_bernoulli(0.25, 1))
+#     # Assign a color based on the label; flip the color with probability e
+#     colors = tf_xor(labels, tf_bernoulli(e, 1))
+#     colors_re = 1-colors
+#     colors_re = tf.cast([colors_re], dtype=tf.int32)
+#     print(colors_re)
+#     # Apply the color to the image by zeroing out the other color channel
+#     #images = tf.stack([example["image"], example["image"]], axis=1)
 
-    #example['image'] = images
-    #example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
-    example['label'] = labels
-    return example
+#     #example['image'] = images
+#     #example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
+#     example['label'] = labels
+#     return example
 
 
 # def _preprocess_exampe(model, example, dataset_name, e):
@@ -178,19 +178,19 @@ def _preprocess_exampe(model, example, dataset_name, e):
 #     return example
 
 
-# def _preprocess_exampe(model, example, dataset_name):
-#     example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
-#     example["image"] = tf.image.resize(example["image"], 
-#         size=(model.input_shape[0], model.input_shape[1]))
-#     example["label"] = example["label"]
-#     return example
+def _preprocess_exampe(model, example, dataset_name):
+    example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
+    example["image"] = tf.image.resize(example["image"], 
+        size=(model.input_shape[0], model.input_shape[1]))
+    example["label"] = example["label"]
+    return example
 
 def _get_dataset(dataset_name, model, split, batch_size, e,
     num_batches=None):
 
     dataset, info = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
         split=split, with_info=True)
-    dataset = dataset.map(lambda x: _preprocess_exampe(model, x, dataset_name, e))
+    #dataset = dataset.map(lambda x: _preprocess_exampe(model, x, dataset_name, e))
     dataset = dataset.shuffle(512)
     dataset = dataset.batch(batch_size)
     if num_batches is not None:
