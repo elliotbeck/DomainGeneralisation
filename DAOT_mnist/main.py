@@ -151,6 +151,8 @@ def _preprocess_exampe(model, example, dataset_name, e):
     else: 
         a = 0
     print(a)
+
+    images = tf.unstack(images)
     images[0,1,:,:] *= 0
     images = tf.stack(images)
     example['image'] = images
