@@ -179,11 +179,19 @@ def eval_one_epoch(model, dataset, summary_directory, global_step, config, train
 
 
 def _preprocess_exampe(model, example, dataset_name, e):
+    def tf_bernoulli(p, size):
+      return tf.cast([tf.random.uniform([size]) < p], dtype=tf.float32)
+    def tf_xor(a, b):
+      return tf.abs((a-b)) # Assumes both inputs are either 0 or 1
     example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
-    print(example["image"].shape)
+    # 2x subsample for computational convenience
     example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
-    print(example["image"].shape)
-    example["label"] = example["label"]
+    # Assign a binary label based on the digit; flip label with probability 0.25
+    labels = tf.cast([[example["label"] < 5]], dtype=tf.int32)
+    labels = tf_xor(labels, tf_bernoulli(0.25, 1))
+
+
+
     return example
 
 def _get_dataset(dataset_name, model, split, batch_size, e,
