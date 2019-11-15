@@ -51,7 +51,7 @@ class generator(tf.keras.Model):
 
         self.model = tf.keras.Sequential([
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Conv2D(kernel_size=(1), filters=2 ,strides=(1), 
+            tf.keras.layers.Conv2D(kernel_size=(1), filters=14 ,strides=(1), 
                                     input_shape=in_shape, padding="same",
                                     kernel_initializer=tf.keras.initializers.GlorotNormal(), 
                                     activation='relu'),
