@@ -110,10 +110,10 @@ def loss_fn_classifier(model_classifier, model_generator, features1, features2, 
 # loss function for generator
 def loss_fn_generator(model_classifier, model_critic, model_generator, features1, 
         features2, config, training):
-    inputs1 = features1["image"]
-    label1 = tf.squeeze(features1["label"])
-    inputs2 = features2["image"]
-    label2 = tf.squeeze(features2["label"])
+    inputs1 = tf.cast(features1["image"], tf.float32)
+    label1 = tf.cast(features1["label"], tf.int32)
+    inputs2 = tf.cast(features2["image"], tf.float32)
+    label2 = tf.cast(features2["label"], tf.int32)
     label_generated1 = label1
     label_generated2 = label2
 
@@ -132,8 +132,9 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
 
     # get mean classification loss on generated data
     classification_loss_generated = tf.losses.binary_crossentropy(
-        tf.one_hot(tf.concat([label_generated1, label_generated2], 0), axis=-1, depth=config.num_classes),
-        tf.concat([model_classifier_output_generated1, model_classifier_output_generated2], 0), from_logits=False)
+        tf.one_hot(tf.concat([label_generated1, label_generated2], 0), axis=-1, 
+        depth=config.num_classes), tf.concat([model_classifier_output_generated1, 
+        model_classifier_output_generated2], 0), from_logits=False)
     mean_classification_loss_generated = tf.math.reduce_mean(classification_loss_generated)
     
     # compute sinkhorn distances for M1
@@ -181,10 +182,10 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
 
 # loss function for critic
 def loss_fn_critic(model_critic, model_generator, features1, features2, config, training):
-    inputs1 = features1["image"]
-    label1 = tf.squeeze(features1["label"])
-    inputs2 = features2["image"]
-    label2 = tf.squeeze(features2["label"])
+    inputs1 = tf.cast(features1["image"], tf.float32)
+    label1 = tf.cast(features1["label"], tf.int32)
+    inputs2 = tf.cast(features2["image"], tf.float32)
+    label2 = tf.cast(features2["label"], tf.int32)
     label_generated1 = label1
     label_generated2 = label2
 
