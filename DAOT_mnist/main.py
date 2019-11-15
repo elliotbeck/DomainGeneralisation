@@ -68,7 +68,7 @@ def loss_fn(model, features, config, training):
     model_output = tf.cast(model_output, dtype = tf.float32)
     print(model_output)
     classification_loss = tf.losses.binary_crossentropy(
-        tf.one_hot(label, axis=-1, depth=config.num_classes),
+        tf.one_hot(label, axis=-1, depth=config.num_classes, dtype = tf.int32),
         model_output, from_logits=False)
     mean_classification_loss = tf.reduce_mean(classification_loss) 
 
