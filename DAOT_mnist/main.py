@@ -72,7 +72,7 @@ def loss_fn(model, features, config, training):
     mean_classification_loss = tf.reduce_mean(classification_loss) 
 
     accuracy = tf.reduce_mean(
-        tf.where(tf.equal(label, tf.argmax(model_output, axis=-1)),
+        tf.where(tf.equal(tf.cast(label, tf.int32), tf.argmax(model_output, axis=-1)),
                     tf.ones_like(label, dtype=tf.float32),
                     tf.zeros_like(label, dtype=tf.float32)))
 
