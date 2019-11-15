@@ -59,7 +59,7 @@ def loss_fn(model, features, config, training):
     inputs = features["image"]
     inputs = tf.cast(inputs, tf.float32)
     label = tf.squeeze(features["label"])
-
+    label = tf.cast(label, tf.int32)
     # L2 regularizers
     l2_regularizer = tf.add_n([tf.nn.l2_loss(v) for v in 
         model.trainable_variables if 'bias' not in v.name])
@@ -67,7 +67,7 @@ def loss_fn(model, features, config, training):
     model_output = model(inputs, training=training)
     model_output = tf.cast(model_output, dtype = tf.float32)
     print(model_output)
-    print(tf.one_hot(label, axis=-1, depth=10, dtype = tf.int8))
+    print(tf.one_hot(tf.constant([1,1,1,1,1,1,1,1,0,0,0,0]), axis=-1, depth=2))
     classification_loss = tf.losses.binary_crossentropy(
         tf.one_hot(label, axis=-1, depth=config.num_classes, dtype = tf.int32),
         model_output, from_logits=False)
