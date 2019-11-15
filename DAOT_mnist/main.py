@@ -193,15 +193,17 @@ def _preprocess_exampe(model, example, dataset_name, e):
     re_colors = tf.reshape(re_colors, [])
     print(re_colors)
     # Apply the color to the image by zeroing out the other color channel
-    images = np.stack([example["image"], example["image"]], axis=1)
+    if re_colors == tf.constant(0): 
+        images = tf.stack([tf.zeros([14,14]), example["image"]], axis=1)
+    else: 
+        images = tf.stack([example["image"], tf.zeros([14,14])], axis=1)
     print(images)
+    
     #images[0,re_colors,:,:] *= tf.constant(0)
-    images[0,re_colors,:,:] = np.zeros((14,14))
+    #images[0,re_colors,:,:] = np.zeros((14,14))
     #images[0,re_colors,:,:] = tf.math.scalar_mul(tf.constant(0, dtype=tf.float32), images[0,re_colors,:,:])
     #images[0,re_colors,:,:] = np.zeros((14,14))
     #K.set_value(images[0,re_colors,:,:], np.zeros((14,14)))
-
-
 
     return example
 
