@@ -199,7 +199,7 @@ def _preprocess_exampe(model, example, dataset_name, e):
     # Apply the color to the image by zeroing out the other color channel
     images = tf.stack([example["image"], example["image"]], axis=1)
     #images[0,re_colors,:,:] *= tf.constant(0)
-    images = tf.Variable(images, trainable=False)
+    images = tf.Variable('var_name', initializer = images, trainable=False)
     images[0,re_colors,:,:].assign(tf.constant(np.zeros((14,14))))
     #images[0,re_colors,:,:] = tf.math.scalar_mul(tf.constant(0, dtype=tf.float32), images[0,re_colors,:,:])
     #images[0,re_colors,:,:] = np.zeros((14,14))
