@@ -58,7 +58,7 @@ class generator(tf.keras.Model):
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Conv2D(kernel_size=(1), filters=2,strides=(1), padding="same", 
                                     kernel_initializer=tf.keras.initializers.GlorotNormal(), 
-                                    activation='tanh')
+                                    input_shape=in_shape, activation='tanh')
         ])
         self.model.build([None] + [2] + self.input_shape)  # Batch input shape.
 
