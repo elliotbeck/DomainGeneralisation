@@ -11,6 +11,7 @@ class ResNet50(tf.keras.Model):
         in_shape = [1] + self.input_shape 
 
         self.model = tf.keras.models.Sequential([
+            tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(128, activation='relu'),
             tf.keras.layers.Flatten(),
             tf.keras.layers.BatchNormalization(),
