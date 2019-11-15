@@ -200,7 +200,7 @@ def _preprocess_exampe(model, example, dataset_name, e):
     images = tf.stack([example["image"], example["image"]], axis=1)
     #images[0,re_colors,:,:] *= tf.constant(0)
     images = np.array(images)
-    images[0,re_colors,:,:] = 0
+    images[0,re_colors,:,:].assign(tf.constant(np.zeros((14,14))))
     #images[0,re_colors,:,:] = tf.math.scalar_mul(tf.constant(0, dtype=tf.float32), images[0,re_colors,:,:])
     #images[0,re_colors,:,:] = np.zeros((14,14))
     #K.set_value(images[0,re_colors,:,:], np.zeros((14,14)))
