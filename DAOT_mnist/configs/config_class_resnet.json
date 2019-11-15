@@ -19,7 +19,7 @@
     "save_checkpoints_secs": 600,
     "log_step_count_steps": 500,
 
-    "num_classes": 10,
+    "num_classes": 2,
     "name": "ResNet50",
     "resnet_weights": "imagenet",
 

@@ -184,19 +184,20 @@ def _preprocess_exampe(model, example, dataset_name, e):
     # 2x subsample for computational convenience
     example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
     # Assign a binary label based on the digit; flip label with probability 0.25
-    labels = tf.cast([[example["label"] < 5]], dtype=tf.float32)
-    labels = util.tf_xor(labels, util.tf_bernoulli(0.25, 1))
+    label = tf.cast([[example["label"] < 5]], dtype=tf.float32)
+    label = util.tf_xor(label, util.tf_bernoulli(0.25, 1))
     # Assign a color based on the label; flip the color with probability e
-    colors = util.tf_xor(labels, util.tf_bernoulli(e, 1))
+    colors = util.tf_xor(label, util.tf_bernoulli(e, 1))
     re_colors = 1-colors
     re_colors = tf.cast(re_colors, dtype=tf.int32)
-    #re_colors = tf.reshape(re_colors, [])
     # Apply the color to the image by zeroing out the other color channel
     if re_colors == tf.constant(0): 
         image = tf.stack([tf.expand_dims(tf.zeros([14,14]), 0), example["image"]], axis=1)
     else: 
         image = tf.stack([example["image"], tf.expand_dims(tf.zeros([14,14]), 0)], axis=1)
-    tf.print(image)
+    print(image.shape)
+    example["image"] = image
+    example["label"] = label
 
     return example
 
