@@ -56,7 +56,7 @@ class generator(tf.keras.Model):
                                     kernel_initializer=tf.keras.initializers.GlorotNormal(), 
                                     activation='relu'),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Conv2D(kernel_size=(1), filters=2,strides=(1), padding="same", 
+            tf.keras.layers.Conv2D(kernel_size=(1), filters=14,strides=(1), padding="same", 
                                     kernel_initializer=tf.keras.initializers.GlorotNormal(), 
                                     activation='tanh')
         ])
