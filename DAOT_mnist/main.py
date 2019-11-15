@@ -190,20 +190,13 @@ def _preprocess_exampe(model, example, dataset_name, e):
     colors = util.tf_xor(labels, util.tf_bernoulli(e, 1))
     re_colors = 1-colors
     re_colors = tf.cast(re_colors, dtype=tf.int32)
-    re_colors = tf.reshape(re_colors, [])
-    print(re_colors)
+    #re_colors = tf.reshape(re_colors, [])
     # Apply the color to the image by zeroing out the other color channel
     if re_colors == tf.constant(0): 
-        images = tf.stack([tf.expand_dims(tf.zeros([14,14]), 0), example["image"]], axis=1)
+        image = tf.stack([tf.expand_dims(tf.zeros([14,14]), 0), example["image"]], axis=1)
     else: 
-        images = tf.stack([example["image"], tf.expand_dims(tf.zeros([14,14]), 0)], axis=1)
-    print(images)
-
-    #images[0,re_colors,:,:] *= tf.constant(0)
-    #images[0,re_colors,:,:] = np.zeros((14,14))
-    #images[0,re_colors,:,:] = tf.math.scalar_mul(tf.constant(0, dtype=tf.float32), images[0,re_colors,:,:])
-    #images[0,re_colors,:,:] = np.zeros((14,14))
-    #K.set_value(images[0,re_colors,:,:], np.zeros((14,14)))
+        image = tf.stack([example["image"], tf.expand_dims(tf.zeros([14,14]), 0)], axis=1)
+    tf.print(image)
 
     return example
 
