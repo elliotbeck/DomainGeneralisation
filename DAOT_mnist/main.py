@@ -57,7 +57,7 @@ parser.add_argument('--use_dropout', type=int, help='Flag whether to use dropout
 
 def loss_fn(model, features, config, training):
     inputs = features["image"]
-    #inputs = tf.cast(inputs, tf.float32)
+    inputs = tf.cast(inputs, tf.float32)
     label = tf.squeeze(features["label"])
 
     # L2 regularizers
@@ -67,7 +67,7 @@ def loss_fn(model, features, config, training):
     model_output = model(inputs, training=training)
     model_output = tf.cast(model_output, dtype = tf.float32)
     print(model_output)
-    print(tf.one_hot(label, axis=-1, depth=3, dtype = tf.int32))
+    print(tf.one_hot(label, axis=-1, depth=3, dtype = tf.int8))
     classification_loss = tf.losses.binary_crossentropy(
         tf.one_hot(label, axis=-1, depth=config.num_classes, dtype = tf.int32),
         model_output, from_logits=False)
