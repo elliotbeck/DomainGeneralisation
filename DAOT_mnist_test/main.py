@@ -66,8 +66,9 @@ def loss_fn_classifier(model_classifier, model_generator, features1, features2, 
     label1 = tf.cast(features1["label"], tf.int32)
     inputs2 = tf.cast(features2["image"], tf.float32)
     label2 = tf.cast(features2["label"], tf.int32)
-    inputs = tf.concat([inputs1, inputs2], 0)
-    label = tf.concat([label1, label2], 0)
+    inputs = tf.concat([inputs1, inputs2], 1)
+    label = tf.concat([label1, label2], 1)
+    print(inputs)
     # get generated inputs, labels stay the same
     inputs_generated = model_generator(inputs, training=training)
     label_generated = label
