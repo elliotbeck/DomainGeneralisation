@@ -20,7 +20,7 @@ plt.interactive(False)
 
 from absl import flags, app, logging
 import tensorflow as tf
-import tensorflow.keras.backend as K
+#import tensorflow.keras.backend as K
 import numpy as np
 import time
 #from datasets import mnist2
@@ -180,27 +180,23 @@ def eval_one_epoch(model, dataset, summary_directory, global_step, config, train
 
 
 def _preprocess_exampe(model, example, dataset_name, e):
-    def tf_bernoulli(p, size):
-      return tf.cast([tf.random.uniform([size]) < p], dtype=tf.float32)
-    def tf_xor(a, b):
-      return tf.abs((a-b)) # Assumes both inputs are either 0 or 1
     example["image"] = tf.cast(example["image"], dtype=tf.float32)/255.
     # 2x subsample for computational convenience
     example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
     # Assign a binary label based on the digit; flip label with probability 0.25
     labels = tf.cast([[example["label"] < 5]], dtype=tf.float32)
-    labels = tf_xor(labels, tf_bernoulli(0.25, 1))
+    labels = util.tf_xor(labels, util.tf_bernoulli(0.25, 1))
     # Assign a color based on the label; flip the color with probability e
-    colors = tf_xor(labels, tf_bernoulli(e, 1))
+    colors = util.tf_xor(labels, util.tf_bernoulli(e, 1))
     re_colors = 1-colors
     re_colors = tf.cast(re_colors, dtype=tf.int32)
     re_colors = tf.reshape(re_colors, [])
     print(re_colors)
     # Apply the color to the image by zeroing out the other color channel
-    images = tf.stack([example["image"], example["image"]], axis=1)
+    images = np.stack([example["image"], example["image"]], axis=1)
+    print(images)
     #images[0,re_colors,:,:] *= tf.constant(0)
-    images = tf.Variable('var_name', initializer = images, trainable=False)
-    images[0,re_colors,:,:].assign(tf.constant(np.zeros((14,14))))
+    images[0,re_colors,:,:] = np.zeros((14,14))
     #images[0,re_colors,:,:] = tf.math.scalar_mul(tf.constant(0, dtype=tf.float32), images[0,re_colors,:,:])
     #images[0,re_colors,:,:] = np.zeros((14,14))
     #K.set_value(images[0,re_colors,:,:], np.zeros((14,14)))

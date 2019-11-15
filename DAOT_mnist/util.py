@@ -26,7 +26,6 @@ def config_to_namedtuple(obj):
 def get_config(config_path):
     with open(config_path) as config_file:
         config = json.load(config_file)
-
     return config
 
 
@@ -36,3 +35,11 @@ def update_config(config, args):
             if eval("args.{}".format(entry)) is not None:
                 config[entry] = eval("args.{}".format(entry))
     return config
+
+
+def tf_bernoulli(p, size):
+    return tf.cast([tf.random.uniform([size]) < p], dtype=tf.float32)
+
+
+def tf_xor(a, b):
+    return tf.abs((a-b)) # Assumes both inputs are either 0 or 1
