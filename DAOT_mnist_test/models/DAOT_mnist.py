@@ -47,7 +47,7 @@ class generator(tf.keras.Model):
         super().__init__(*args, **kwargs)
         self.config = config
 
-        in_shape = self.input_shape + [3]
+        in_shape = [2] + self.input_shape
 
         self.model = tf.keras.Sequential([
             tf.keras.layers.BatchNormalization(),
@@ -78,7 +78,7 @@ class critic(tf.keras.Model):
         super().__init__(*args, **kwargs)
         self.config = config
 
-        in_shape = self.input_shape + [3]
+        in_shape = [2] + self.input_shape 
 
         self.model = tf.keras.Sequential([
             tf.keras.layers.Flatten(),
