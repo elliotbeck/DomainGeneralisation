@@ -68,7 +68,7 @@ def loss_fn_classifier(model_classifier, model_generator, features1, features2, 
     label2 = tf.cast(features2["label"], tf.int32)
     inputs = tf.concat([inputs1, inputs2], 0)
     label = tf.concat([label1, label2], 0)
-    print(inputs1)
+    print(inputs1.shape)
     # get generated inputs, labels stay the same
     inputs_generated = model_generator(inputs, training=training)
     label_generated = label
@@ -317,7 +317,7 @@ def _preprocess_exampe(model_classifier, example, dataset_name, e):
     # 2x subsample for computational convenience
     example["image"] = tf.reshape(example["image"],[-1, 28, 28])[:, ::2, ::2]
     example["image"] = tf.squeeze(example["image"], axis=0)
-    print(example["image"])
+    print(example["image"].shape)
     # Assign a binary label based on the digit; flip label with probability 0.25
     label = tf.cast([[example["label"] < 5]], dtype=tf.float32)
     label = util.tf_xor(label, util.tf_bernoulli(0.25, 1))
