@@ -65,7 +65,7 @@ def loss_fn(model, features, config, training):
         model.trainable_variables if 'bias' not in v.name])
 
     model_output = model(inputs, training=training)
-    
+    print(model_output)
     classification_loss = tf.losses.binary_crossentropy(
         tf.one_hot(label, axis=-1, depth=config.num_classes, dtype=tf.int16),
         model_output, from_logits=False)
