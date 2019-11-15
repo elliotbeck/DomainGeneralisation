@@ -29,7 +29,7 @@ import experiment_repo as repo
 import util
 import local_settings
 
-DEBUG = True
+DEBUG = False
 random.seed(DAOT_mnist.config_seed)
 
 parser = argparse.ArgumentParser(description='Train my model.')
