@@ -309,21 +309,21 @@ def main():
     # Get model
     model = get_model(config.name, config)
 
-    # Get datasets
+        # Get datasets
     if DEBUG:
         num_batches = 5
     else:
         num_batches = None
 
-    ds_train = _get_dataset(config.dataset, model,
-        split=tfds.Split.TRAIN.subsplit(tfds.percent[:67]), batch_size=config.batch_size, 
+    ds_train1 = _get_dataset(config.dataset, model,
+        split=tfds.Split.TRAIN.subsplit(tfds.percent[:50]), batch_size=config.batch_size, 
         num_batches=num_batches, e = 0.2)
     
-    ds_val = _get_dataset(config.dataset, model,
-        split=tfds.Split.TRAIN.subsplit(tfds.percent[-33:]), batch_size=config.batch_size, 
+    ds_train2 = _get_dataset(config.dataset, model,
+        split=tfds.Split.TRAIN.subsplit(tfds.percent[-50:]), batch_size=config.batch_size, 
         num_batches=num_batches, e = 0.1)
     
-    ds_test = _get_dataset(config.dataset, model,
+    ds_val = _get_dataset(config.dataset, model,
         split=tfds.Split.TEST, batch_size=config.batch_size, 
         num_batches=num_batches, e = 0.9)
 
@@ -343,10 +343,10 @@ def main():
             
             start_time = time.time()
 
-            train_one_epoch(model=model, train_input=ds_train, 
+            train_one_epoch(model=model, train_input=ds_train1.concatenate(ds_train2), 
                 optimizer=optimizer, global_step=global_step, config=config)
 
-            train_metr = eval_one_epoch(model=model, dataset=ds_train,
+            train_metr = eval_one_epoch(model=model, dataset=ds_train1.concatenate(ds_train2),
                 summary_directory=os.path.join(manager._directory, "train"), 
                 global_step=global_step, config=config, training=False)
             
@@ -357,7 +357,7 @@ def main():
            
             if epoch == (config.num_epochs - 1):
                 # full training set
-                train_metr = eval_one_epoch(model=model, dataset=ds_train,
+                train_metr = eval_one_epoch(model=model, dataset=ds_train1.concatenate(ds_train2),
                     summary_directory=os.path.join(manager._directory, "train"), 
                     global_step=global_step, config=config, training=False)
                 # full test_in set
