@@ -195,7 +195,6 @@ def _preprocess_exampe(model, example, dataset_name, e):
         image = tf.stack([tf.expand_dims(tf.zeros([14,14]), 0), example["image"]], axis=1)
     else: 
         image = tf.stack([example["image"], tf.expand_dims(tf.zeros([14,14]), 0)], axis=1)
-    print(image.shape)
     example["image"] = image
     example["label"] = label
 
