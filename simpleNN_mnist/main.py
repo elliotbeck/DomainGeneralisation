@@ -206,6 +206,7 @@ def _get_dataset(dataset_name, model, split, batch_size, e,
 
     dataset, info = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
         split=split, with_info=True)
+    print(info)
     dataset = dataset.map(lambda x: _preprocess_exampe(model, x, dataset_name, e))
     dataset = dataset.shuffle(512)
     dataset = dataset.batch(batch_size)
