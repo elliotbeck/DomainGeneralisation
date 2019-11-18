@@ -3,6 +3,7 @@ import numpy as np
 import torch
 from torchvision import datasets
 from torch import nn, optim, autograd
+import util
 
 parser = argparse.ArgumentParser(description='Colored MNIST')
 parser.add_argument('--hidden_dim', type=int, default=256)
@@ -25,6 +26,9 @@ for restart in range(flags.n_restarts):
   print("Restart", restart)
 
   # Load MNIST, make train/val splits, and shuffle train set examples
+
+  dataset = HDF5Dataset('/Users/elliotbeck/Documents/Master ETH/AS 2019/Masterthesis/Paper Implementations/GeneratingDataOfUnseenDomains/data/art_painting_test.hdf5', recursive=True, load_data=False, 
+   data_cache_size=4, transform=None)
 
   mnist = datasets.MNIST('/cluster/work/math/ebeck/torch_datasets/mnist', train=True, download=True)
   mnist_train = (mnist.train_data, mnist.train_labels)
