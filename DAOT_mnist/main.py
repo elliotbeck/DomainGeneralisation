@@ -327,10 +327,10 @@ def _preprocess_exampe(model_classifier, example, dataset_name, e):
     # Apply the color to the image by zeroing out the other color channel
     if re_colors == tf.constant(0): 
         image = tf.stack([tf.zeros([14,14], dtype=tf.float64),
-        example["image"]], axis=0)
+        example["image"]], axis=-1)
     else: 
         image = tf.stack([example["image"], tf.zeros([14,14], 
-        dtype=tf.float64)], axis=0)
+        dtype=tf.float64)], axis=-1)
     example["image"] = image
     print(example["image"].shape)
     example["label"] = label
