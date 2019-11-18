@@ -22,6 +22,7 @@ plt.interactive(False)
 
 from absl import flags, app, logging
 import tensorflow as tf
+import tensorflow_transform as tft
 import numpy as np
 import time
 from datasets import pacs
@@ -30,7 +31,7 @@ import experiment_repo as repo
 import util
 import local_settings
 
-DEBUG = False
+DEBUG = True
 random.seed(DAOT.config_seed)
 
 parser = argparse.ArgumentParser(description='Train my model.')
@@ -328,6 +329,7 @@ def _get_dataset(dataset_name, model_classifier, validation_split, split, batch_
     dataset, info = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
         split=split, builder_kwargs=builder_kwargs, with_info=True)
     dataset = dataset.map(lambda x: _preprocess_exampe(model_classifier, x, dataset_name))
+    print(tft.mean(dataset["label"]))
     dataset = dataset.shuffle(512)
     dataset = dataset.batch(batch_size)
     if num_batches is not None:
