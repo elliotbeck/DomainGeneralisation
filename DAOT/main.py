@@ -316,6 +316,7 @@ def _preprocess_exampe(model_classifier, example, dataset_name):
     example["label"] = example["attributes"]["label"]
     example["domain"] = example["attributes"]["domain"]
     example["label"] = tf.subtract(example["label"],1)
+    print(tft.mean(example["label"]))
     return example
 
 
@@ -329,7 +330,6 @@ def _get_dataset(dataset_name, model_classifier, validation_split, split, batch_
     dataset, info = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
         split=split, builder_kwargs=builder_kwargs, with_info=True)
     dataset = dataset.map(lambda x: _preprocess_exampe(model_classifier, x, dataset_name))
-    print(tft.mean(dataset["label"]))
     dataset = dataset.shuffle(512)
     dataset = dataset.batch(batch_size)
     if num_batches is not None:
