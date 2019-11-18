@@ -51,7 +51,7 @@ class generator(tf.keras.Model):
 
         self.model = tf.keras.Sequential([
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Conv2D(kernel_size=(1), filters=2 ,strides=(1), 
+            tf.keras.layers.Conv2D(kernel_size=(3), filters=2 ,strides=(1), 
                                     input_shape=in_shape, padding="same",
                                     kernel_initializer=tf.keras.initializers.GlorotNormal(), 
                                     activation='relu'),
@@ -64,6 +64,8 @@ class generator(tf.keras.Model):
 
     def call(self, inputs, training=None, mask=None):
         X_shortcut = inputs
+        print(X_shortcut.shape)
+        print(self.model(inputs, training, mask.shape))
         output = tf.keras.layers.add([config_dic2["lambd"]*self.model(inputs, training, mask), X_shortcut])
         #output = tf.keras.activations.tanh(output)
         return output
