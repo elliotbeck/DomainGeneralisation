@@ -315,7 +315,7 @@ def eval_one_epoch(model_classifier, model_generator, dataset, summary_directory
 def _preprocess_exampe(model_classifier, example, dataset_name, e):
     example["image"] = tf.cast(example["image"], dtype=tf.float64)/255.
     # 2x subsample for computational convenience
-    example["image"] = example["image"][:, ::2, ::2]
+    example["image"] = example["image"][::2, ::2, :]
     #example["image"] = tf.squeeze(example["image"], axis=0)
     # Assign a binary label based on the digit; flip label with probability 0.25
     label = tf.cast([[example["label"] < 5]], dtype=tf.float32)
