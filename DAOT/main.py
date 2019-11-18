@@ -22,7 +22,7 @@ plt.interactive(False)
 
 from absl import flags, app, logging
 import tensorflow as tf
-import tensorflow_transform as tft
+#import tensorflow_transform as tft
 import numpy as np
 import time
 from datasets import pacs
@@ -316,7 +316,7 @@ def _preprocess_exampe(model_classifier, example, dataset_name):
     example["label"] = example["attributes"]["label"]
     example["domain"] = example["attributes"]["domain"]
     example["label"] = tf.subtract(example["label"],1)
-    print(tft.mean(example["label"]))
+    #print(tft.mean(example["label"]))
     return example
 
 
