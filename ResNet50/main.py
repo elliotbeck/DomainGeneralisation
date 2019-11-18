@@ -8,12 +8,13 @@ import os
 from random import shuffle
 import matplotlib
 import sklearn
+import random
 
 #matplotlib.use('tkAgg')
 import matplotlib.pyplot as plt
 import tensorflow_datasets as tfds
 
-from models import get_model
+from models import get_model, resnet
 from util import copy_source
 
 plt.interactive(False)
@@ -29,6 +30,7 @@ import util
 import local_settings
 
 DEBUG = False
+random.seed(resnet.config_seed)
 
 parser = argparse.ArgumentParser(description='Train my model.')
 parser.add_argument('--config', type=str, 
