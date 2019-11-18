@@ -15,7 +15,7 @@ class basic_nn(tf.keras.Model):
         super().__init__(*args, **kwargs)
         self.config = config
 
-        in_shape = [2] + self.input_shape 
+        in_shape = self.input_shape + [2]
 
         self.model = tf.keras.Sequential([
             tf.keras.layers.Flatten(),
@@ -30,7 +30,7 @@ class basic_nn(tf.keras.Model):
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(num_classes, activation='softmax')
         ])
-        self.model.build([None] + [2] + self.input_shape)  # Batch input shape.
+        self.model.build([None] + self.input_shape + [2])  # Batch input shape.
 
     def call(self, inputs, training=None, mask=None):
         return self.model(inputs, training, mask)
@@ -47,20 +47,20 @@ class generator(tf.keras.Model):
         super().__init__(*args, **kwargs)
         self.config = config
 
-        in_shape = [2] + self.input_shape
+        in_shape = self.input_shape + [2]
 
         self.model = tf.keras.Sequential([
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Conv2D(kernel_size=(1), filters=14 ,strides=(1), 
+            tf.keras.layers.Conv2D(kernel_size=(3), filters=2 ,strides=(1), 
                                     input_shape=in_shape, padding="same",
                                     kernel_initializer=tf.keras.initializers.GlorotNormal(), 
                                     activation='relu'),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Conv2D(kernel_size=(1), filters=14,strides=(1), padding="same", 
+            tf.keras.layers.Conv2D(kernel_size=(1), filters=2, strides=(1), padding="same", 
                                     kernel_initializer=tf.keras.initializers.GlorotNormal(), 
                                     activation='tanh')
         ])
-        self.model.build([None] + [2] + self.input_shape)  # Batch input shape.
+        self.model.build([None] + self.input_shape+ [2])  # Batch input shape.
 
     def call(self, inputs, training=None, mask=None):
         X_shortcut = inputs
@@ -81,7 +81,7 @@ class critic(tf.keras.Model):
         super().__init__(*args, **kwargs)
         self.config = config
 
-        in_shape = [2] + self.input_shape 
+        in_shape = self.input_shape + [2]
 
         self.model = tf.keras.Sequential([
             tf.keras.layers.Flatten(),
@@ -93,7 +93,7 @@ class critic(tf.keras.Model):
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(64, activation='relu'),
         ])
-        self.model.build([None] + [2] + self.input_shape)  # Batch input shape.
+        self.model.build([None] + self.input_shape + [2])  # Batch input shape.
 
     def call(self, inputs, training=None, mask=None):
         return self.model(inputs, training, mask)
