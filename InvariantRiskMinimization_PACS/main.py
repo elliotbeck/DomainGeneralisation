@@ -27,11 +27,70 @@ for restart in range(flags.n_restarts):
 
   # Load MNIST, make train/val splits, and shuffle train set examples
 
-  dataset = HDF5Dataset('/Users/elliotbeck/Documents/Master ETH/AS 2019/Masterthesis/Paper Implementations/GeneratingDataOfUnseenDomains/data/art_painting_test.hdf5', recursive=True, load_data=False, 
-   data_cache_size=4, transform=None)
 
-  with h5py.File('/Users/elliotbeck/Documents/Master ETH/AS 2019/Masterthesis/Paper Implementations/GeneratingDataOfUnseenDomains/data/art_painting_test.hdf5', 'r') as f:
-   data_train, labels_train = f['images'], f['labels'] 
+# read in training data
+
+# Get the Art training data
+filename = '/cluster/home/ebeck/art_painting_train.hdf5'
+f = h5py.File(filename, 'r')
+
+a_group_key = list(f.keys())[0]
+X_train = list(f[a_group_key])
+a_group_key = list(f.keys())[1]
+y_train = list(f[a_group_key])
+
+# append cartoon training data
+filename = '/cluster/home/ebeck/cartoon_train.hdf5'
+f = h5py.File(filename, 'r')
+
+a_group_key = list(f.keys())[0]
+X_train.extend(list(f[a_group_key]))
+a_group_key = list(f.keys())[1]
+y_train.extend(list(f[a_group_key]))
+
+# append sketch training data
+filename = '/cluster/home/ebeck/sketch_train.hdf5'
+f = h5py.File(filename, 'r')
+
+a_group_key = list(f.keys())[0]
+X_train.extend(list(f[a_group_key]))
+a_group_key = list(f.keys())[1]
+y_train.extend(list(f[a_group_key]))
+
+
+X_train = np.asarray(X_train)
+y_train = np.asarray(y_train)
+y_train = y_train - 1
+
+
+# read in test data
+
+filename = '/cluster/home/ebeck/photo_val.hdf5'
+f = h5py.File(filename, 'r')
+
+a_group_key = list(f.keys())[0]
+X_test = list(f[a_group_key])
+a_group_key = list(f.keys())[1]
+y_test = list(f[a_group_key])
+
+X_test = np.asarray(X_test)
+y_test = np.asarray(y_test)
+y_test = y_test - 1
+
+# preprocess data
+
+X_train = X_train / 255.0
+X_test = X_test / 255.0
+
+y_train = np_utils.to_categorical(y_train, 7)
+y_test = np_utils.to_categorical(y_test, 7)
+
+print(X_train.shape)
+print(X_test.shape)
+
+
+
+
 
   mnist = datasets.MNIST('/cluster/work/math/ebeck/torch_datasets/mnist', train=True, download=True)
   mnist_train = (mnist.train_data, mnist.train_labels)

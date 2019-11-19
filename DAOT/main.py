@@ -36,7 +36,7 @@ random.seed(DAOT.config_seed)
 
 parser = argparse.ArgumentParser(description='Train my model.')
 parser.add_argument('--config', type=str, 
-    default="configs/config_class.json",
+    default="DomainGeneralisation/DAOT/configs/config_class.json",
     help='Path to config file.')
 parser.add_argument('--all_checkpoints_folder', type=str, 
     default="checkpoints_pretr", help='Checkpoint folder name.')
