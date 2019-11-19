@@ -541,7 +541,10 @@ def main():
                 val_out_metr['accuracy'], val_out_metr['loss']))
             logging.info("val_in_accuracy: {:2f}, val_in_loss: {:4f}".format(
                 val_in_metr['accuracy'], val_in_metr['loss']))
-           
+            logging.info("test_in_accuracy: {:2f}, test_in_loss: {:4f}".format(
+                test_in_metr['accuracy'], test_in_metr['loss']))
+            logging.info("test_out_accuracy: {:2f}, test_out_loss: {:4f}".format(
+                test_out_metr['accuracy'], test_out_metr['loss']))
 
             if epoch == epoch_start:
                 dir_path = os.path.dirname(os.path.realpath(__file__))
