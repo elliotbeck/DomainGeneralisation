@@ -30,6 +30,9 @@ for restart in range(flags.n_restarts):
   dataset = HDF5Dataset('/Users/elliotbeck/Documents/Master ETH/AS 2019/Masterthesis/Paper Implementations/GeneratingDataOfUnseenDomains/data/art_painting_test.hdf5', recursive=True, load_data=False, 
    data_cache_size=4, transform=None)
 
+  with h5py.File('/Users/elliotbeck/Documents/Master ETH/AS 2019/Masterthesis/Paper Implementations/GeneratingDataOfUnseenDomains/data/art_painting_test.hdf5', 'r') as f:
+   data_train, labels_train = f['images'], f['labels'] 
+
   mnist = datasets.MNIST('/cluster/work/math/ebeck/torch_datasets/mnist', train=True, download=True)
   mnist_train = (mnist.train_data, mnist.train_labels)
   mnist = datasets.MNIST('/cluster/work/math/ebeck/torch_datasets/mnist', train=False, download=True)
