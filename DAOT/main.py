@@ -458,20 +458,20 @@ def main():
         split="train3", batch_size=tf.cast(config.batch_size/2, tf.int64),
         num_batches=num_batches)
 
-    # ds_val = _get_dataset(config.dataset, model_classifier, config.test_domain,
-    #     split=tfds.Split.VALIDATION, batch_size=config.batch_size, 
-    #     num_batches=num_batches)
-
-    # ds_test = _get_dataset(config.dataset, model_classifier, config.test_domain,
-    #     split=tfds.Split.TEST, batch_size=config.batch_size,
-    #     num_batches=num_batches)
-
     ds_val_in = _get_dataset(config.dataset, model_classifier, config.test_domain,
         split="val_in", batch_size=tf.cast(config.batch_size/2, tf.int64),
         num_batches=num_batches)
 
     ds_val_out = _get_dataset(config.dataset, model_classifier, config.test_domain,
         split="val_out", batch_size=tf.cast(config.batch_size/2, tf.int64),
+        num_batches=num_batches)
+
+    ds_test_in = _get_dataset(config.dataset, model_classifier, config.test_domain,
+        split="test_in", batch_size=tf.cast(config.batch_size/2, tf.int64), 
+        num_batches=num_batches)
+
+    ds_test_out = _get_dataset(config.dataset, model_classifier, config.test_domain,
+        split="test_out", batch_size=tf.cast(config.batch_size/2, tf.int64),
         num_batches=num_batches)
 
     # TODO: add test set - done
@@ -504,31 +504,30 @@ def main():
                 train_input2=rand_inputs[random[1]], optimizer1=optimizer1, optimizer2=optimizer2,
                 optimizer3=optimizer3, global_step=global_step, config=config)
 
-            train_metr = eval_one_epoch(model_classifier=model_classifier, model_generator=model_generator, dataset=ds_train_complete,
+            train_metr = eval_one_epoch(model_classifier=model_classifier, 
+                model_generator=model_generator, dataset=ds_train_complete,
                 summary_directory=os.path.join(manager._directory, "train"), 
                 global_step=global_step, config=config, training=False)
             
-            val_out_metr = eval_one_epoch(model_classifier=model_classifier, model_generator=model_generator, dataset=ds_val_out,
+            val_out_metr = eval_one_epoch(model_classifier=model_classifier, 
+                model_generator=model_generator, dataset=ds_val_out,
                 summary_directory=os.path.join(manager._directory, "val_out"), 
                 global_step=global_step, config=config, training=False)
 
-            val_in_metr = eval_one_epoch(model_classifier=model_classifier, model_generator=model_generator, dataset=ds_val_in,
+            val_in_metr = eval_one_epoch(model_classifier=model_classifier, 
+                model_generator=model_generator, dataset=ds_val_in,
                 summary_directory=os.path.join(manager._directory, "val_in"),
                 global_step=global_step, config=config, training=False)
-           
-            # if epoch == (config.num_epochs - 1):
-            #     # full training set
-            #     train_metr = eval_one_epoch(model_classifier=model_classifier, dataset=ds_train_complete,
-            #         summary_directory=os.path.join(manager._directory, "train"), 
-            #         global_step=global_step, config=config, training=False)
-            #     # full test_out set
-            #     test_out_metr = eval_one_epoch(model_classifier=model_classifier, dataset=ds_val_out,
-            #         summary_directory=os.path.join(manager._directory, "val_out"),
-            #         global_step=global_step, config=config, training=False)
-            #     # full test_in set
-            #     test_in_metr = eval_one_epoch(model_classifier=model_classifier, dataset=ds_val_in,
-            #         summary_directory=os.path.join(manager._directory, "val_in"),
-            #         global_step=global_step, config=config, training=False)
+
+            test_in_metr = eval_one_epoch(model_classifier=model_classifier, 
+                model_generator=model_generator, dataset=ds_test_in,
+                summary_directory=os.path.join(manager._directory, "test_in"), 
+                global_step=global_step, config=config, training=False)
+
+            test_out_metr = eval_one_epoch(model_classifier=model_classifier, 
+                model_generator=model_generator, dataset=ds_test_out,
+                summary_directory=os.path.join(manager._directory, "test_out"),
+                global_step=global_step, config=config, training=False)
 
 
             manager.save()
@@ -554,7 +553,9 @@ def main():
     exp_repo.mark_experiment_as_completed(exp_id, 
         train_accuracy=train_metr['accuracy'],
         val_out_accuracy=val_out_metr['accuracy'],
-        val_in_accuracy=val_in_metr['accuracy'])
+        val_in_accuracy=val_in_metr['accuracy'],
+        test_in_accuracy=test_in_metr['accuracy'],
+        test_out_accuracy=test_out_metr['accuracy'])
 
 if __name__ == "__main__":
     main()

@@ -31,16 +31,20 @@ config_dic = json.loads(data)
 
 if config_dic["test_domain"] == ["photo"]:
     VALIDATION_SPLIT = ["photo"]
-    holdout_domain_path = ["pacs/photo_train.hdf5", "pacs/photo_val.hdf5"]
+    holdout_domain_path = ["pacs/photo_train.hdf5", 
+    "pacs/photo_val.hdf5", "pacs/photo_test.hdf5"]
 elif config_dic["test_domain"] == ["sketch"]:
     VALIDATION_SPLIT = ["sketch"]
-    holdout_domain_path = ["pacs/sketch_train.hdf5", "pacs/sketch_val.hdf5"]
+    holdout_domain_path = ["pacs/sketch_train.hdf5", 
+    "pacs/sketch_val.hdf5", "pacs/sketch_test.hdf5"]
 elif config_dic["test_domain"] == ["cartoon"]:
     VALIDATION_SPLIT = ["cartoon"]
-    holdout_domain_path = ["pacs/cartoon_train.hdf5", "pacs/cartoon_val.hdf5"]
+    holdout_domain_path = ["pacs/cartoon_train.hdf5", 
+    "pacs/cartoon_val.hdf5", "pacs/cartoon_test.hdf5"]
 elif config_dic["test_domain"] == ["art_painting"]:
     VALIDATION_SPLIT = ["art_painting"]
-    holdout_domain_path = ["pacs/art_painting_train.hdf5", "pacs/art_painting_val.hdf5"]
+    holdout_domain_path = ["pacs/art_painting_train.hdf5", 
+    "pacs/art_painting_val.hdf5", "pacs/art_painting_test.hdf5"]
 else:
     print("Invalid Selection") 
 
@@ -56,7 +60,7 @@ class PACSConfig(tfds.core.BuilderConfig):
         super(PACSConfig, self).__init__(
             name="{}".format("_".join(self.validation_split)),
             description="pacs dataset",
-            version="0.3.0",
+            version="0.5.0",
             **kwargs)
 
 
@@ -126,10 +130,21 @@ class PACS(tfds.core.GeneratorBasedBuilder):
         validation_files_out = [os.path.join(local_settings.RAW_DATA_PATH, f)
             for f in filenames]
 
-        # filenames = ['pacs/art_painting_test.hdf5', 'pacs/sketch_test.hdf5',
-        #              'pacs/cartoon_test.hdf5']
-        # test_files = [os.path.join(local_settings.RAW_DATA_PATH, f)
-        #               for f in filenames]
+        # filter hold out domain out from test data
+        filenames_test = ['pacs/art_painting_test.hdf5', 'pacs/sketch_test.hdf5',
+                     'pacs/cartoon_test.hdf5', 'pacs/photo_test.hdf5']
+        test_list = list(set(filenames_test) - set(holdout_domain_path))
+
+        # get training domains of test data
+        filenames = test_list
+        test_files_in = [os.path.join(local_settings.RAW_DATA_PATH, f) 
+        for f in filenames]
+
+        # get test domain of validation data
+        filenames = [holdout_domain_path[2]]
+        test_files_out = [os.path.join(local_settings.RAW_DATA_PATH, f)
+            for f in filenames]
+
 
         return [tfds.core.SplitGenerator(
                     name="train1",
@@ -171,21 +186,21 @@ class PACS(tfds.core.GeneratorBasedBuilder):
                     num_shards=1,
                     gen_kwargs=dict(
                         split="val_out",
-                        files=validation_files_out))
-                # tfds.core.SplitGenerator(
-                #     name=tfds.Split.VALIDATION,
-                #     num_shards=10,
-                #     gen_kwargs=dict(
-                #         split="validation",
-                #         files=validation_files
-                #     )),
-                # tfds.core.SplitGenerator(
-                #     name=tfds.Split.TEST,
-                #     num_shards=1,
-                #     gen_kwargs=dict(
-                #         split="test",
-                #         files=test_files
-                # ))
+                        files=validation_files_out)),
+                tfds.core.SplitGenerator(
+                    name="test_in",
+                    num_shards=10,
+                    gen_kwargs=dict(
+                        split="test_in",
+                        files=test_files_in
+                    )),
+                tfds.core.SplitGenerator(
+                    name="test_out",
+                    num_shards=1,
+                    gen_kwargs=dict(
+                        split="test_out",
+                        files=test_files_out
+                ))
                 ]
     
 
