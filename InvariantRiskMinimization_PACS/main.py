@@ -123,7 +123,7 @@ for restart in range(flags.n_restarts):
       if flags.grayscale_model:
         out = input.view(input.shape[0], 2, 14 * 14).sum(dim=1)
       else:
-        out = input.view(input)
+        out = input
       out = self._main(out)
       return out
 
