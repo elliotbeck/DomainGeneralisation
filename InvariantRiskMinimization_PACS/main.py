@@ -4,13 +4,14 @@ import torch
 from torchvision import datasets
 from torch import nn, optim, autograd
 from torch.nn import functional as F
+import torchvision.models as models
 import h5py
 
 parser = argparse.ArgumentParser(description='Colored MNIST')
 parser.add_argument('--hidden_dim', type=int, default=256)
 parser.add_argument('--l2_regularizer_weight', type=float,default=0.001)
 parser.add_argument('--lr', type=float, default=0.001)
-parser.add_argument('--n_restarts', type=int, default=10)
+parser.add_argument('--n_restarts', type=int, default=2)
 parser.add_argument('--penalty_anneal_iters', type=int, default=100)
 parser.add_argument('--penalty_weight', type=float, default=10000.0)
 parser.add_argument('--steps', type=int, default=501)
@@ -108,13 +109,16 @@ for restart in range(flags.n_restarts):
       if flags.grayscale_model:
         lin1 = nn.Linear(14 * 14, flags.hidden_dim)
       else:
-        lin1 = nn.Linear(3 * 227 * 227, flags.hidden_dim)
+        lin0 = models.resnet18(pretrained=True)
+        num_ftrs = lin0.fc.in_features
+      lin1 = nn.Linear(num_ftrs, flags.hidden_dim)
       lin2 = nn.Linear(flags.hidden_dim, flags.hidden_dim)
       lin3 = nn.Linear(flags.hidden_dim, 7)
       for lin in [lin1, lin2, lin3]:
         nn.init.xavier_uniform_(lin.weight)
         nn.init.zeros_(lin.bias)
-      self._main = nn.Sequential(lin1, nn.ReLU(True), lin2, nn.ReLU(True), lin3)
+      self._main = nn.Sequential(lin0, nn.ReLU(True), lin1, nn.ReLU(True), 
+                                    lin2, nn.ReLU(True), lin3)
     def forward(self, input):
       if flags.grayscale_model:
         out = input.view(input.shape[0], 2, 14 * 14).sum(dim=1)
