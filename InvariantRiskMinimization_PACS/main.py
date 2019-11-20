@@ -120,7 +120,7 @@ for restart in range(flags.n_restarts):
         out = input.view(input.shape[0], 2, 14 * 14).sum(dim=1)
       else:
         out = input.view(input.shape[0], 3 * 227 * 227)
-      out = self._main(out)
+      out = self._main(out.to(self.device))
       return out
 
   mlp = MLP().cuda()
