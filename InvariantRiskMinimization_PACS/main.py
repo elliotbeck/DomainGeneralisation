@@ -88,8 +88,8 @@ for restart in range(flags.n_restarts):
 
   def make_environment(images, labels):
       return{
-        'images': (images.float() / 255.),
-        'labels': labels[:, None]
+        'images': (images.float() / 255.).cuda(),
+        'labels': labels[:, None].cuda)()
       }
 
   envs = [
@@ -120,7 +120,7 @@ for restart in range(flags.n_restarts):
         out = input.view(input.shape[0], 2, 14 * 14).sum(dim=1)
       else:
         out = input.view(input.shape[0], 3 * 227 * 227)
-      out = self._main(out.to(self.device))
+      out = self._main(out)
       return out
 
   mlp = MLP().cuda()
