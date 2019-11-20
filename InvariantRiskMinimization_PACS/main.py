@@ -131,7 +131,7 @@ for restart in range(flags.n_restarts):
     return nn.functional.binary_cross_entropy_with_logits(logits, y.float())
 
   def mean_accuracy(logits, y):
-    equals = torch.sum(torch.eq(logits.max(1)[1].float(),y_train1.max(1)[1].float()).cuda()).cuda()
+    equals = torch.sum(torch.eq(logits.max(1)[1].cuda(),y_train1.max(1)[1].cuda()))
     return equals.float()/mlp.shape[0]
 
   def penalty(logits, y):
