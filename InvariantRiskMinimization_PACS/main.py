@@ -41,7 +41,7 @@ for restart in range(flags.n_restarts):
   y_train1 = list(f[a_group_key])
   
   # append cartoon training data
-  filename = '/cluster/work/math/ebeck/data/pacscartoon_train.hdf5'
+  filename = '/cluster/work/math/ebeck/data/pacs/cartoon_train.hdf5'
   f = h5py.File(filename, 'r')
 
   a_group_key = list(f.keys())[0]
@@ -50,7 +50,7 @@ for restart in range(flags.n_restarts):
   y_train2 = (list(f[a_group_key]))
 
   # append sketch training data
-  filename = '/cluster/work/math/ebeck/data/pacssketch_train.hdf5'
+  filename = '/cluster/work/math/ebeck/data/pacs/sketch_train.hdf5'
   f = h5py.File(filename, 'r')
 
   a_group_key = list(f.keys())[0]
@@ -61,7 +61,7 @@ for restart in range(flags.n_restarts):
 
   # read in test data
 
-  filename = '/cluster/work/math/ebeck/data/pacsdata/photo_val.hdf5'
+  filename = '/cluster/work/math/ebeck/data/pacs/photo_val.hdf5'
   f = h5py.File(filename, 'r')
 
   a_group_key = list(f.keys())[0]
