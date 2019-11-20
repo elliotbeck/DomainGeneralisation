@@ -132,7 +132,7 @@ for restart in range(flags.n_restarts):
 
   def mean_accuracy(logits, y):
     equals = torch.sum(torch.eq(logits.max(1)[1].cuda(),y_train1.max(1)[1].cuda()))
-    return equals.float()/mlp.shape[0]
+    return equals.float()/logits.shape[0]
 
   def penalty(logits, y):
     scale = torch.tensor(1.).cuda().requires_grad_()
