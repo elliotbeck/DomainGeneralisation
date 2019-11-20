@@ -124,7 +124,7 @@ for restart in range(flags.n_restarts):
         out = input.view(input.shape[0], 3 * 227 * 227)
       out = self._main(out)
       return out
-      
+
   mlp = MLP().cuda()
 
   # Define loss function helpers
@@ -159,9 +159,6 @@ for restart in range(flags.n_restarts):
 
   for step in range(flags.steps):
     for env in envs:
-      logits = mlp(env['images'][:50,:,:,:])
-      logits = logits.squeeze().float()
-
       env['labels'] = env['labels'].squeeze()
       env['nll'] = mean_nll(logits, env['labels'])
       env['acc'] = mean_accuracy(logits, env['labels'])
