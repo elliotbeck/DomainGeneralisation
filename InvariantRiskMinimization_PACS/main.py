@@ -3,7 +3,9 @@ import numpy as np
 import torch
 from torchvision import datasets
 from torch import nn, optim, autograd
+from torch.nn import functional as F
 import util
+import h5py
 
 parser = argparse.ArgumentParser(description='Colored MNIST')
 parser.add_argument('--hidden_dim', type=int, default=256)
@@ -28,107 +30,76 @@ for restart in range(flags.n_restarts):
   # Load MNIST, make train/val splits, and shuffle train set examples
 
 
-# read in training data
+  # read in training data
 
-# Get the Art training data
-filename = '/cluster/home/ebeck/art_painting_train.hdf5'
-f = h5py.File(filename, 'r')
+  # Get the Art training data
+  filename = '/cluster/work/math/ebeck/data/pacs/art_painting_test.hdf5'
+  f = h5py.File(filename, 'r')
 
-a_group_key = list(f.keys())[0]
-X_train = list(f[a_group_key])
-a_group_key = list(f.keys())[1]
-y_train = list(f[a_group_key])
+  a_group_key = list(f.keys())[0]
+  X_train1 = list(f[a_group_key])
+  a_group_key = list(f.keys())[1]
+  y_train1 = list(f[a_group_key])
+  
+  # append cartoon training data
+  filename = '/cluster/work/math/ebeck/data/pacscartoon_train.hdf5'
+  f = h5py.File(filename, 'r')
 
-# append cartoon training data
-filename = '/cluster/home/ebeck/cartoon_train.hdf5'
-f = h5py.File(filename, 'r')
+  a_group_key = list(f.keys())[0]
+  X_train2 = (list(f[a_group_key]))
+  a_group_key = list(f.keys())[1]
+  y_train2 = (list(f[a_group_key]))
 
-a_group_key = list(f.keys())[0]
-X_train.extend(list(f[a_group_key]))
-a_group_key = list(f.keys())[1]
-y_train.extend(list(f[a_group_key]))
+  # append sketch training data
+  filename = '/cluster/work/math/ebeck/data/pacssketch_train.hdf5'
+  f = h5py.File(filename, 'r')
 
-# append sketch training data
-filename = '/cluster/home/ebeck/sketch_train.hdf5'
-f = h5py.File(filename, 'r')
-
-a_group_key = list(f.keys())[0]
-X_train.extend(list(f[a_group_key]))
-a_group_key = list(f.keys())[1]
-y_train.extend(list(f[a_group_key]))
-
-
-X_train = np.asarray(X_train)
-y_train = np.asarray(y_train)
-y_train = y_train - 1
+  a_group_key = list(f.keys())[0]
+  X_train3 = (list(f[a_group_key]))
+  a_group_key = list(f.keys())[1]
+  y_train3 = (list(f[a_group_key]))
 
 
-# read in test data
+  # read in test data
 
-filename = '/cluster/home/ebeck/photo_val.hdf5'
-f = h5py.File(filename, 'r')
+  filename = '/cluster/work/math/ebeck/data/pacsdata/photo_val.hdf5'
+  f = h5py.File(filename, 'r')
 
-a_group_key = list(f.keys())[0]
-X_test = list(f[a_group_key])
-a_group_key = list(f.keys())[1]
-y_test = list(f[a_group_key])
-
-X_test = np.asarray(X_test)
-y_test = np.asarray(y_test)
-y_test = y_test - 1
-
-# preprocess data
-
-X_train = X_train / 255.0
-X_test = X_test / 255.0
-
-y_train = np_utils.to_categorical(y_train, 7)
-y_test = np_utils.to_categorical(y_test, 7)
-
-print(X_train.shape)
-print(X_test.shape)
+  a_group_key = list(f.keys())[0]
+  X_test = list(f[a_group_key])
+  a_group_key = list(f.keys())[1]
+  y_test = list(f[a_group_key])
 
 
+  # convert data to tensors
 
+  X_train1, X_train2, X_train3 = np.array(X_train1, dtype=np.float32), np.array(X_train2, dtype=np.float32), np.array(X_train3, dtype=np.float32)
+  y_train1, y_train2, y_train3  = np.array(y_train1, dtype=np.float32), np.array(y_train2, dtype=np.float32), np.array(y_train3, dtype=np.float32)
+  X_test = np.array(X_test, dtype=np.float32)
+  y_test = np.array(y_test, dtype=np.float32)
+  y_train1, y_train2, y_train3, y_test = y_train1-1, y_train2-1, y_train3-1, y_test-1
 
-
-  mnist = datasets.MNIST('/cluster/work/math/ebeck/torch_datasets/mnist', train=True, download=True)
-  mnist_train = (mnist.train_data, mnist.train_labels)
-  mnist = datasets.MNIST('/cluster/work/math/ebeck/torch_datasets/mnist', train=False, download=True)
-  mnist_val = (mnist.test_data, mnist.test_labels)
-
-  rng_state = np.random.get_state()
-  np.random.shuffle(mnist_train[0].numpy())
-  np.random.set_state(rng_state)
-  np.random.shuffle(mnist_train[1].numpy())
+  X_train1, X_train2, X_train3 = torch.from_numpy(X_train1).float(), torch.from_numpy(X_train2).float(), torch.from_numpy(X_train3).float()
+  y_train1, y_train2, y_train3 = torch.from_numpy(y_train1).float(), torch.from_numpy(y_train2).float(), torch.from_numpy(y_train3).float()
+  y_train1, y_train2, y_train3 = F.one_hot(y_train1.to(torch.int64)), F.one_hot(y_train2.to(torch.int64)), F.one_hot(y_train3.to(torch.int64))
+  X_test, y_test = torch.from_numpy(X_test).float(), torch.from_numpy(y_test).float()
+  y_test = F.one_hot(y_test.to(torch.int64))
 
   # Build environments
 
-  def make_environment(images, labels, e):
-    def torch_bernoulli(p, size):
-      return (torch.rand(size) < p).float()
-    def torch_xor(a, b):
-      return (a-b).abs() # Assumes both inputs are either 0 or 1
-    # 2x subsample for computational convenience
-    images = images.reshape((-1, 28, 28))[:, ::2, ::2]
-    # Assign a binary label based on the digit; flip label with probability 0.25
-    labels = (labels < 5).float()
-    labels = torch_xor(labels, torch_bernoulli(0.25, len(labels)))
-    # Assign a color based on the label; flip the color with probability e
-    colors = torch_xor(labels, torch_bernoulli(e, len(labels)))
-    # Apply the color to the image by zeroing out the other color channel
-    images = torch.stack([images, images], dim=1)
-    images[torch.tensor(range(len(images))), (1-colors).long(), :, :] *= 0
-    return {
-      'images': (images.float() / 255.).cuda(),
-      'labels': labels[:, None].cuda()
-    }
+  def make_environment(images, labels):
+      return{
+        'images': (images.float() / 255.),
+        'labels': labels[:, None]
+      }
 
   envs = [
-    make_environment(mnist_train[0][::2], mnist_train[1][::2], 0.2),
-    make_environment(mnist_train[0][1::2], mnist_train[1][1::2], 0.1),
-    make_environment(mnist_val[0], mnist_val[1], 0.9)
+    make_environment(X_train1, y_train1),
+    make_environment(X_train2, y_train2),
+    make_environment(X_train3, y_train3),
+    make_environment(X_test, y_test)
   ]
+
 
   # Define and instantiate the model
 
@@ -138,9 +109,9 @@ print(X_test.shape)
       if flags.grayscale_model:
         lin1 = nn.Linear(14 * 14, flags.hidden_dim)
       else:
-        lin1 = nn.Linear(2 * 14 * 14, flags.hidden_dim)
+        lin1 = nn.Linear(3 * 227 * 227, flags.hidden_dim)
       lin2 = nn.Linear(flags.hidden_dim, flags.hidden_dim)
-      lin3 = nn.Linear(flags.hidden_dim, 1)
+      lin3 = nn.Linear(flags.hidden_dim, 7)
       for lin in [lin1, lin2, lin3]:
         nn.init.xavier_uniform_(lin.weight)
         nn.init.zeros_(lin.bias)
@@ -149,7 +120,7 @@ print(X_test.shape)
       if flags.grayscale_model:
         out = input.view(input.shape[0], 2, 14 * 14).sum(dim=1)
       else:
-        out = input.view(input.shape[0], 2 * 14 * 14)
+        out = input.view(input.shape[0], 3 * 227 * 227)
       out = self._main(out)
       return out
 
@@ -158,11 +129,11 @@ print(X_test.shape)
   # Define loss function helpers
 
   def mean_nll(logits, y):
-    return nn.functional.binary_cross_entropy_with_logits(logits, y)
+    return nn.functional.binary_cross_entropy_with_logits(logits, y.float())
 
   def mean_accuracy(logits, y):
-    preds = (logits > 0.).float()
-    return ((preds - y).abs() < 1e-2).float().mean()
+    equals = torch.sum(torch.eq(mlp.max(1)[1],y_train1.max(1)[1]))
+    return equals.float()/mlp.shape[0]
 
   def penalty(logits, y):
     scale = torch.tensor(1.).cuda().requires_grad_()
@@ -192,9 +163,9 @@ print(X_test.shape)
       env['acc'] = mean_accuracy(logits, env['labels'])
       env['penalty'] = penalty(logits, env['labels'])
 
-    train_nll = torch.stack([envs[0]['nll'], envs[1]['nll']]).mean()
-    train_acc = torch.stack([envs[0]['acc'], envs[1]['acc']]).mean()
-    train_penalty = torch.stack([envs[0]['penalty'], envs[1]['penalty']]).mean()
+    train_nll = torch.stack([envs[0]['nll'], envs[1]['nll'], envs[2]['nll']]).mean()
+    train_acc = torch.stack([envs[0]['acc'], envs[1]['acc'], envs[2]['acc']]).mean()
+    train_penalty = torch.stack([envs[0]['penalty'], envs[1]['penalty'], envs[2]['penalty']]).mean()
 
     weight_norm = torch.tensor(0.).cuda()
     for w in mlp.parameters():
@@ -213,7 +184,7 @@ print(X_test.shape)
     loss.backward()
     optimizer.step()
     
-    test_acc = envs[2]['acc']
+    test_acc = envs[3]['acc']
     if step % 100 == 0:
       pretty_print(
         np.int32(step),
