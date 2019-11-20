@@ -89,7 +89,7 @@ for restart in range(flags.n_restarts):
   def make_environment(images, labels):
       return{
         'images': (images.float() / 255.).cuda(),
-        'labels': labels[:, None].cuda)()
+        'labels': labels[:, None].cuda()
       }
 
   envs = [
