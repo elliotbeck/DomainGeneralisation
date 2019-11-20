@@ -131,7 +131,7 @@ for restart in range(flags.n_restarts):
     return nn.functional.binary_cross_entropy_with_logits(logits, y.float())
 
   def mean_accuracy(logits, y):
-    equals = torch.sum(torch.eq(mlp.max(1)[1],y_train1.max(1)[1]))
+    equals = torch.sum(torch.eq(logits.max(1)[1],y_train1.max(1)[1]))
     return equals.float()/mlp.shape[0]
 
   def penalty(logits, y):
@@ -159,6 +159,7 @@ for restart in range(flags.n_restarts):
     for env in envs:
       logits = mlp(env['images'])
       logits = logits.squeeze().float()
+
       env['labels'] = env['labels'].squeeze()
       env['nll'] = mean_nll(logits, env['labels'])
       env['acc'] = mean_accuracy(logits, env['labels'])
