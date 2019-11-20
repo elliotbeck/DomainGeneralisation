@@ -161,8 +161,7 @@ for restart in range(flags.n_restarts):
 
   for step in range(flags.steps):
     for env in envs:
-      print(env['images'].shape)
-      logits = mlp(env['images'][:50])
+      logits = mlp(env['images'][:50,:,:,:])
       logits = logits.squeeze().float()
 
       env['labels'] = env['labels'].squeeze()
