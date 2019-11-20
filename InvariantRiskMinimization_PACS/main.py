@@ -103,30 +103,28 @@ for restart in range(flags.n_restarts):
 
   # Define and instantiate the model
 
+
   class MLP(nn.Module):
     def __init__(self):
       super(MLP, self).__init__()
       if flags.grayscale_model:
         lin1 = nn.Linear(14 * 14, flags.hidden_dim)
       else:
-        lin0 = models.resnet18(pretrained=True)
-        num_ftrs = lin0.fc.in_features
-      lin1 = nn.Linear(num_ftrs, flags.hidden_dim)
+        lin1 = nn.Linear(3 * 227 * 227, flags.hidden_dim)
       lin2 = nn.Linear(flags.hidden_dim, flags.hidden_dim)
       lin3 = nn.Linear(flags.hidden_dim, 7)
       for lin in [lin1, lin2, lin3]:
         nn.init.xavier_uniform_(lin.weight)
         nn.init.zeros_(lin.bias)
-      self._main = nn.Sequential(lin0, nn.ReLU(True), lin1, nn.ReLU(True), 
-                                    lin2, nn.ReLU(True), lin3)
+      self._main = nn.Sequential(lin1, nn.ReLU(True), lin2, nn.ReLU(True), lin3)
     def forward(self, input):
       if flags.grayscale_model:
         out = input.view(input.shape[0], 2, 14 * 14).sum(dim=1)
       else:
-        out = input.permute(0,3,1,2)
+        out = input.view(input.shape[0], 3 * 227 * 227)
       out = self._main(out)
       return out
-
+      
   mlp = MLP().cuda()
 
   # Define loss function helpers
