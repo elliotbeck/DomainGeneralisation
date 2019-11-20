@@ -17,8 +17,6 @@ parser.add_argument('--steps', type=int, default=501)
 parser.add_argument('--grayscale_model', action='store_true')
 flags = parser.parse_args()
 
-torch.set_default_tensor_type('torch.cuda.FloatTensor')
-
 print('Flags:')
 for k,v in sorted(vars(flags).items()):
   print("\t{}: {}".format(k, v))
@@ -133,7 +131,7 @@ for restart in range(flags.n_restarts):
     return nn.functional.binary_cross_entropy_with_logits(logits, y.float())
 
   def mean_accuracy(logits, y):
-    equals = torch.sum(torch.eq(logits.max(1)[1],y_train1.max(1)[1]))
+    equals = torch.sum(torch.eq(logits.max(1)[1].float(),y_train1.max(1)[1].float()))
     return equals.float()/mlp.shape[0]
 
   def penalty(logits, y):
