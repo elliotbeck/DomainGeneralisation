@@ -1,5 +1,5 @@
 {
-    "seed": 2,
+    "seed": 1,
     
     "dataset": "pacs",
     "test_domain": ["sketch"], 
