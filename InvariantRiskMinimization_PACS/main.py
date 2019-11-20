@@ -123,7 +123,7 @@ for restart in range(flags.n_restarts):
       if flags.grayscale_model:
         out = input.view(input.shape[0], 2, 14 * 14).sum(dim=1)
       else:
-        out = input
+        out = input.permute(0,3,1,2)
       out = self._main(out)
       return out
 
