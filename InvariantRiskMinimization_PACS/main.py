@@ -128,7 +128,7 @@ for restart in range(flags.n_restarts):
   # Define loss function helpers
 
   def mean_nll(logits, y):
-    return nn.functional.binary_cross_entropy_with_logits(logits, y.float())
+    return nn.functional.binary_cross_entropy_with_logits(logits.float(), y.float())
 
   def mean_accuracy(logits, y):
     equals = torch.sum(torch.eq(mlp.max(1)[1],y_train1.max(1)[1]))
