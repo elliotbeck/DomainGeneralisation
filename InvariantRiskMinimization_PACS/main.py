@@ -4,7 +4,6 @@ import torch
 from torchvision import datasets
 from torch import nn, optim, autograd
 from torch.nn import functional as F
-import util
 import h5py
 
 parser = argparse.ArgumentParser(description='Colored MNIST')
