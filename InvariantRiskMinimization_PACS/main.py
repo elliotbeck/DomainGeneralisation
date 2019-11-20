@@ -159,8 +159,7 @@ for restart in range(flags.n_restarts):
     for env in envs:
       logits = mlp(env['images'])
       logits = logits.squeeze(1).float()
-      print(logits.shape)
-      print(env['labels'].shape)
+      env['labels'] = env['labels'].squeeze()
       env['nll'] = mean_nll(logits, env['labels'])
       env['acc'] = mean_accuracy(logits, env['labels'])
       env['penalty'] = penalty(logits, env['labels'])
