@@ -120,7 +120,7 @@ for restart in range(flags.n_restarts):
           ct = 0
           for child in resnet.children():
             ct += 1
-            if ct < 9:
+            if ct < 10:
               for param in child.parameters():
                 param.requires_grad = False
       resnet.fc = nn.Linear(2048, flags.hidden_dim)
