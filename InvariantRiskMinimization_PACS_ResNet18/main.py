@@ -116,9 +116,13 @@ for restart in range(flags.n_restarts):
       if flags.grayscale_model:
         lin1 = nn.Linear(14 * 14, flags.hidden_dim)
       else:
-          resnet = models.resnet18(pretrained=True)
-          for param in resnet.parameters():
-              param.requires_grad = False
+          resnet = models.resnet50(pretrained=True)
+          ct = 0
+          for child in resnet.children():
+            ct += 1
+            if ct < 8:
+              for param in child.parameters():
+                param.requires_grad = False
       resnet.fc = nn.Linear(2048, flags.hidden_dim)
       lin1 = nn.Linear(flags.hidden_dim, flags.hidden_dim)
       lin2 = nn.Linear(flags.hidden_dim, flags.hidden_dim)
