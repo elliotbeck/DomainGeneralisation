@@ -28,7 +28,7 @@ for k,v in sorted(vars(flags).items()):
 
 final_train_accs = []
 final_test_accs = []
-batch_size = 32
+batch_size = 16
 
 for restart in range(flags.n_restarts):
   print("Restart", restart)
@@ -120,7 +120,7 @@ for restart in range(flags.n_restarts):
           ct = 0
           for child in resnet.children():
             ct += 1
-            if ct < 8:
+            if ct < 9:
               for param in child.parameters():
                 param.requires_grad = False
       resnet.fc = nn.Linear(2048, flags.hidden_dim)
