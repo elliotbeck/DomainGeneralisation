@@ -74,7 +74,7 @@ class ModelBaseline:
         self.val_paths.remove(self.val_paths[unseen_index])
 
         if not os.path.exists(flags.logs):
-            oos.makedirs(flags.logs)
+            os.makedirs(flags.logs)
 
         flags_log = os.path.join(flags.logs, 'path_log.txt')
         write_log(str(self.train_paths), flags_log)
