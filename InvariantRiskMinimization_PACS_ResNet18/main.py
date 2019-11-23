@@ -12,7 +12,7 @@ import torchvision
 from torchvision import transforms, datasets, models
 
 parser = argparse.ArgumentParser(description='Colored MNIST')
-parser.add_argument('--hidden_dim', type=int, default=512)
+parser.add_argument('--hidden_dim', type=int, default=256)
 parser.add_argument('--l2_regularizer_weight', type=float,default=0.001)
 parser.add_argument('--lr', type=float, default=0.001)
 parser.add_argument('--n_restarts', type=int, default=1)
@@ -126,7 +126,8 @@ for restart in range(flags.n_restarts):
       for lin in [lin1, lin2, lin3]:
         nn.init.xavier_uniform_(lin.weight)
         nn.init.zeros_(lin.bias)
-      self._main = nn.Sequential(resnet, nn.ReLU(True), lin1, nn.ReLU(True), lin2, nn.ReLU(True), lin3)
+      self._main = nn.Sequential(resnet, nn.ReLU(True), lin1, nn.ReLU(True), 
+                                  lin2, nn.ReLU(True), lin3)
     def forward(self, input):
       if flags.grayscale_model:
         out = input.view(input.shape[0], 2, 14 * 14).sum(dim=1)
@@ -188,7 +189,8 @@ for restart in range(flags.n_restarts):
 
     train_nll = torch.stack([envs[0]['nll'], envs[1]['nll'], envs[2]['nll']]).mean()
     train_acc = torch.stack([envs[0]['acc'], envs[1]['acc'], envs[2]['acc']]).mean()
-    train_penalty = torch.stack([envs[0]['penalty'], envs[1]['penalty'], envs[2]['penalty']]).mean()
+    train_penalty = torch.stack([envs[0]['penalty'], envs[1]['penalty'], 
+                                  envs[2]['penalty']]).mean()
 
     weight_norm = torch.tensor(0.).cuda()
     for w in mlp.parameters():
