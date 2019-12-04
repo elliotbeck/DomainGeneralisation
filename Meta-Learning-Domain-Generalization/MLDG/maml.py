@@ -241,22 +241,25 @@ class MAML:
         for op_name in weights_dict:
 
             # Check if layer should be trained from scratch
+
             if op_name not in self.SKIP_LAYER:
 
                 with tf.variable_scope('model', reuse=True):
-		            with tf.variable_scope(op_name, reuse=True):
+                    with tf.variable_scope(op_name, reuse=True):
 
-		                for data in weights_dict[op_name]:
+                        for data in weights_dict[op_name]:
 
-		                    # Biases
-		                    if len(data.shape) == 1:
-		                        var = tf.get_variable('biases', trainable=True)
-		                        session.run(var.assign(data))
+                                    # Biases
 
-		                    # Weights
-		                    else:
-		                        var = tf.get_variable('weights', trainable=True)
-		                        session.run(var.assign(data))
+                            if len(data.shape) == 1:
+                                var = tf.get_variable('biases', trainable=True)
+                                session.run(var.assign(data))
+                            else:
+
+                                    # Weights
+
+                                var = tf.get_variable('weights', trainable=True)
+                                session.run(var.assign(data))
 
     
     
