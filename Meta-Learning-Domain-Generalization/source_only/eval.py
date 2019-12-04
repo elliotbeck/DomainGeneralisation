@@ -9,8 +9,8 @@ from datetime import datetime
 from tensorflow.contrib.data import Iterator
 
 # Path to the textfiles for the trainings and validation set
-dataroot = '/scratch0/dataset/domain_generalization/kfold/'
-test_file = '../data/sourceonly/art_painting/test.txt'
+dataroot = '/cluster/work/math/ebeck/data/pacs/kfold'
+test_file = '/data/sourceonly/art_painting/test.txt'
 checkpoint_path = 'results/checkpoints'
 num_classes = 7
 scratch_layers = ['fc8']
