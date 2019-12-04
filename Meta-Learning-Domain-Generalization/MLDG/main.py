@@ -14,7 +14,7 @@ FLAGS = flags.FLAGS
 
 ## Dataset/method options
 flags.DEFINE_string('datasource', 'PACS', 'PACS')
-flags.DEFINE_string('dataroot', '/scratch0/dataset/domain_generalization/kfold/', 'Root folder where PACS dataset is stored')
+flags.DEFINE_string('dataroot', '/cluster/work/math/ebeck/data/pacs/kfold/', 'Root folder where PACS dataset is stored')
 flags.DEFINE_integer('num_classes', 7, 'number of classes used in classification (e.g. 5-way classification).')
 
 ## Training options
