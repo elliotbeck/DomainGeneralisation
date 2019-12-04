@@ -27,9 +27,9 @@ Configuration Part.
 """
 
 # Path to the textfiles for the trainings and validation set
-dataroot = '/scratch0/dataset/domain_generalization/kfold/'
-train_file = '../data/sourceonly/art_painting/train.txt'
-val_file = '../data/sourceonly/art_painting/val.txt'
+dataroot = '/cluster/work/math/ebeck/data/pacs/kfold/'
+train_file = 'data/sourceonly/art_painting/train.txt'
+val_file = 'data/sourceonly/art_painting/val.txt'
 out_path = 'results/'
 
 # Learning params
