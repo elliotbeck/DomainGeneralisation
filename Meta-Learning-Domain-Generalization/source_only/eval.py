@@ -10,7 +10,7 @@ from tensorflow.contrib.data import Iterator
 
 # Path to the textfiles for the trainings and validation set
 dataroot = '/cluster/work/math/ebeck/data/pacs/kfold'
-test_file = '/cluster/home/ebeck/DomainGeneralisation/Meta-Learning-Domain-Generalization/data/sourceonly/art_painting'
+test_file = '/data/sourceonly/art_painting'
 checkpoint_path = 'results/checkpoints'
 num_classes = 7
 scratch_layers = ['fc8']
