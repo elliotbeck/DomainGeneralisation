@@ -11,7 +11,7 @@ from tensorflow.contrib.data import Iterator
 # Path to the textfiles for the trainings and validation set
 dataroot = '/cluster/work/math/ebeck/data/pacs/kfold'
 test_file = 'data/sourceonly/art_painting/test.txt'
-checkpoint_path = 'results/checkpoints'
+checkpoint_path = '/cluster/home/ebeck/DomainGeneralisation/Meta-Learning-Domain-Generalization/results/checkpoints'
 num_classes = 7
 scratch_layers = ['fc8']
 batch_size = 1
