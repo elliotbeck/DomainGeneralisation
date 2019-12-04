@@ -23,7 +23,7 @@ class MAML:
         self.forward = self.forward_alexnet
         self.construct_weights = self.construct_alexnet_weights
         self.loss_func = xent
-        self.WEIGHTS_PATH = '/scratch0/Projects/new_ideas/domain_generalization/tensorflow_code/pretrained_weights/bvlc_alexnet.npy'
+        self.WEIGHTS_PATH = '/cluster/home/ebeck/DomainGeneralisation/Meta-Learning-Domain-Generalization/data/bvlc_alexnet.npy'
     
     def construct_model_train(self, prefix='metatrain_'):
         # a: training data for inner gradient, b: test data for meta gradient
