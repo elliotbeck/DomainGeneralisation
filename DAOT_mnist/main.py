@@ -345,6 +345,7 @@ def _get_dataset(dataset_name, model_classifier, split, batch_size, e,
     dataset = dataset.map(lambda x: _preprocess_exampe(model_classifier, x, dataset_name, e))
     dataset = dataset.shuffle(512)
     dataset = dataset.batch(batch_size)
+    dataset = dataset.take(tf.cast(20, tf.int64))
     if num_batches is not None:
         dataset = dataset.take(num_batches)
 
