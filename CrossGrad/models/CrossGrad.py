@@ -47,6 +47,8 @@ class model_label(tf.keras.Model):
         self.model = tf.keras.models.Sequential()
         self.model.add(tf.keras.applications.resnet50.ResNet50(include_top=False,
                                                     weights= resnet_weights, input_shape=in_shape))
+        for layer in self.model.layers:
+            layer.trainable = False         
         self.model.add(tf.keras.layers.GlobalAveragePooling2D())                                    
         self.model.add(tf.keras.layers.Flatten(input_shape=in_shape))
         self.model.add(tf.keras.layers.BatchNormalization())
@@ -57,8 +59,6 @@ class model_label(tf.keras.Model):
         self.model.add(tf.keras.layers.Dropout(0.5))
         self.model.add(tf.keras.layers.BatchNormalization())
         self.model.add(tf.keras.layers.Dense(num_classes_labels, activation='softmax'))
-        for layer in self.model.layers[0]:
-            layer.trainable = False 
         self.model.build([None] + self.input_shape + [3])  # Batch input shape.
 
     def call(self, inputs, training=None, mask=None):
