@@ -25,7 +25,7 @@ flags.DEFINE_string(name="tfds_path", default=None, help="")
 
 flags = flags.FLAGS
 
-with open('/cluster/home/ebeck/CrossGrad/configs/config_class_crossgrad.json', 'r') as myfile:
+with open('configs/config_class_crossgrad.json', 'r') as myfile:
     data=myfile.read()
 config_dic = json.loads(data)
 
