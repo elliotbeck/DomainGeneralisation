@@ -1,0 +1,33 @@
+{
+    "seed": 6,
+    
+    "dataset": "pacs",
+    "test_domain": ["photo"], 
+    "training_domains": ["sketch", "art", "cartoon"],    
+
+    "local_json_dir_name": "tmp",
+    
+    "learning_rate": 0.0001,
+    "decay_every": 500,
+    "decay_base": 0.85,
+    "batch_size": 24,
+    "num_epochs": 10,
+
+    
+    "l2_penalty_weight": 1e-05,
+    
+    "eval_every_n_epochs": 5,
+    "save_summary_steps": 500,
+    "save_checkpoints_secs": 600,
+    "log_step_count_steps": 500,
+    
+
+    "num_classes_label": 7,
+    "num_classes_domain": 3,
+    "name_classifier_domain": "classifier_domain",
+    "name_classifier_label": "classifier_label",
+    "resnet_weights": "imagenet",
+
+    "dropout_rate": 0.7, 
+    "use_dropout": 1
+}
