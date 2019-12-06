@@ -47,7 +47,7 @@ class model_label(tf.keras.Model):
         self.model = tf.keras.models.Sequential()
         self.model.add(tf.keras.applications.resnet50.ResNet50(include_top=False,
                                                     weights= resnet_weights, input_shape=in_shape))
-        for layer in self.model.layers[:-1]:
+        for layer in self.model.layers.resnet50[:-1]:
             layer.trainable = False 
         self.model.add(tf.keras.layers.GlobalAveragePooling2D())                                    
         self.model.add(tf.keras.layers.Flatten(input_shape=in_shape))
