@@ -4,26 +4,27 @@ import tensorflow as tf
 class model_domain(tf.keras.Model):
     INPUT_SHAPE = [227, 227]
 
-    def __init__(self, num_classes_domains, resnet_weights, config, *args, **kwargs):
+    def __init__(self, num_classes_labels, resnet_weights, config, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.config = config
 
         in_shape = self.input_shape + [3]
 
-        self.model = tf.keras.Sequential([
-            tf.compat.v1.keras.applications.ResNet50(include_top=False,
-                                                        weights=resnet_weights, input_shape=in_shape),
-            tf.keras.layers.GlobalAveragePooling2D(),
-            tf.keras.layers.Flatten(input_shape=in_shape),
-            tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(128, activation='relu'),
-            tf.keras.layers.Dropout(0.5),
-            tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(64, activation='relu'),
-            tf.keras.layers.Dropout(0.5),
-            tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(num_classes_domains)
-        ])
+        self.model = tf.keras.models.Sequential()
+        self.model.add(tf.keras.applications.resnet50.ResNet50(include_top=False,
+                                                    weights= resnet_weights, input_shape=in_shape))
+        for layer in self.model.layers[:-1]:
+            layer.trainable = False 
+        self.model.add(tf.keras.layers.GlobalAveragePooling2D())                                    
+        self.model.add(tf.keras.layers.Flatten(input_shape=in_shape))
+        self.model.add(tf.keras.layers.BatchNormalization())
+        self.model.add(tf.keras.layers.Dense(256, activation='relu'))
+        self.model.add(tf.keras.layers.Dropout(0.5))
+        self.model.add(tf.keras.layers.BatchNormalization())
+        self.model.add(tf.keras.layers.Dense(256, activation='relu'))
+        self.model.add(tf.keras.layers.Dropout(0.5))
+        self.model.add(tf.keras.layers.BatchNormalization())
+        self.model.add(tf.keras.layers.Dense(num_classes_labels, activation='softmax'))
         self.model.build([None] + self.input_shape + [3])  # Batch input shape.
 
     def call(self, inputs, training=None, mask=None):
@@ -46,8 +47,8 @@ class model_label(tf.keras.Model):
         self.model = tf.keras.models.Sequential()
         self.model.add(tf.keras.applications.resnet50.ResNet50(include_top=False,
                                                     weights= resnet_weights, input_shape=in_shape))
-        # for layer in self.model.layers[:-4]:
-        #     layer.trainable = False 
+        for layer in self.model.layers[:-1]:
+            layer.trainable = False 
         self.model.add(tf.keras.layers.GlobalAveragePooling2D())                                    
         self.model.add(tf.keras.layers.Flatten(input_shape=in_shape))
         self.model.add(tf.keras.layers.BatchNormalization())
