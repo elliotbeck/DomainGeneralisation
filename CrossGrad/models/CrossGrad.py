@@ -11,11 +11,11 @@ class model_domain(tf.keras.Model):
         in_shape = self.input_shape + [3]
 
         self.model = tf.keras.models.Sequential()
-        self.model.add(tf.keras.applications.resnet50.ResNet50(include_top=False,
-                                                    weights= resnet_weights, input_shape=in_shape))
-        for layer in self.model.layers:
-            layer.trainable = False 
-        self.model.add(tf.keras.layers.GlobalAveragePooling2D())                                    
+        # self.model.add(tf.keras.applications.resnet50.ResNet50(include_top=False,
+        #                                             weights= resnet_weights, input_shape=in_shape))
+        # for layer in self.model.layers:
+        #     layer.trainable = False 
+        # self.model.add(tf.keras.layers.GlobalAveragePooling2D())                                    
         self.model.add(tf.keras.layers.Flatten())
         self.model.add(tf.keras.layers.BatchNormalization())
         self.model.add(tf.keras.layers.Dense(256, activation='relu'))
@@ -45,11 +45,11 @@ class model_label(tf.keras.Model):
         in_shape = self.input_shape + [3]
 
         self.model = tf.keras.models.Sequential()
-        self.model.add(tf.keras.applications.resnet50.ResNet50(include_top=False,
-                                                    weights= resnet_weights, input_shape=in_shape))
-        for layer in self.model.layers:
-            layer.trainable = False         
-        self.model.add(tf.keras.layers.GlobalAveragePooling2D())                                    
+        # self.model.add(tf.keras.applications.resnet50.ResNet50(include_top=False,
+        #                                             weights= resnet_weights, input_shape=in_shape))
+        # for layer in self.model.layers:
+        #     layer.trainable = False         
+        # self.model.add(tf.keras.layers.GlobalAveragePooling2D())                                    
         self.model.add(tf.keras.layers.Flatten())
         self.model.add(tf.keras.layers.BatchNormalization())
         self.model.add(tf.keras.layers.Dense(256, activation='relu'))
