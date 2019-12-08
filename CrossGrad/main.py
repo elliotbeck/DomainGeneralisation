@@ -138,8 +138,8 @@ def _train_step(model_label, model_domain, features1, features2, features3,
     with tf.GradientTape(persistent=True) as tape_src:
 
         tape_src.watch(features1["image"])
-        tape_src.watch(features2["image"])
-        tape_src.watch(features3["image"])
+        # tape_src.watch(features2["image"])
+        # tape_src.watch(features3["image"])
 
         # get loss of labels
         mean_classification_loss, accuracy, l2_regularizer = loss_fn_label(
