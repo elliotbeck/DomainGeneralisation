@@ -104,8 +104,8 @@ def loss_fn_regular(features1, features2, features3, model_task1, model_task2,
     
     accuracy3 = tf.reduce_mean(
         tf.where(tf.equal(label3, tf.argmax(model_task3_output, axis=-1)),
-                    tf.ones_like(label2, dtype=tf.float32),
-                    tf.zeros_like(label2, dtype=tf.float32)))
+                    tf.ones_like(label3, dtype=tf.float32),
+                    tf.zeros_like(label3, dtype=tf.float32)))
 
     # get the mean accurary over all task models
     accuracy = tf.reduce_mean([accuracy1, accuracy2, accuracy3])
