@@ -234,7 +234,7 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
 
 
 def _train_step(model_classifier, model_generator, model_critic, features1, features2, 
-                optimizer1, optimizer2, optimizer3, global_step, config):
+                optimizer, global_step, config):
     with tf.GradientTape() as tape_src:
         # get loss of classifier
         mean_classification_loss_weighted, l2_regularizer, accuracy, _ = loss_fn_classifier(
@@ -249,7 +249,7 @@ def _train_step(model_classifier, model_generator, model_critic, features1, feat
         
         # update weights of classifier
         grads = tape_src.gradient(total_loss, model_classifier.trainable_variables)
-        optimizer1.apply_gradients(zip(grads, model_classifier.trainable_variables))
+        optimizer.apply_gradients(zip(grads, model_classifier.trainable_variables))
 
     with tf.GradientTape() as tape_src:
         # get loss of critic
@@ -257,7 +257,7 @@ def _train_step(model_classifier, model_generator, model_critic, features1, feat
 
         # update weights of critic
         grads = tape_src.gradient(loss_critic, model_critic.trainable_variables)
-        optimizer2.apply_gradients(zip(grads, model_critic.trainable_variables))
+        optimizer.apply_gradients(zip(grads, model_critic.trainable_variables))
 
     with tf.GradientTape() as tape_src:
         # get loss of generator 
@@ -266,17 +266,16 @@ def _train_step(model_classifier, model_generator, model_critic, features1, feat
 
         # update weights of generator
         grads = tape_src.gradient(loss_generator, model_generator.trainable_variables)
-        optimizer3.apply_gradients(zip(grads, model_generator.trainable_variables))
+        optimizer.apply_gradients(zip(grads, model_generator.trainable_variables))
 
         global_step.assign_add(1)
 
 
 def train_one_epoch(model_classifier, model_generator, model_critic, train_input1, train_input2,
-                    optimizer1, optimizer2, optimizer3, global_step, config):
+                    optimizer, global_step, config):
 
     for _input1, _input2 in zip(train_input1, train_input2):
-        _train_step(model_classifier, model_generator, model_critic, _input1, _input2, optimizer1,
-        optimizer2, optimizer3, global_step, config)
+        _train_step(model_classifier, model_generator, model_critic, _input1, _input2, optimizer, global_step, config)
 
 
 # compute the mean of all examples for a specific set (eval, validation, out-of-distribution, etc)
@@ -415,9 +414,8 @@ def main():
     learning_rate = tf.keras.optimizers.schedules.ExponentialDecay(
         config.learning_rate, config.decay_every, 
         config.decay_base, staircase=True)
-    optimizer1 = tf.keras.optimizers.Adam(learning_rate, epsilon=1e-03)
-    optimizer2 = tf.keras.optimizers.Adam(learning_rate, epsilon=1e-03)
-    optimizer3 = tf.keras.optimizers.Adam(learning_rate, epsilon=1e-03)
+    optimizer = tf.keras.optimizers.Adam(learning_rate, epsilon=1e-03)
+
 
     if args.reload_ckpt != "None":
         # TODO: fix this hack
@@ -501,8 +499,7 @@ def main():
 
             train_one_epoch(model_classifier=model_classifier, model_generator= model_generator, 
                 model_critic = model_critic, train_input1=rand_inputs[random[0]], 
-                train_input2=rand_inputs[random[1]], optimizer1=optimizer1, optimizer2=optimizer2,
-                optimizer3=optimizer3, global_step=global_step, config=config)
+                train_input2=rand_inputs[random[1]], optimizer=optimizer, global_step=global_step, config=config)
 
             train_metr = eval_one_epoch(model_classifier=model_classifier, 
                 model_generator=model_generator, dataset=ds_train_complete,
