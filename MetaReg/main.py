@@ -33,7 +33,7 @@ import util
 import local_settings
 from collections import defaultdict
 
-DEBUG = False
+DEBUG = True
 
 
 parser = argparse.ArgumentParser(description='Train my model.')
@@ -301,6 +301,7 @@ def _train_step_full(features1, features2, features3, model_final,
         tf.summary.scalar("accuracy", accuracy, step=global_step)
 
         # update weights of critic
+        print(model_final.model.summary())
         grads = tape_src.gradient(total_loss, model_final.trainable_variables)
         optimizer.apply_gradients(zip(grads, model_final.trainable_variables))
         
