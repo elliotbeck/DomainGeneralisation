@@ -550,14 +550,14 @@ def main():
             start_time = time.time()
 
             # Metalearning of the regularizer
-            if epoch <= (config.num_epochs/2 - 1):
+            if epoch < (config.num_epochs/2):
                 train_one_epoch(model_task1 = model_task1, model_task2=model_task2, model_task3=model_task3, 
                     model1 = model1, model2 = model2, model3 = model3,
                     model_regularizer=model_regularizer, train_input1=ds_train1, 
                     train_input2=ds_train2, train_input3=ds_train3 ,optimizer=optimizer,
                     global_step=global_step, config=config)
 
-            if epoch >= (config.num_epochs/2 - 1):
+            if epoch >= (config.num_epochs/2):
                 
                 # After Metalearning, train the full model
                 train_one_epoch_full(train_input1=ds_train1, train_input2=ds_train2, 
@@ -595,7 +595,7 @@ def main():
                 manager.save()
 
                 logging.info("\n #### \n epoch: %d, time: %0.2f" % 
-                    (epoch-config.num_epochs/2 - 1, time.time() - start_time))
+                    (epoch-config.num_epochs/2, time.time() - start_time))
                 logging.info("Global step: {}".format(global_step.numpy()))
                 logging.info("train_accuracy: {:2f}, train_loss: {:4f}".format(
                     train_metr['accuracy'], train_metr['loss']))
