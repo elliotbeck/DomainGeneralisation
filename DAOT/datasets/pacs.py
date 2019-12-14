@@ -25,7 +25,7 @@ flags.DEFINE_string(name="tfds_path", default=None, help="")
 
 flags = flags.FLAGS
 
-with open('DomainGeneralisation/DAOT/configs/config_class_daot.json', 'r') as myfile:
+with open('configs/config_class_daot.json', 'r') as myfile:
     data=myfile.read()
 config_dic = json.loads(data)
 
