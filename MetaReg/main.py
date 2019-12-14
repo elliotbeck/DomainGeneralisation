@@ -103,7 +103,7 @@ def loss_fn_regular(features1, features2, features3, model_task1, model_task2,
                     tf.zeros_like(label2, dtype=tf.float32)))
     
     accuracy3 = tf.reduce_mean(
-        tf.where(tf.equal(label2, tf.argmax(model_task3_output, axis=-1)),
+        tf.where(tf.equal(label3, tf.argmax(model_task3_output, axis=-1)),
                     tf.ones_like(label2, dtype=tf.float32),
                     tf.zeros_like(label2, dtype=tf.float32)))
 
