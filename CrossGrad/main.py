@@ -194,7 +194,7 @@ def _train_step(model_label, model_domain, features1, features2, features3,
                                         model_domain, config, training=True)
 
         # get loss of labels
-        mean_classification_loss, accuracy, l2_regularizer = loss_fn_label(
+        total_loss, accuracy, l2_regularizer = loss_fn_label(
             features1, features2, features3, model_label, config=config, training=True)
 
         # calculate the losses with peturbated x
