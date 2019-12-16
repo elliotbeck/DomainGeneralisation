@@ -83,7 +83,7 @@ def loss_fn_domain(features1, features2, features3, model_domain, config, traini
     domain_loss3 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = tf.one_hot(domain3, axis=-1, 
                                 depth=config.num_classes_domain), 
                                 logits = model_domain(inputs3, training=training)), name='domain_loss3')
-    domain_loss = tf.reduce_mean([domain_loss1,domain_loss2,domain_loss3])
+    domain_loss = tf.reduce_mean([domain_loss1, domain_loss2, domain_loss3])
     return domain_loss
 
 def loss_fn_label(features1, features2, features3, model_label, config, training):
@@ -188,13 +188,26 @@ def _train_step(model_label, model_domain, features1, features2, features3,
 
     
     with tf.GradientTape(persistent=True) as tape_src:
+        
+        # get loss of domains
+        loss_domain = loss_fn_domain(features1, features2, features3, 
+                                        model_domain, config, training=True)
+
+        # get loss of labels
+        mean_classification_loss, accuracy, l2_regularizer = loss_fn_label(
+            features1, features2, features3, model_label, config=config, training=True)
+
         # calculate the losses with peturbated x
         loss_l, _, _ = loss_fn_label(X_d1, X_d2, X_d3, model_label ,config=config, training=True)
         loss_d = loss_fn_domain(X_l1, X_l2, X_l3, model_domain ,config=config, training=True)
 
+        # calculate the losses for the gradients
+        loss3 = 0.9*loss_domain+0.1*loss_d
+        loss4 = 0.9*total_loss+0.1*loss_l
+
         # calculate gradients for both neural nets
-        grads3 = tape_src.gradient(0.9*loss_domain+0.1*loss_d, model_domain.trainable_variables)
-        grads4 = tape_src.gradient(0.9*total_loss+0.1*loss_l, model_label.trainable_variables)
+        grads3 = tape_src.gradient(loss3, model_domain.trainable_variables)
+        grads4 = tape_src.gradient(loss4, model_label.trainable_variables)
 
         # apply gradient to both neural nets
         optimizer.apply_gradients(zip(grads3, model_domain.trainable_variables))
@@ -202,7 +215,7 @@ def _train_step(model_label, model_domain, features1, features2, features3,
 
 
 
-def train_one_epoch(model_domain, model_label,  train_input1, train_input2, train_input3,
+def train_one_epoch(model_domain, model_label, train_input1, train_input2, train_input3,
                     optimizer,  global_step, config):
     train_input1.shuffle(buffer_size=10000)
     train_input2.shuffle(buffer_size=10000)
