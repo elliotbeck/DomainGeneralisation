@@ -358,13 +358,13 @@ def main():
     else:
         num_batches = None
 
-        ds_train1 = _get_dataset(config.dataset, model_label,
+    ds_train1 = _get_dataset(config.dataset, model_label,
         split=tfds.Split.TRAIN.subsplit(tfds.percent[:50]), 
         batch_size=tf.cast(config.batch_size/2, tf.int64), 
         num_batches=num_batches, domain = tf.constant(0), e = 0.2)
 
     ds_train2 = _get_dataset(config.dataset, model_label, 
-        split=tfds.Split.TRAIN.subsplit(tfds.percent[-50:]), 
+        split=tfds.Split.TRAIN.subsplit(tfds.percent[-50:]),
         batch_size=tf.cast(config.batch_size/2, tf.int64),
         num_batches=num_batches, domain = tf.constant(1), e = 0.1)
     
@@ -410,7 +410,7 @@ def main():
                 summary_directory=os.path.join(manager._directory, "train2"), 
                 global_step=global_step, config=config, training=False)
             
-            val_metr= eval_one_epoch(model_label=model_label, dataset=ds_val,
+            val_metr = eval_one_epoch(model_label=model_label, dataset=ds_val,
                 summary_directory=os.path.join(manager._directory, "val"), 
                 global_step=global_step, config=config, training=False)
            
