@@ -32,7 +32,7 @@ class model_task(tf.keras.Model):
 
         self.model = tf.keras.models.Sequential()
         self.model.add(model_feature)
-        self.model.add(tf.keras.layers.Dense(num_classes_labels, activation='softmax', use_bias=False))
+        self.model.add(tf.keras.layers.Dense(num_classes_labels, use_bias=False))
         self.model.build([None] + self.input_shape + [3])
 
     def call(self, inputs, training=None, mask=None):
