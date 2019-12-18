@@ -21,7 +21,7 @@ class model_domain(tf.keras.Model):
             tf.keras.layers.Dense(16, activation='relu'),
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(num_classes_domain, activation='softmax')
+            tf.keras.layers.Dense(num_classes_domain)
         ])
         self.model.build([None] + self.input_shape + [2])  # Batch input shape.
 
@@ -53,7 +53,7 @@ class model_label(tf.keras.Model):
             tf.keras.layers.Dense(16, activation='relu'),
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(num_classes_labels, activation='softmax')
+            tf.keras.layers.Dense(num_classes_labels)
         ])
         self.model.build([None] + self.input_shape + [2])  # Batch input shape.
 
