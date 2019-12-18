@@ -54,7 +54,7 @@ class model_label(tf.keras.Model):
         self.model.add(tf.keras.layers.Dense(256, activation='relu'))
         self.model.add(tf.keras.layers.Dropout(0.5))
         self.model.add(tf.keras.layers.BatchNormalization())
-        self.model.add(tf.keras.layers.Dense(num_classes_label, activation='softmax'))
+        self.model.add(tf.keras.layers.Dense(num_classes_label))
         self.model.build([None] + self.input_shape + [3])  # Batch input shape.
 
     def call(self, inputs, training=None, mask=None):
