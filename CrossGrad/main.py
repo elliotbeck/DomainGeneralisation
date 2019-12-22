@@ -102,17 +102,15 @@ def loss_fn_label(features1, features2, features3, model_label, config, training
     model_label_output2 = model_label(inputs2, training=training)
     model_label_output3 = model_label(inputs3, training=training)
 
-
-
     label_loss1 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = tf.one_hot(label1, axis=-1, 
                                 depth=config.num_classes_label), 
-                                logits = model_label_output1), name='Label_loss1')
+                                logits = model_label_output1))
     label_loss2 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = tf.one_hot(label2, axis=-1, 
                                 depth=config.num_classes_label), 
-                                logits = model_label_output2), name='Label_loss2')
+                                logits = model_label_output2))
     label_loss3 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = tf.one_hot(label3, axis=-1, 
                                 depth=config.num_classes_label), 
-                                logits = model_label_output3), name='Label_loss3')                          
+                                logits = model_label_output3))                          
     label_loss = tf.reduce_mean([label_loss1,label_loss2,label_loss3])
 
     accuracy1 = tf.reduce_mean(
@@ -366,6 +364,7 @@ def main():
     # learning_rate = tf.keras.optimizers.schedules.ExponentialDecay(
     #     config.learning_rate, config.decay_every, 
     #     config.decay_base, staircase=True)
+    
     # learning rate = 0.02 in paper
     optimizer = tf.keras.optimizers.RMSprop(learning_rate=0.02)
 

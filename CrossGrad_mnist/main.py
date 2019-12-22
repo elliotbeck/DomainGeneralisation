@@ -331,6 +331,8 @@ def main():
     # learning_rate = tf.keras.optimizers.schedules.ExponentialDecay(
     #     config.learning_rate, config.decay_every, 
     #     config.decay_base, staircase=True)
+
+    
     # learning rate = 0.02 in paper
     optimizer = tf.keras.optimizers.RMSprop(learning_rate=0.02)
 
