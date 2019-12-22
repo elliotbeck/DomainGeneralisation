@@ -206,9 +206,9 @@ def _train_step2(model1, model2, model3, model_regularizer, features1, features2
         grads = tf.reshape(grads, [2048,7])
         optimizer.apply_gradients(zip([grads], [meta_train_model.trainable_variables[0]]))
 
-# third step of metalearning, update regularizer NN
-def _train_step3(model_regularizer, features1, features2, features3, 
-                optimizer, global_step, config, models ,random_domains):
+# # third step of metalearning, update regularizer NN
+# def _train_step3(model_regularizer, features1, features2, features3, 
+#                 optimizer, global_step, config, models ,random_domains):
 
     meta_test_model = models[random_domains[0]]
 
@@ -224,9 +224,9 @@ def _train_step3(model_regularizer, features1, features2, features3,
         loss = [model1_loss, model2_loss, model3_loss]
         meta_test_loss = loss[random_domains[1]]
         # calculate gradients and apply SGD updates
-        grads = tape_src.gradient(meta_test_loss, model_regularizer.trainable_variables)
-        print(grads) 
-        optimizer.apply_gradients(zip(grads, model_regularizer.trainable_variables))
+        grads1 = tape_src.gradient(meta_test_loss, model_regularizer.trainable_variables)
+        print(grads1) 
+        optimizer.apply_gradients(zip(grads1, model_regularizer.trainable_variables))
 
 
 
@@ -283,10 +283,10 @@ def train_one_epoch(model_task1, model_task2, model_task3, model1,
     for layer in model_task3.model.layers[:-1]:
         layer.trainable = True
 
-    # TRAIN_STEP3, meta update for regularizer
-    for _input1, _input2, _input3 in zip(train_input1, train_input2, train_input3):
-        _train_step3(model_regularizer, _input1, _input2, _input3, optimizer, global_step, config, 
-                        models=models, random_domains=random_domains)
+    # # TRAIN_STEP3, meta update for regularizer
+    # for _input1, _input2, _input3 in zip(train_input1, train_input2, train_input3):
+    #     _train_step3(model_regularizer, _input1, _input2, _input3, optimizer, global_step, config, 
+    #                     models=models, random_domains=random_domains)
 
 
 def _train_step_full(features1, features2, features3, model_final,
