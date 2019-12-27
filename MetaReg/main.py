@@ -211,10 +211,10 @@ def _train_step2(model1, model2, model3, model_regularizer, features1, features2
 # def _train_step3(model_regularizer, features1, features2, features3, 
 #                 optimizer, global_step, config, models ,random_domains):
 
-        meta_test_model = models[random_domains[0]]
+        # meta_test_model = models[random_domains[0]]
 
         _, model1_loss, model2_loss, model3_loss, _ = loss_fn_regular(features1, features2, features3, 
-                                                            meta_test_model, meta_test_model, meta_test_model, 
+                                                            meta_train_model, meta_train_model, meta_train_model, 
                                                             config=config, training=True)
 
         loss = [model1_loss, model2_loss, model3_loss]
@@ -222,8 +222,8 @@ def _train_step2(model1, model2, model3, model_regularizer, features1, features2
 
     # with tf.GradientTape() as tape_src:
         print(model_regularizer.trainable_variables)
-        loss = [model1_loss, model2_loss, model3_loss]
-        meta_test_loss = loss[random_domains[1]]
+        # loss = [model1_loss, model2_loss, model3_loss]
+        # meta_test_loss = loss[random_domains[1]]
         # calculate gradients and apply SGD updates
         grads1 = tape_src.gradient(meta_test_loss, model_regularizer.trainable_variables)
         print(grads1) 
@@ -249,7 +249,6 @@ def train_one_epoch(model_task1, model_task2, model_task3, model1,
     # sample two random domains
     random_domains = random.sample([0, 1, 2], 2)
 
-    
     # not possible to use deepcopy, thus for loop workaround
     for a, b in zip(model1.variables, model_task1.variables):
         a.assign(b)
@@ -269,12 +268,12 @@ def train_one_epoch(model_task1, model_task2, model_task3, model1,
     models = [model1, model2, model3]
     
     # only take l(=20) batches of the datasets
-    train_input1 = train_input1.take(20)
-    train_input2 = train_input2.take(20)
-    train_input3 = train_input3.take(20)
+    _train_input1 = train_input1.take(20)
+    _train_input2 = train_input2.take(20)
+    _train_input3 = train_input3.take(20)
 
     # TRAIN_STEP2, meta learning of regularizer
-    for _input1, _input2, _input3 in zip(train_input1, train_input2, train_input3):
+    for _input1, _input2, _input3 in zip(_train_input1, _train_input2, _train_input3):
         _train_step2(model1, model2, model3, model_regularizer, _input1, _input2, _input3, optimizer, 
         global_step, config, models=models, random_domains=random_domains)
     
