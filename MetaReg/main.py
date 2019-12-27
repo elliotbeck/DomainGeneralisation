@@ -248,13 +248,6 @@ def train_one_epoch(model_task1, model_task2, model_task3, model1,
     # sample two random domains
     random_domains = random.sample([0, 1, 2], 2)
 
-    # all layers but the last untrainable (needed for meta learning)
-    for layer in model_task1.model.layers[:-1]:
-        layer.trainable = False 
-    for layer in model_task2.model.layers[:-1]:
-        layer.trainable = False
-    for layer in model_task3.model.layers[:-1]:
-        layer.trainable = False
     
     # not possible to use deepcopy, thus for loop workaround
     for a, b in zip(model1.variables, model_task1.variables):
@@ -263,6 +256,15 @@ def train_one_epoch(model_task1, model_task2, model_task3, model1,
         a.assign(b)
     for a, b in zip(model3.variables, model_task3.variables):
         a.assign(b)
+
+    # all layers but the last untrainable (needed for meta learning)
+    for layer in model1.model.layers[:-1]:
+        layer.trainable = False 
+    for layer in model2.model.layers[:-1]:
+        layer.trainable = False
+    for layer in model3.model.layers[:-1]:
+        layer.trainable = False
+
     models = [model1, model2, model3]
     
     # only take l(=20) batches of the datasets
@@ -275,13 +277,13 @@ def train_one_epoch(model_task1, model_task2, model_task3, model1,
         _train_step2(model1, model2, model3, model_regularizer, _input1, _input2, _input3, optimizer, 
         global_step, config, models=models, random_domains=random_domains)
     
-    # all layers trainable again (unset meta learning)
-    for layer in model_task1.model.layers[:-1]:
-        layer.trainable = True 
-    for layer in model_task2.model.layers[:-1]:
-        layer.trainable = True
-    for layer in model_task3.model.layers[:-1]:
-        layer.trainable = True
+    # # all layers trainable again (unset meta learning)
+    # for layer in model_task1.model.layers[:-1]:
+    #     layer.trainable = True 
+    # for layer in model_task2.model.layers[:-1]:
+    #     layer.trainable = True
+    # for layer in model_task3.model.layers[:-1]:
+    #     layer.trainable = True
 
     # # TRAIN_STEP3, meta update for regularizer
     # for _input1, _input2, _input3 in zip(train_input1, train_input2, train_input3):
