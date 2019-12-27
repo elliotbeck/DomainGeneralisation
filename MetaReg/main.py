@@ -186,9 +186,10 @@ def _train_step1(model_task1, model_task2, model_task3, features1, features2, fe
 def _train_step2(model1, model2, model3, model_regularizer, features1, features2, features3, 
                 optimizer, global_step, config, models, random_domains):
 
-    with tf.GradientTape() as tape_src:
+    with tf.GradientTape(persistent=True) as tape_src:
         _, model1_loss, model2_loss, model3_loss, _ = loss_fn_regular(features1, 
                                     features2, features3, model1, model2, model3, config=config, training=True)
+        tape_src.watch(model_regularizer.trainable_variables)
     
         loss = [model1_loss, model2_loss, model3_loss]
 
@@ -199,7 +200,7 @@ def _train_step2(model1, model2, model3, model_regularizer, features1, features2
         grads = tape_src.gradient(meta_train_loss, meta_train_model.trainable_variables) 
         optimizer.apply_gradients(zip(grads, meta_train_model.trainable_variables))
 
-    with tf.GradientTape() as tape_src:
+    # with tf.GradientTape() as tape_src:
         output = model_regularizer(tf.expand_dims(tf.abs(tf.reshape(meta_train_model.trainable_variables[0], [-1])), 0))
         # calculate gradients and apply SGD updates
         grads = tape_src.gradient(output, model_regularizer.trainable_variables) 
@@ -210,17 +211,17 @@ def _train_step2(model1, model2, model3, model_regularizer, features1, features2
 # def _train_step3(model_regularizer, features1, features2, features3, 
 #                 optimizer, global_step, config, models ,random_domains):
 
-    meta_test_model = models[random_domains[0]]
+        meta_test_model = models[random_domains[0]]
 
-    _, model1_loss, model2_loss, model3_loss, _ = loss_fn_regular(features1, features2, features3, 
-                                                        meta_test_model, meta_test_model, meta_test_model, 
-                                                        config=config, training=True)
+        _, model1_loss, model2_loss, model3_loss, _ = loss_fn_regular(features1, features2, features3, 
+                                                            meta_test_model, meta_test_model, meta_test_model, 
+                                                            config=config, training=True)
 
-    loss = [model1_loss, model2_loss, model3_loss]
-    meta_test_loss = loss[random_domains[1]]
+        loss = [model1_loss, model2_loss, model3_loss]
+        meta_test_loss = loss[random_domains[1]]
 
-    with tf.GradientTape() as tape_src:
-        tape_src.watch(model_regularizer.trainable_variables)
+    # with tf.GradientTape() as tape_src:
+        print(model_regularizer.trainable_variables)
         loss = [model1_loss, model2_loss, model3_loss]
         meta_test_loss = loss[random_domains[1]]
         # calculate gradients and apply SGD updates
