@@ -220,7 +220,7 @@ def _train_step2(model1, model2, model3, model_regularizer, features1, features2
     meta_test_loss = loss[random_domains[1]]
 
     with tf.GradientTape() as tape_src:
-
+        tape_src.watch(model_regularizer.trainable_variables)
         loss = [model1_loss, model2_loss, model3_loss]
         meta_test_loss = loss[random_domains[1]]
         # calculate gradients and apply SGD updates
@@ -277,13 +277,13 @@ def train_one_epoch(model_task1, model_task2, model_task3, model1,
         _train_step2(model1, model2, model3, model_regularizer, _input1, _input2, _input3, optimizer, 
         global_step, config, models=models, random_domains=random_domains)
     
-    # # all layers trainable again (unset meta learning)
-    # for layer in model_task1.model.layers[:-1]:
-    #     layer.trainable = True 
-    # for layer in model_task2.model.layers[:-1]:
-    #     layer.trainable = True
-    # for layer in model_task3.model.layers[:-1]:
-    #     layer.trainable = True
+    # all layers trainable again (unset meta learning)
+    for layer in model1.model.layers[:-1]:
+        layer.trainable = True 
+    for layer in model2.model.layers[:-1]:
+        layer.trainable = True
+    for layer in model3.model.layers[:-1]:
+        layer.trainable = True
 
     # # TRAIN_STEP3, meta update for regularizer
     # for _input1, _input2, _input3 in zip(train_input1, train_input2, train_input3):
