@@ -290,11 +290,6 @@ def main():
         num_batches=num_batches, e = 0.9)
 
 
-    # TODO: add test set - done
-    
-    show_inputs = iter(ds_train1)
-    _ = model(next(show_inputs)["image"])
-
     # Set up checkpointing
     if args.reload_ckpt != "None":
         ckpt = tf.train.Checkpoint(model=model, global_step=global_step)
