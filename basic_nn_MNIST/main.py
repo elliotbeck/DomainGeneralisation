@@ -267,7 +267,7 @@ def main():
         trainable=False, dtype=tf.int64)
 
     # Get model
-    model = get_model(config.name, config)
+    model = get_model(config)
 
     # Get datasets
     if DEBUG:
