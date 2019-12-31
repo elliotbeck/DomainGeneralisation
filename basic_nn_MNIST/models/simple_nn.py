@@ -12,7 +12,7 @@ class basic_nn(tf.keras.Model):
 
         self.model = tf.keras.Sequential([
             tf.keras.layers.Flatten(),
-            tf.keras.layers.Dense(256, activation='relu'),
+            tf.keras.layers.Dense(256, activation='relu', input_shape = in_shape),
             tf.keras.layers.Flatten(),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(256, activation='relu'),
