@@ -27,3 +27,7 @@ class basic_nn(tf.keras.Model):
 
     def call(self, inputs, training=None, mask=None):
         return self.model(inputs, training, mask)
+    
+    @property
+    def input_shape(self):
+        return basic_nn.INPUT_SHAPE
