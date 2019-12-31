@@ -38,3 +38,6 @@ def update_config(config, args):
             if eval("args.{}".format(entry)) is not None:
                 config[entry] = eval("args.{}".format(entry))
     return config
+
+def g_sgd(gradients, state, learning_rate=0.1):
+    return -learning_rate*gradients, state

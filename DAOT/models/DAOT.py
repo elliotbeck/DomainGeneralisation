@@ -9,7 +9,7 @@ config_seed = config_dic2["seed"]
 
 
 class ResNet50(tf.keras.Model):
-    INPUT_SHAPE = [224, 224]
+    INPUT_SHAPE = [227, 227]
 
     def __init__(self, num_classes, resnet_weights, config, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -22,10 +22,10 @@ class ResNet50(tf.keras.Model):
                                                         weights=resnet_weights, input_shape=in_shape),
             tf.keras.layers.Flatten(),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(1028, activation='relu'),
+            tf.keras.layers.Dense(2048, activation='relu'),
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(1028, activation='relu'),
+            tf.keras.layers.Dense(1024, activation='relu'),
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(34, activation='relu'),
@@ -44,7 +44,7 @@ class ResNet50(tf.keras.Model):
 
 
 class generator(tf.keras.Model):
-    INPUT_SHAPE = [224, 224]
+    INPUT_SHAPE = [227, 227]
 
     def __init__(self, config, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -75,7 +75,7 @@ class generator(tf.keras.Model):
         return generator.INPUT_SHAPE
 
 class critic(tf.keras.Model):
-    INPUT_SHAPE = [224, 224]
+    INPUT_SHAPE = [227, 227]
 
     def __init__(self, num_classes, resnet_weights, config, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -88,10 +88,10 @@ class critic(tf.keras.Model):
                                                         weights=resnet_weights, input_shape=in_shape),
             tf.keras.layers.Flatten(),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(1028, activation='relu'),
+            tf.keras.layers.Dense(2048, activation='relu'),
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(1028, activation='relu'),
+            tf.keras.layers.Dense(1024, activation='relu'),
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(34, activation='relu')
