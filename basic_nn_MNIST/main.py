@@ -72,7 +72,7 @@ def loss_fn(model, features, config, training):
     
     classification_loss = tf.losses.binary_crossentropy(
         tf.one_hot(label, axis=-1, depth=config.num_classes),
-        model_output, from_logits=False)
+        model_output, from_logits=False, dtype=tf.int16)
     mean_classification_loss = tf.reduce_mean(classification_loss) 
 
     accuracy = tf.reduce_mean(
