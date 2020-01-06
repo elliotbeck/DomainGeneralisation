@@ -136,11 +136,9 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
     divergence_intra1 = util.compute_divergence(X_critic_true1, X_critic_generated1)
     divergence_intra2 = util.compute_divergence(X_critic_true2, X_critic_generated2)
     divergence_intra = divergence_intra1 + divergence_intra2
-    print(divergence_intra)
     divergence_inter1 = util.compute_divergence(X_critic_generated1, X_critic_true2)
     divergence_inter2 = util.compute_divergence(X_critic_generated2, X_critic_true1)
     divergence_inter = divergence_inter1 + divergence_inter2
-    print(divergence_inter)
     loss_generator = mean_classification_loss_generated - divergence_intra - divergence_inter
     return loss_generator 
 
@@ -168,6 +166,7 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
     divergence_inter1 = util.compute_divergence(X_critic_true1, X_critic_true2)
 
     loss_critic = divergence_intra1 + divergence_intra2 - divergence_inter1
+    #print(loss_critic)
     return loss_critic
 
 
@@ -253,7 +252,6 @@ def _preprocess_exampe(model_classifier, example, dataset_name):
     example["label"] = example["attributes"]["label"]
     example["domain"] = example["attributes"]["domain"]
     example["label"] = tf.subtract(example["label"],1)
-    #print(tft.mean(example["label"]))
     return example
 
 
