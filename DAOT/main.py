@@ -173,7 +173,7 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
     sinkhorn_dist_inter = tf.math.reduce_mean(sinkhorn_dist_inter1) + tf.math.reduce_mean(sinkhorn_dist_inter2)
 
     loss_generator = mean_classification_loss_generated - sinkhorn_dist_intra - sinkhorn_dist_inter
-    return -loss_generator
+    return loss_generator
 
 
 # loss function for critic
