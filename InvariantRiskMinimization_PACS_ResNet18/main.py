@@ -12,13 +12,13 @@ import torchvision
 from torchvision import transforms, datasets, models
 
 parser = argparse.ArgumentParser(description='Colored MNIST')
-parser.add_argument('--hidden_dim', type=int, default=256)
+parser.add_argument('--hidden_dim', type=int, default=1028)
 parser.add_argument('--l2_regularizer_weight', type=float,default=0.001)
-parser.add_argument('--lr', type=float, default=0.001)
+parser.add_argument('--lr', type=float, default=0.01)
 parser.add_argument('--n_restarts', type=int, default=1)
 parser.add_argument('--penalty_anneal_iters', type=int, default=100)
 parser.add_argument('--penalty_weight', type=float, default=10000.0)
-parser.add_argument('--steps', type=int, default=501)
+parser.add_argument('--steps', type=int, default=1001)
 parser.add_argument('--grayscale_model', action='store_true')
 flags = parser.parse_args()
 
