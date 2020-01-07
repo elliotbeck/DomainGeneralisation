@@ -28,7 +28,7 @@ for k,v in sorted(vars(flags).items()):
 
 final_train_accs = []
 final_test_accs = []
-batch_size = 8
+batch_size = 4
 
 for restart in range(flags.n_restarts):
   print("Restart", restart)
