@@ -119,8 +119,8 @@ for restart in range(flags.n_restarts):
           resnet = models.resnet50(pretrained=True)
           resnet.fc = torch.nn.Sequential(
                 torch.nn.Linear(
-                in_features=2048,
-                    out_features=1))
+                in_features=8192,
+                    out_features=1028))
           # ct = 0
           # for child in resnet.children():
           #   ct += 1
