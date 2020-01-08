@@ -413,8 +413,9 @@ def main():
     show_inputs = iter(ds_train1)
     _ = model_classifier(next(show_inputs)["image"])
 
-    for index, (_, _) in enumerate(ds_test_out):
-        print(index)
+    for index, _ in enumerate(ds_test_out):
+        i = index
+    print(str(i))
 
     # Set up checkpointing
     if args.reload_ckpt != "None":
