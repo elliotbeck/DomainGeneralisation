@@ -60,7 +60,7 @@ class PACSConfig(tfds.core.BuilderConfig):
         super(PACSConfig, self).__init__(
             name="{}".format("_".join(self.validation_split)),
             description="pacs dataset",
-            version="0.5.0",
+            version="0.6.0",
             **kwargs)
 
 
@@ -142,6 +142,7 @@ class PACS(tfds.core.GeneratorBasedBuilder):
 
         # get test domain of validation data
         filenames = [holdout_domain_path[2]]
+        print(filenames)
         test_files_out = [os.path.join(local_settings.RAW_DATA_PATH, f)
             for f in filenames]
 
