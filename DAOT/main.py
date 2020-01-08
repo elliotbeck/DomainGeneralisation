@@ -31,7 +31,7 @@ import experiment_repo as repo
 import util
 import local_settings
 
-DEBUG = False
+DEBUG = True
 random.seed(DAOT.config_seed)
 
 parser = argparse.ArgumentParser(description='Train my model.')
@@ -412,6 +412,9 @@ def main():
     
     show_inputs = iter(ds_train1)
     _ = model_classifier(next(show_inputs)["image"])
+
+    for index, (_, _) in enumerate(ds_test_out):
+        print(index)
 
     # Set up checkpointing
     if args.reload_ckpt != "None":
