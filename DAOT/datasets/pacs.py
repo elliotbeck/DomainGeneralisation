@@ -142,7 +142,6 @@ class PACS(tfds.core.GeneratorBasedBuilder):
 
         # get test domain of validation data
         filenames = [holdout_domain_path[2]]
-        print(filenames)
         test_files_out = [os.path.join(local_settings.RAW_DATA_PATH, f)
             for f in filenames]
 
