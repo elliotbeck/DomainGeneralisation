@@ -131,52 +131,18 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
 
     # get mean classification loss on generated data
     classification_loss_generated = tf.losses.binary_crossentropy(
-        tf.one_hot(tf.concat([label_generated1, label_generated2], 0), axis=-1, 
-        depth=config.num_classes), tf.concat([model_classifier_output_generated1, 
-        model_classifier_output_generated2], 0), from_logits=False)
+        tf.one_hot(tf.concat([label_generated1, label_generated2], 0), axis=-1, depth=config.num_classes),
+        tf.concat([model_classifier_output_generated1, model_classifier_output_generated2], 0), from_logits=False)
     mean_classification_loss_generated = tf.math.reduce_mean(classification_loss_generated)
     
-    # compute sinkhorn distances for M1
-    # in case computational complexity doesn't matter replace zip with itertools.product
-    sinkhorn_dist_intra1 = []
-    for _input1, _input2 in itertools.product(X_critic_true1, X_critic_generated1):
-        # compute M1 (cost_matrix)
-        cost_matrix = util.compute_cost_matrix(_input1, _input2)
-        # calulate sinkhorn distance
-        _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
-        sinkhorn_dist_intra1.append(sinkhorn_dist)
-    # compute sinkhorn distances for M2
-    sinkhorn_dist_intra2 = []
-    for _input1, _input2 in itertools.product(X_critic_true2, X_critic_generated2):
-        # compute M2 (cost_matrix)
-        cost_matrix = util.compute_cost_matrix(_input1, _input2)
-        # calulate sinkhorn distance
-        _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
-        sinkhorn_dist_intra2.append(sinkhorn_dist)
-    
-    sinkhorn_dist_intra = tf.math.reduce_mean(sinkhorn_dist_intra1) + tf.math.reduce_mean(sinkhorn_dist_intra2)
-    # compute sinkhorn distances for M3
-    sinkhorn_dist_inter1 = []
-    for _input1, _input2 in itertools.product(X_critic_true2, X_critic_generated1):
-        # compute M3 (cost_matrix)
-        cost_matrix = util.compute_cost_matrix(_input1, _input2)
-        # calulate sinkhorn distance
-        _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
-        sinkhorn_dist_inter1.append(sinkhorn_dist)
-        
-    # compute sinkhorn distances for M4
-    sinkhorn_dist_inter2 = []
-    for _input1, _input2 in itertools.product(X_critic_true1, X_critic_generated2):
-        # compute M4 (cost_matrix)
-        cost_matrix = util.compute_cost_matrix(_input1, _input2)
-        # calulate sinkhorn distance
-        _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
-        sinkhorn_dist_inter2.append(sinkhorn_dist)
-
-    sinkhorn_dist_inter = tf.math.reduce_mean(sinkhorn_dist_inter1) + tf.math.reduce_mean(sinkhorn_dist_inter2)
-
-    loss_generator = mean_classification_loss_generated - sinkhorn_dist_intra - sinkhorn_dist_inter
-    return -loss_generator
+    divergence_intra1 = util.compute_divergence(X_critic_true1, X_critic_generated1)
+    divergence_intra2 = util.compute_divergence(X_critic_true2, X_critic_generated2)
+    divergence_intra = divergence_intra1 + divergence_intra2
+    divergence_inter1 = util.compute_divergence(X_critic_generated1, X_critic_true2)
+    divergence_inter2 = util.compute_divergence(X_critic_generated2, X_critic_true1)
+    divergence_inter = divergence_inter1 + divergence_inter2
+    loss_generator = mean_classification_loss_generated - divergence_intra - divergence_inter
+    return loss_generator 
 
 
 # loss function for critic
@@ -198,43 +164,13 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
     X_critic_generated1 = model_critic(X_generated1, training=training)  
     X_critic_generated2 = model_critic(X_generated2, training=training)
 
-    # # compute M1 (cost_matrix)
-    # norms_true = tf.norm(X_critic_true1,2, axis=1)
-    # norms_generated = tf.norm(X_critic_generated1,2, axis=1)
-    # matrix_norms = tf.tensordot(norms_true,norms_generated, axes=0)
-    # matrix_critic = tf.tensordot(X_critic_true1,tf.transpose(X_critic_generated1), axes=1)
-    # cost_matrix = 1 - matrix_critic/matrix_norms
-    
-    # compute sinkhorn distances for M1
-    sinkhorn_dist_intra1 = []
-    for _input1, _input2 in itertools.product(X_critic_true1, X_critic_generated1):
-        # compute M1 (cost_matrix)
-        cost_matrix = util.compute_cost_matrix(_input1, _input2)
-        # calulate sinkhorn distance
-        _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
-        sinkhorn_dist_intra1.append(sinkhorn_dist)
-    # compute sinkhorn distances for M2
-    sinkhorn_dist_intra2 = []
-    for _input1, _input2 in itertools.product(X_critic_true2, X_critic_generated2):
-        # compute M2 (cost_matrix)
-        cost_matrix = util.compute_cost_matrix(_input1, _input2)
-        # calulate sinkhorn distance
-        _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
-        sinkhorn_dist_intra2.append(sinkhorn_dist)
-    
-    sinkhorn_dist_intra = tf.math.reduce_mean(sinkhorn_dist_intra1) + tf.math.reduce_mean(sinkhorn_dist_intra2)
-    # compute sinkhorn distances for M3
-    sinkhorn_dist_inter = []
-    for _input1, _input2 in itertools.product(X_critic_true1, X_critic_true2):
-        # compute M3 (cost_matrix)
-        cost_matrix = util.compute_cost_matrix(_input1, _input2)
-        # calulate sinkhorn distance
-        _, sinkhorn_dist = util.compute_optimal_transport(cost_matrix, _input1 ,_input2)
-        sinkhorn_dist_inter.append(sinkhorn_dist)
+    divergence_intra1 = util.compute_divergence(X_critic_true1, X_critic_generated1)
+    divergence_intra2 = util.compute_divergence(X_critic_true2, X_critic_generated2)
+    divergence_inter1 = util.compute_divergence(X_critic_true1, X_critic_true2)
 
-    loss_critic = sinkhorn_dist_intra - tf.math.reduce_mean(sinkhorn_dist_inter)
+    loss_critic = divergence_intra1 + divergence_intra2 - divergence_inter1
+    #print(loss_critic)
     return loss_critic
-
 
 def _train_step(model_classifier, model_generator, model_critic, features1, features2, 
                 optimizer, global_step, config):

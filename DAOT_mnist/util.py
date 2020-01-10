@@ -6,6 +6,7 @@ from datetime import datetime
 import os
 import tensorflow as tf
 import numpy as np
+from itertools import combinations
 
 import local_settings
 
@@ -85,3 +86,47 @@ def tf_bernoulli(p, size):
 
 def tf_xor(a, b):
     return tf.abs((a-b)) # Assumes both inputs are either 0 or 1
+
+def compute_divergence(input1, input2):
+    sinkhorn_dist_inter1 = []
+    for _input1, _input2 in zip(input1, input2):
+        # compute M1 (cost_matrix)
+        cost_matrix = compute_cost_matrix(_input1, _input2)
+
+        # calulate sinkhorn distance
+        _, sinkhorn_dist = compute_optimal_transport(cost_matrix, _input1 ,_input2)
+        sinkhorn_dist_inter1.append(sinkhorn_dist)
+        result1 = tf.reduce_mean(sinkhorn_dist_inter1)
+
+    sinkhorn_dist_inter2 = []
+    for _input1, _input2 in zip(input2, input1):
+        # compute M1 (cost_matrix)
+        cost_matrix = compute_cost_matrix(_input1, _input2)
+
+        # calulate sinkhorn distance
+        _, sinkhorn_dist = compute_optimal_transport(cost_matrix, _input1 ,_input2)
+        sinkhorn_dist_inter2.append(sinkhorn_dist)
+        result2 = tf.reduce_mean(sinkhorn_dist_inter2)    
+        
+    sinkhorn_dist_intra1 = []
+    for _input1, _input2 in combinations(input1, 2):
+        # compute M1 (cost_matrix)
+        cost_matrix = compute_cost_matrix(_input1, _input2)
+
+        # calulate sinkhorn distance
+        _, sinkhorn_dist = compute_optimal_transport(cost_matrix, _input1 ,_input2)
+        sinkhorn_dist_intra1.append(sinkhorn_dist)
+        result3 = tf.reduce_mean(sinkhorn_dist_intra1) 
+
+    sinkhorn_dist_intra2 = []
+    for _input1, _input2 in combinations(input2, 2):
+        # compute M1 (cost_matrix)
+        cost_matrix = compute_cost_matrix(_input1, _input2)
+
+        # calulate sinkhorn distance
+        _, sinkhorn_dist = compute_optimal_transport(cost_matrix, _input1 ,_input2)
+        sinkhorn_dist_intra2.append(sinkhorn_dist)
+        result4 = tf.reduce_mean(sinkhorn_dist_intra2) 
+
+    divergence = result1 + result2 - result3 - result4
+    return divergence
