@@ -142,7 +142,7 @@ def penalty(logits, y):
         scale = tf.ones(1,1)
         tape_src.watch(scale)
         loss = mean_nll(logits * scale, y)
-        grad = tape_src.gradient(loss, scale)
+    grad = tape_src.gradient(loss, scale)
 
     return tf.reduce_sum(grad**2)
 
@@ -173,7 +173,6 @@ train_acc_temp = tf.keras.metrics.Mean(name='train_acc_temp')
 test_acc_temp = tf.keras.metrics.Mean(name='test_acc_temp')
 
 # start loop
-
 for step in range(flags.epochs):
     train_loss.reset_states()
     train_acc.reset_states()
@@ -220,8 +219,8 @@ for step in range(flags.epochs):
                 # Rescale the entire loss to keep gradients in a reasonable range
                 loss /= penalty_weight
             # update weights of classifier
-            grads = tape_src.gradient(loss, model.trainable_variables)
-            optimizer.apply_gradients(zip(grads, model.trainable_variables))
+        grads = tape_src.gradient(loss, model.trainable_variables)
+        optimizer.apply_gradients(zip(grads, model.trainable_variables))
 
     if step == 0:    
         pretty_print('epoch', 'train nll', 'train acc', 'test acc')
