@@ -196,7 +196,7 @@ for step in range(flags.epochs):
 
             train_nll = train_loss_temp.result()
             train_accuracy = train_acc_temp.result()
-            train_penalty = test_acc_temp.results()
+            train_penalty = test_acc_temp.result()
 
             test_accuracy = mean_accuracy(model(env2["image"]), env2["label"])
 
