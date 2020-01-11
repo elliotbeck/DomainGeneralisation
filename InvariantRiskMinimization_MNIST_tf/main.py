@@ -185,7 +185,6 @@ for step in range(flags.epochs):
             train_loss_temp.reset_states()
             train_acc_temp.reset_states()
             test_acc_temp.reset_states()
-            env = [[], [], []]
 
             train_loss_temp(mean_nll(model(env0["image"]), env0["label"]))
             train_acc_temp(mean_accuracy(model(env0["image"]), env0["label"]))
