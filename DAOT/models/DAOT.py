@@ -26,7 +26,7 @@ class ResNet50(tf.keras.Model):
             tf.keras.layers.Dense(2048, activation='relu'),
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(2048, activation='relu'),
+            tf.keras.layers.Dense(1024, activation='relu'),
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(34, activation='relu'),
