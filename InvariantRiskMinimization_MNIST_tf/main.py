@@ -39,14 +39,7 @@ class ResNet50(tf.keras.Model):
         self.model = tf.keras.Sequential([
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(flags.hidden_dim, activation='relu'),
-            tf.keras.layers.Flatten(),
-            tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(flags.hidden_dim, activation='relu'),
-            tf.keras.layers.Dropout(0.5),
-            tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(flags.hidden_dim, activation='relu'),
-            tf.keras.layers.Dropout(0.5),
-            tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(num_classes, activation='softmax')
         ])
         self.model.build([None] + self.input_shape + [2])  # Batch input shape.
@@ -218,7 +211,7 @@ for step in range(flags.epochs):
             if penalty_weight > 1.0:
                 # Rescale the entire loss to keep gradients in a reasonable range
                 loss /= penalty_weight
-            # update weights of classifier
+        # update weights of classifier
         grads = tape_src.gradient(loss, model.trainable_variables)
         optimizer.apply_gradients(zip(grads, model.trainable_variables))
 
