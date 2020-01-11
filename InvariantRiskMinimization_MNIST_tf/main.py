@@ -17,7 +17,7 @@ parser.add_argument('--n_restarts', type=int, default=1)
 parser.add_argument('--penalty_anneal_iters', type=int, default=100)
 parser.add_argument('--penalty_weight', type=float, default=10000.0)
 parser.add_argument('--epochs', type=int, default=501)
-parser.add_argument('--batch_size', type=int, default=20000)
+parser.add_argument('--batch_size', type=int, default=30000)
 parser.add_argument('--shuffle_buffer_size', type=int, default=20000)
 parser.add_argument('--grayscale_model', action='store_true')
 flags = parser.parse_args()
@@ -91,7 +91,7 @@ def _preprocess_exampe(model, example, dataset_name, e):
 
 def _get_dataset(dataset_name, model, split, batch_size, e):
 
-    dataset, info = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
+    dataset, _ = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
         split=split, with_info=True)
     dataset = dataset.map(lambda x: _preprocess_exampe(model, x, dataset_name, e))
     dataset = dataset.shuffle(flags.shuffle_buffer_size)
