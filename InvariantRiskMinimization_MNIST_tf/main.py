@@ -168,6 +168,10 @@ train_loss = tf.keras.metrics.Mean(name='train_loss')
 train_acc = tf.keras.metrics.Mean(name='train_acc')
 test_acc = tf.keras.metrics.Mean(name='test_acc')
 
+train_loss_temp = tf.keras.metrics.Mean(name='train_loss_temp')
+train_acc_temp = tf.keras.metrics.Mean(name='train_acc_temp')
+test_acc_temp = tf.keras.metrics.Mean(name='test_acc_temp')
+
 # start loop
 
 for step in range(flags.epochs):
@@ -177,26 +181,25 @@ for step in range(flags.epochs):
 
     for env0, env1, env2 in zip(envs[0], envs[1], envs[2]):
         with tf.GradientTape() as tape_src:
-
+            
+            train_loss_temp.reset_states()
+            train_acc_temp.reset_states()
+            test_acc_temp.reset_states()
             env = [[], [], []]
 
-            env[0].append(mean_nll(model(env0["image"]), env0["label"]))
-            env[0].append(mean_accuracy(model(env0["image"]), env0["label"]))
-            env[0].append(penalty(model(env0["image"]), env0["label"]))
+            train_loss_temp(mean_nll(model(env0["image"]), env0["label"]))
+            train_acc_temp(mean_accuracy(model(env0["image"]), env0["label"]))
+            test_acc_temp(penalty(model(env0["image"]), env0["label"]))
 
-            env[1].append(mean_nll(model(env1["image"]), env1["label"]))
-            env[1].append(mean_accuracy(model(env1["image"]), env1["label"]))
-            env[1].append(penalty(model(env1["image"]), env1["label"]))
+            train_loss_temp(mean_nll(model(env1["image"]), env1["label"]))
+            train_acc_temp(mean_accuracy(model(env1["image"]), env1["label"]))
+            test_acc_temp(penalty(model(env1["image"]), env1["label"]))
 
-            env[2].append(mean_nll(model(env2["image"]), env2["label"]))
-            env[2].append(mean_accuracy(model(env2["image"]), env2["label"]))
-            env[2].append(penalty(model(env2["image"]), env2["label"]))
+            train_nll = train_loss_temp.result()
+            train_accuracy = train_acc_temp.result()
+            train_penalty = test_acc_temp.results()
 
-            train_nll = tf.reduce_mean([env[0][0], env[1][0]])
-            train_accuracy = tf.reduce_mean([env[0][1], env[1][1]])
-            train_penalty = tf.reduce_mean([env[0][2], env[1][2]])
-
-            test_accuracy = env[2][1]
+            test_accuracy = mean_accuracy(model(env2["image"]), env2["label"])
 
             train_loss(train_nll)
             train_acc(train_accuracy)
