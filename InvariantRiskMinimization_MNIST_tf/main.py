@@ -171,7 +171,7 @@ for step in range(flags.epochs):
     train_acc.reset_states()
     test_acc.reset_states()
 
-    for env0, env1, env2 in tf.data.Dataset.zip((envs[0], envs[1], envs[2])):
+    for env0, env1, env2 in zip(envs[0], envs[1], envs[2]):
         with tf.GradientTape() as tape_src:
             
             train_loss_temp.reset_states()
