@@ -39,7 +39,14 @@ class ResNet50(tf.keras.Model):
         self.model = tf.keras.Sequential([
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(flags.hidden_dim, activation='relu'),
+            tf.keras.layers.Flatten(),
+            tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(flags.hidden_dim, activation='relu'),
+            tf.keras.layers.Dropout(0.5),
+            tf.keras.layers.BatchNormalization(),
+            tf.keras.layers.Dense(flags.hidden_dim, activation='relu'),
+            tf.keras.layers.Dropout(0.5),
+            tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(num_classes, activation='softmax')
         ])
         self.model.build([None] + self.input_shape + [2])  # Batch input shape.
