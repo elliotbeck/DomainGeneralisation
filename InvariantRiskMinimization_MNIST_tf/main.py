@@ -217,7 +217,7 @@ for step in range(flags.epochs):
 
     if step == 0:    
         pretty_print('epoch', 'train nll', 'train acc', 'test acc')
-    if step % 100 == 0:
+    if step % 1 == 0:
         pretty_print(
             np.int32(step+1),
             train_loss.result().numpy(),
