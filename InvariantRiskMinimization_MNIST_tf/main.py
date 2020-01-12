@@ -194,17 +194,17 @@ for step in range(flags.epochs):
 
             env = [[], [], []]
 
-            env[0].append(mean_nll(model(env0["image"]), tf.squeeze(tf.squeeze(env0["label"]))))
-            env[0].append(mean_accuracy(model(env0["image"]), tf.squeeze(tf.squeeze(env0["label"]))))
-            env[0].append(penalty(model(env0["image"]), tf.squeeze(tf.squeeze(env0["label"]))))
+            env[0].append(mean_nll(model(env0["image"]), env0["label"]))
+            env[0].append(mean_accuracy(model(env0["image"]), env0["label"]))
+            env[0].append(penalty(model(env0["image"]), env0["label"]))
 
-            env[1].append(mean_nll(model(env1["image"]), tf.squeeze(tf.squeeze(env1["label"]))))
-            env[1].append(mean_accuracy(model(env1["image"]), tf.squeeze(tf.squeeze(env1["label"]))))
-            env[1].append(penalty(model(env1["image"]), tf.squeeze(tf.squeeze(env1["label"]))))
+            env[1].append(mean_nll(model(env1["image"]), env1["label"]))
+            env[1].append(mean_accuracy(model(env1["image"]), env1["label"]))
+            env[1].append(penalty(model(env1["image"]), env1["label"]))
 
-            env[2].append(mean_nll(model(env2["image"]), tf.squeeze(tf.squeeze(env2["label"]))))
-            env[2].append(mean_accuracy(model(env2["image"]), tf.squeeze(tf.squeeze(env2["label"]))))
-            env[2].append(penalty(model(env2["image"]), tf.squeeze(tf.squeeze(env2["label"]))))
+            env[2].append(mean_nll(model(env2["image"]), env2["label"]))
+            env[2].append(mean_accuracy(model(env2["image"]), env2["label"]))
+            env[2].append(penalty(model(env2["image"]), env2["label"]))
 
             train_nll = tf.reduce_mean([env[0][0], env[1][0]])
             train_accuracy = tf.reduce_mean([env[0][1], env[1][1]])
