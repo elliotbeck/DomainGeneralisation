@@ -84,14 +84,14 @@ def _preprocess_exampe(model, example, dataset_name, e):
         image = tf.stack([example["image"], tf.zeros([14,14], 
         dtype=tf.float64)], axis=-1)
     example["image"] = image
-    example["label"] = tf.squeeze(tf.squeeze(label))
+    example["label"] = label
 
     return example
 
 
 def _get_dataset(dataset_name, model, split, batch_size, e):
 
-    dataset, _ = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
+    dataset, info = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
         split=split, with_info=True)
     dataset = dataset.map(lambda x: _preprocess_exampe(model, x, dataset_name, e))
     dataset = dataset.shuffle(flags.shuffle_buffer_size)
@@ -142,7 +142,7 @@ def penalty(logits, y):
         scale = tf.ones(1,1)
         tape_src.watch(scale)
         loss = mean_nll(logits * scale, y)
-    grad = tape_src.gradient(loss, scale)
+        grad = tape_src.gradient(loss, scale)
 
     return tf.reduce_sum(grad**2)
 
@@ -168,11 +168,8 @@ train_loss = tf.keras.metrics.Mean(name='train_loss')
 train_acc = tf.keras.metrics.Mean(name='train_acc')
 test_acc = tf.keras.metrics.Mean(name='test_acc')
 
-# train_loss_temp = tf.keras.metrics.Mean(name='train_loss_temp')
-# train_acc_temp = tf.keras.metrics.Mean(name='train_acc_temp')
-# test_acc_temp = tf.keras.metrics.Mean(name='test_acc_temp')
-
 # start loop
+
 for step in range(flags.epochs):
     train_loss.reset_states()
     train_acc.reset_states()
@@ -180,38 +177,20 @@ for step in range(flags.epochs):
 
     for env0, env1, env2 in zip(envs[0], envs[1], envs[2]):
         with tf.GradientTape() as tape_src:
-            
-            # train_loss_temp.reset_states()
-            # train_acc_temp.reset_states()
-            # test_acc_temp.reset_states()
-
-            # train_loss_temp(mean_nll(model(env0["image"]), env0["label"]))
-            # train_acc_temp(mean_accuracy(model(env0["image"]), env0["label"]))
-            # test_acc_temp(penalty(model(env0["image"]), env0["label"]))
-
-            # train_loss_temp(mean_nll(model(env1["image"]), env1["label"]))
-            # train_acc_temp(mean_accuracy(model(env1["image"]), env1["label"]))
-            # test_acc_temp(penalty(model(env1["image"]), env1["label"]))
-
-            # train_nll = train_loss_temp.result()
-            # train_accuracy = train_acc_temp.result()
-            # train_penalty = test_acc_temp.result()
-
-            # test_accuracy = mean_accuracy(model(env2["image"]), env2["label"])
 
             env = [[], [], []]
 
-            env[0].append(mean_nll(model(env0["image"]), env0["label"]))
-            env[0].append(mean_accuracy(model(env0["image"]), env0["label"]))
-            env[0].append(penalty(model(env0["image"]), env0["label"]))
+            env[0].append(mean_nll(model(env0["image"]), tf.squeeze(tf.squeeze(env0["label"]))))
+            env[0].append(mean_accuracy(model(env0["image"]), tf.squeeze(tf.squeeze(env0["label"]))))
+            env[0].append(penalty(model(env0["image"]), tf.squeeze(tf.squeeze(env0["label"]))))
 
-            env[1].append(mean_nll(model(env1["image"]), env1["label"]))
-            env[1].append(mean_accuracy(model(env1["image"]), env1["label"]))
-            env[1].append(penalty(model(env1["image"]), env1["label"]))
+            env[1].append(mean_nll(model(env1["image"]), tf.squeeze(tf.squeeze(env1["label"]))))
+            env[1].append(mean_accuracy(model(env1["image"]), tf.squeeze(tf.squeeze(env1["label"]))))
+            env[1].append(penalty(model(env1["image"]), tf.squeeze(tf.squeeze(env1["label"]))))
 
-            env[2].append(mean_nll(model(env2["image"]), env2["label"]))
-            env[2].append(mean_accuracy(model(env2["image"]), env2["label"]))
-            env[2].append(penalty(model(env2["image"]), env2["label"]))
+            env[2].append(mean_nll(model(env2["image"]), tf.squeeze(tf.squeeze(env2["label"]))))
+            env[2].append(mean_accuracy(model(env2["image"]), tf.squeeze(tf.squeeze(env2["label"]))))
+            env[2].append(penalty(model(env2["image"]), tf.squeeze(tf.squeeze(env2["label"]))))
 
             train_nll = tf.reduce_mean([env[0][0], env[1][0]])
             train_accuracy = tf.reduce_mean([env[0][1], env[1][1]])
@@ -233,14 +212,14 @@ for step in range(flags.epochs):
             loss = train_nll
             loss += flags.l2_regularizer_weight * weight_norm
             penalty_weight = (flags.penalty_weight 
-                if step >= flags.penalty_anneal_iters else 1.0)
+                if step >= flags.penalty_anneal_iters else 100.0)
             loss += penalty_weight * train_penalty
             if penalty_weight > 1.0:
                 # Rescale the entire loss to keep gradients in a reasonable range
                 loss /= penalty_weight
-        # update weights of classifier
-        grads = tape_src.gradient(loss, model.trainable_variables)
-        optimizer.apply_gradients(zip(grads, model.trainable_variables))
+            # update weights of classifier
+            grads = tape_src.gradient(loss, model.trainable_variables)
+            optimizer.apply_gradients(zip(grads, model.trainable_variables))
 
     if step == 0:    
         pretty_print('epoch', 'train nll', 'train acc', 'test acc')
