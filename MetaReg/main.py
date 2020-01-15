@@ -1,6 +1,6 @@
 import argparse
 import copy
-import datetime
+import datetime 
 import json
 import pickle
 import math
@@ -222,8 +222,8 @@ def _train_step2(model1, model2, model3, model_regularizer, features1, features2
 
     # with tf.GradientTape() as tape_src:
         print(model_regularizer.trainable_variables)
-        print(meta_test_loss)
         meta_test_loss = tf.convert_to_tensor(meta_test_loss)
+        print(meta_test_loss)
         # loss = [model1_loss, model2_loss, model3_loss]
         # meta_test_loss = loss[random_domains[1]]
         # calculate gradients and apply SGD updates
