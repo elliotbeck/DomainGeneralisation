@@ -228,7 +228,7 @@ def _train_step2(model1, model2, model3, model_regularizer, features1, features2
         # loss = [model1_loss, model2_loss, model3_loss]
         # meta_test_loss = loss[random_domains[1]]
         # calculate gradients and apply SGD updates
-        grads1 = tape_src.gradient(meta_test_loss, tf.convert_to_tensor(model_regularizer.trainable_variables))
+        grads1 = tape_src.gradient(meta_test_loss, model_regularizer.trainable_variables)
         print(grads1) 
         optimizer.apply_gradients(zip(grads1, model_regularizer.trainable_variables))
 
