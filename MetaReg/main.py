@@ -270,9 +270,9 @@ def train_one_epoch(model_task1, model_task2, model_task3, model1,
     models = [model1, model2, model3]
     
     # only take l(=20) batches of the datasets
-    _train_input1 = train_input1.take(20)
-    _train_input2 = train_input2.take(20)
-    _train_input3 = train_input3.take(20)
+    _train_input1 = train_input1.take(5)
+    _train_input2 = train_input2.take(5)
+    _train_input3 = train_input3.take(5)
 
     # TRAIN_STEP2, meta learning of regularizer
     for _input1, _input2, _input3 in zip(_train_input1, _train_input2, _train_input3):
@@ -499,7 +499,7 @@ def main():
 
     # Get datasets
     if DEBUG:
-        num_batches = 5
+        num_batches = 10
     else:
         num_batches = None
 
