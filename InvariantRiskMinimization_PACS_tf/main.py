@@ -26,7 +26,7 @@ parser.add_argument('--grayscale_model', action='store_true')
 parser.add_argument('--seed', type=int, default=1)
 flags = parser.parse_args()
 
-random.seed()
+random.seed(flags.seed)
 
 print('Flags:')
 for k,v in sorted(vars(flags).items()):
