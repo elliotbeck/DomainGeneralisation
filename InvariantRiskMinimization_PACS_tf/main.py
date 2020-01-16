@@ -217,7 +217,7 @@ for step in range(flags.epochs):
             grads = tape_src.gradient(loss, model.trainable_variables)
             optimizer.apply_gradients(zip(grads, model.trainable_variables))
         
-    if step == 0:    
+    if step % 10 == 0:    
         pretty_print('epoch', 'train nll', 'train acc', 'test acc')
     
     pretty_print(
