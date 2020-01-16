@@ -104,6 +104,7 @@ def loss_fn_classifier(model_classifier, model_generator, features1, features2, 
         tf.where(tf.equal(label, tf.cast(tf.argmax(model_classifier_output_original, axis=-1), tf.int32)),
                     tf.ones_like(label, dtype=tf.float32),
                     tf.zeros_like(label, dtype=tf.float32)))
+    print("Hello Elliot")
     return mean_classification_loss_weighted, l2_regularizer, accuracy, classification_loss
 
 # loss function for generator
