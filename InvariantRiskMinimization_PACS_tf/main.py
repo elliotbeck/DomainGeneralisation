@@ -3,6 +3,8 @@ import tensorflow as tf
 import h5py
 import os
 import argparse
+import random
+
 
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
@@ -18,10 +20,13 @@ parser.add_argument('--n_restarts', type=int, default=1)
 parser.add_argument('--penalty_anneal_iters', type=int, default=100)
 parser.add_argument('--penalty_weight', type=float, default=10000.0)
 parser.add_argument('--epochs', type=int, default=10)
-parser.add_argument('--batch_size', type=int, default=2)
+parser.add_argument('--batch_size', type=int, default=8)
 parser.add_argument('--shuffle_buffer_size', type=int, default=2000)
 parser.add_argument('--grayscale_model', action='store_true')
+parser.add_argument('--seed', type=int, default=1)
 flags = parser.parse_args()
+
+random.seed()
 
 print('Flags:')
 for k,v in sorted(vars(flags).items()):
