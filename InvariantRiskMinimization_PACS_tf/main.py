@@ -34,7 +34,7 @@ for k,v in sorted(vars(flags).items()):
 
 # read in data
 
-hf = h5py.File('/cluster/work/math/ebeck/data/pacs/art_painting_train.hdf5', 'r')
+hf = h5py.File('/cluster/work/math/ebeck/data/pacs/sketch_train.hdf5', 'r')
 x_train1 = np.array(hf["images"][:])
 y_train1 = np.array(hf["labels"][:])-1
 
@@ -49,7 +49,7 @@ x_train3 = np.array(hf["images"][:])
 y_train3 = np.array(hf["labels"][:])-1
 
 
-hf = h5py.File('/cluster/work/math/ebeck/data/pacs/sketch_train.hdf5', 'r')
+hf = h5py.File('/cluster/work/math/ebeck/data/pacs/art_painting_test.hdf5', 'r')
 x_test = np.array(hf["images"][:])
 y_test = np.array(hf["labels"][:])-1
 
