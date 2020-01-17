@@ -29,7 +29,7 @@ import experiment_repo as repo
 import util
 import local_settings
 
-DEBUG = False
+DEBUG = True
 random.seed(DAOT_mnist.config_seed)
 
 parser = argparse.ArgumentParser(description='Train my model.')
@@ -388,7 +388,7 @@ def main():
 
     # Get datasets
     if DEBUG:
-        num_batches = 5
+        num_batches = 2
     else:
         num_batches = None
 
