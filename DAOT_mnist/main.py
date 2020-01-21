@@ -279,7 +279,7 @@ def _preprocess_exampe(model_classifier, example, dataset_name, e):
 def _get_dataset(dataset_name, model_classifier, split, batch_size, e,
     num_batches=None):
 
-    dataset, info = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
+    dataset, _ = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
         split=split, with_info=True)
     dataset = dataset.map(lambda x: _preprocess_exampe(model_classifier, x, dataset_name, e))
     dataset = dataset.shuffle(512)
