@@ -12,7 +12,7 @@ os.environ['KMP_DUPLICATE_LIB_OK']='True'
 # such that all samples get used in training
 
 
-parser = argparse.ArgumentParser(description='Colored MNIST')
+parser = argparse.ArgumentParser(description='PACS')
 parser.add_argument('--hidden_dim', type=int, default=1028)
 parser.add_argument('--l2_regularizer_weight', type=float,default=0.0001)
 parser.add_argument('--lr', type=float, default=0.0001)
@@ -39,7 +39,7 @@ x_train1 = np.array(hf["images"][:])
 y_train1 = np.array(hf["labels"][:])-1
 
 
-hf = h5py.File('//cluster/work/math/ebeck/data/pacs/photo_train.hdf5', 'r')
+hf = h5py.File('//cluster/work/math/ebeck/data/pacs/art_painting_train.hdf5', 'r')
 x_train2 = np.array(hf["images"][:])
 y_train2 = np.array(hf["labels"][:])-1
 
@@ -49,7 +49,7 @@ x_train3 = np.array(hf["images"][:])
 y_train3 = np.array(hf["labels"][:])-1
 
 
-hf = h5py.File('/cluster/work/math/ebeck/data/pacs/art_painting_test.hdf5', 'r')
+hf = h5py.File('/cluster/work/math/ebeck/data/pacs/photo_test.hdf5', 'r')
 x_test = np.array(hf["images"][:])
 y_test = np.array(hf["labels"][:])-1
 
@@ -222,7 +222,7 @@ for step in range(flags.epochs):
             grads = tape_src.gradient(loss, model.trainable_variables)
             optimizer.apply_gradients(zip(grads, model.trainable_variables))
         
-    if step % 10 == 0:    
+    if step % 1 == 0:    
         pretty_print('epoch', 'train nll', 'train acc', 'test acc')
     
     pretty_print(
