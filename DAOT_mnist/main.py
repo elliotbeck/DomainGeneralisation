@@ -58,7 +58,6 @@ parser.add_argument('--alpha', type=float, help='weighting factor of classificat
 parser.add_argument('--lambda', type=float, help='weighting factor of generator.')
 parser.add_argument('--seed', type=float, help='weighting factor of generator.')
 
-
 # loss funtion for classifier
 def loss_fn_classifier(model_classifier, model_generator, features1, features2, config, training):
     # save features and labels from the two random training domains and concat them
@@ -296,7 +295,7 @@ def main():
     # parse args and get configs
     args = parser.parse_args()
     logging.set_verbosity(logging.INFO)
-
+    random.seed(args.seed)
     # reload model from checkpoint or train from scratch
     if args.reload_ckpt != "None":
         checkpoint_path = os.path.join(local_settings.MODEL_PATH, 
