@@ -30,7 +30,6 @@ import util
 import local_settings
 
 DEBUG = True
-random.seed(DAOT_mnist.config_seed)
 
 parser = argparse.ArgumentParser(description='Train my model.')
 parser.add_argument('--config', type=str, 
@@ -57,6 +56,7 @@ parser.add_argument('--dropout_rate', type=float, help='Dropout rate.')
 parser.add_argument('--use_dropout', type=int, help='Flag whether to use dropout.')
 parser.add_argument('--alpha', type=float, help='weighting factor of classification loss.')
 parser.add_argument('--lambda', type=float, help='weighting factor of generator.')
+parser.add_argument('--seed', type=float, help='weighting factor of generator.')
 
 
 # loss funtion for classifier
