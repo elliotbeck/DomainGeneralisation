@@ -29,7 +29,7 @@ import experiment_repo as repo
 import util
 import local_settings
 
-DEBUG = True
+DEBUG = False
 
 parser = argparse.ArgumentParser(description='Train my model.')
 parser.add_argument('--config', type=str, 
@@ -188,7 +188,6 @@ def _train_step(model_classifier, model_generator, model_critic, features1, feat
         # update weights of classifier
         grads = tape_src.gradient(total_loss, model_classifier.trainable_variables)
         optimizer.apply_gradients(zip(grads, model_classifier.trainable_variables))
-        print("Hello Elliot1")
 
     with tf.GradientTape() as tape_src:
         # get loss of critic
@@ -197,7 +196,6 @@ def _train_step(model_classifier, model_generator, model_critic, features1, feat
         # update weights of critic
         grads = tape_src.gradient(loss_critic, model_critic.trainable_variables)
         optimizer.apply_gradients(zip(grads, model_critic.trainable_variables))
-        print("Hello Elliot2")
 
     with tf.GradientTape() as tape_src:
         # get loss of generator 
@@ -207,7 +205,6 @@ def _train_step(model_classifier, model_generator, model_critic, features1, feat
         # update weights of generator
         grads = tape_src.gradient(loss_generator, model_generator.trainable_variables)
         optimizer.apply_gradients(zip(grads, model_generator.trainable_variables))
-        print("Hello Elliot3")
 
         global_step.assign_add(1)
 
