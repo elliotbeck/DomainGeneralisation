@@ -32,7 +32,7 @@ import util
 import local_settings
 from collections import defaultdict
 
-DEBUG = False
+DEBUG = True
 
 
 parser = argparse.ArgumentParser(description='Train my model.')
