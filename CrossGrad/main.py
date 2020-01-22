@@ -109,6 +109,7 @@ def loss_fn_label(features1, features2, features3, model_label, config, training
     label_loss3 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels = label3, 
                                 logits = model_label_output3))                          
     label_loss = tf.reduce_mean([label_loss1,label_loss2,label_loss3])
+    print(label_loss)
 
     accuracy1 = tf.reduce_mean(
         tf.where(tf.equal(label1, tf.argmax(model_label_output1, axis=-1)),
@@ -146,7 +147,6 @@ def _train_step(model_label, model_domain, features1, features2, features3,
 
         total_loss = mean_classification_loss + \
             config.l2_penalty_weight*l2_regularizer
-        print(total_loss)
         # get loss of domains
         loss_domain = loss_fn_domain(features1, features2, features3, model_domain, config, training=True)
 
