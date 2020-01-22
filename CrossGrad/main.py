@@ -386,7 +386,7 @@ def main():
 
     # Get datasets
     if DEBUG:
-        num_batches = 5
+        num_batches = 6
     else:
         num_batches = None
 
