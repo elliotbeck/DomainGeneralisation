@@ -44,12 +44,12 @@ x_train2 = np.array(hf["images"][:])
 y_train2 = np.array(hf["labels"][:])-1
 
 
-hf = h5py.File('/cluster/work/math/ebeck/data/pacs/cartoon_train.hdf5', 'r')
+hf = h5py.File('/cluster/work/math/ebeck/data/pacs/photo_train.hdf5', 'r')
 x_train3 = np.array(hf["images"][:])
 y_train3 = np.array(hf["labels"][:])-1
 
 
-hf = h5py.File('/cluster/work/math/ebeck/data/pacs/photo_test.hdf5', 'r')
+hf = h5py.File('/cluster/work/math/ebeck/data/pacs/cartoon_test.hdf5', 'r')
 x_test = np.array(hf["images"][:])
 y_test = np.array(hf["labels"][:])-1
 
