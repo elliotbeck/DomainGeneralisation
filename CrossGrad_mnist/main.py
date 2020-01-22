@@ -247,7 +247,6 @@ def _get_dataset(dataset_name, model_label, split, batch_size, e, domain,
     dataset = dataset.map(lambda x: _preprocess_exampe(model_label, x, dataset_name, domain,e))
     dataset = dataset.shuffle(512)
     dataset = dataset.batch(batch_size)
-    dataset = dataset.take(tf.cast(20, tf.int64))
     if num_batches is not None:
         dataset = dataset.take(num_batches)
 
