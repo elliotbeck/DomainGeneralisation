@@ -6,6 +6,8 @@ import argparse
 import tensorflow_datasets as tfds
 import local_settings
 import util
+import random
+
 
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
@@ -20,7 +22,10 @@ parser.add_argument('--epochs', type=int, default=501)
 parser.add_argument('--batch_size', type=int, default=20000)
 parser.add_argument('--shuffle_buffer_size', type=int, default=20000)
 parser.add_argument('--grayscale_model', action='store_true')
+parser.add_argument('--seed', type=int, default=1)
 flags = parser.parse_args()
+
+random.seed(flags.seed)
 
 print('Flags:')
 for k,v in sorted(vars(flags).items()):
