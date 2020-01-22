@@ -234,7 +234,7 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
         config=config, training=training)
         # losses.append(_classification_loss.numpy())
         # accuracies.append(_accuracy.numpy())
-        print(_classification_loss)
+        print(_input1["image"].shape)
         # update mean-metric
         classification_loss(_classification_loss)
         accuracy(_accuracy)
