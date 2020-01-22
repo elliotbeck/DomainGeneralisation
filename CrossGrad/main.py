@@ -365,7 +365,7 @@ def main():
     #     config.decay_base, staircase=True)
     
     # learning rate = 0.02 in paper
-    optimizer = tf.keras.optimizers.RMSprop(learning_rate=0.02)
+    optimizer = tf.keras.optimizers.RMSprop(learning_rate=config.learning_rate)
 
 
 
