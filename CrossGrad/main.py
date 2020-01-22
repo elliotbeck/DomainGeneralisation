@@ -102,16 +102,14 @@ def loss_fn_label(features1, features2, features3, model_label, config, training
     model_label_output2 = model_label(inputs2, training=training)
     model_label_output3 = model_label(inputs3, training=training)
 
-    label_loss1 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = tf.one_hot(label1, axis=-1, 
-                                depth=config.num_classes_label), 
+    label_loss1 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels = label1,
                                 logits = model_label_output1))
-    label_loss2 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = tf.one_hot(label2, axis=-1, 
-                                depth=config.num_classes_label), 
+    label_loss2 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels = label2, 
                                 logits = model_label_output2))
-    label_loss3 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = tf.one_hot(label3, axis=-1, 
-                                depth=config.num_classes_label), 
+    label_loss3 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels = label3, 
                                 logits = model_label_output3))                          
     label_loss = tf.reduce_mean([label_loss1,label_loss2,label_loss3])
+    print(label_loss)
 
     accuracy1 = tf.reduce_mean(
         tf.where(tf.equal(label1, tf.argmax(model_label_output1, axis=-1)),
