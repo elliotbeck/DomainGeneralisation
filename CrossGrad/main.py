@@ -146,6 +146,7 @@ def _train_step(model_label, model_domain, features1, features2, features3,
 
         total_loss = mean_classification_loss + \
             config.l2_penalty_weight*l2_regularizer
+        print(total_loss)
         # get loss of domains
         loss_domain = loss_fn_domain(features1, features2, features3, model_domain, config, training=True)
 
@@ -234,8 +235,7 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
         config=config, training=training)
         # losses.append(_classification_loss.numpy())
         # accuracies.append(_accuracy.numpy())
-        print(_input1["image"].shape)
-        print(_classification_loss)
+
         # update mean-metric
         classification_loss(_classification_loss)
         accuracy(_accuracy)
@@ -392,7 +392,7 @@ def main():
         num_batches = None
 
     ds_train_complete = _get_dataset(config.dataset, model_label, config.test_domain,
-        split=tfds.Split.TRAIN, batch_size=tf.cast(config.batch_size/3, tf.int64), config = config,
+        split=tfds.Split.TRAIN, batch_size=tf.cast(config.batch_size, tf.int64),
         num_batches=num_batches)
 
     ds_train1 = _get_dataset(config.dataset, model_label, config.test_domain,
