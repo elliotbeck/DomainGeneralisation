@@ -101,11 +101,10 @@ def loss_fn_label(features1, features2, features3, model_label, config, training
     model_label_output1 = model_label(inputs1, training=training)
     model_label_output2 = model_label(inputs2, training=training)
     model_label_output3 = model_label(inputs3, training=training)
-    print(tf.nn.sparse_softmax_cross_entropy_with_logits(labels = label1,
-                                logits = model_label_output1))
+
     label_loss1 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels = label1,
                                 logits = model_label_output1))
-    print(label_loss1)
+
     label_loss2 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels = label2, 
                                 logits = model_label_output2))
     label_loss3 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels = label3, 
