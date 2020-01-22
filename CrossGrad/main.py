@@ -101,7 +101,7 @@ def loss_fn_label(features1, features2, features3, model_label, config, training
     model_label_output1 = model_label(inputs1, training=training)
     model_label_output2 = model_label(inputs2, training=training)
     model_label_output3 = model_label(inputs3, training=training)
-
+    print(model_label_output1)
     label_loss1 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels = label1,
                                 logits = model_label_output1))
     label_loss2 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels = label2, 
@@ -109,7 +109,6 @@ def loss_fn_label(features1, features2, features3, model_label, config, training
     label_loss3 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels = label3, 
                                 logits = model_label_output3))                          
     label_loss = tf.reduce_mean([label_loss1,label_loss2,label_loss3])
-    print(label_loss)
 
     accuracy1 = tf.reduce_mean(
         tf.where(tf.equal(label1, tf.argmax(model_label_output1, axis=-1)),
@@ -233,6 +232,8 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
         _classification_loss, _accuracy, _ = loss_fn_label(
         features1=_input1, features2=_input2, features3=_input3, model_label = model_label, 
         config=config, training=training)
+        loss_fn_label(
+            features1, features2, features3, model_label ,config=config, training=True)
         # losses.append(_classification_loss.numpy())
         # accuracies.append(_accuracy.numpy())
 
