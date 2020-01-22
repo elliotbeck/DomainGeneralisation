@@ -11,7 +11,7 @@
     "decay_every": 500,
     "decay_base": 0.85,
     "batch_size": 128,
-    "num_epochs": 5,
+    "num_epochs": 1,
 
     
     "l2_penalty_weight": 0,
