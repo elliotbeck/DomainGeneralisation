@@ -83,9 +83,7 @@ def loss_fn_domain(features1, features2, features3, model_domain, config, traini
     domain_loss3 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = tf.one_hot(domain3, axis=-1, 
                                 depth=config.num_classes_domain), 
                                 logits = model_domain(inputs3, training=training)), name='domain_loss3')
-    print(domain_loss1 + domain_loss2 + domain_loss3)
     domain_loss = tf.reduce_mean([domain_loss1, domain_loss2, domain_loss3])
-    print(domain_loss)
     return domain_loss
 
 def loss_fn_label(features1, features2, features3, model_label, config, training):
@@ -194,9 +192,10 @@ def _train_step(model_label, model_domain, features1, features2, features3,
                                         model_domain, config, training=True)
 
         # get loss of labels
-        total_loss, accuracy, l2_regularizer = loss_fn_label(
+        mean_classification_loss, accuracy, l2_regularizer = loss_fn_label(
             features1, features2, features3, model_label, config=config, training=True)
-
+        total_loss = mean_classification_loss + \
+            config.l2_penalty_weight*l2_regularizer
         # calculate the losses with peturbated x
         loss_l, _, _ = loss_fn_label(X_d1, X_d2, X_d3, model_label ,config=config, training=True)
         loss_d = loss_fn_domain(X_l1, X_l2, X_l3, model_domain ,config=config, training=True)
