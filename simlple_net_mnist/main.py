@@ -166,7 +166,7 @@ def main():
         for env0, env1, env2 in zip(envs[0], envs[1], envs[2]):
             with tf.GradientTape() as tape_src:
 
-                env = [[], []]
+                env = [[], [], []]
 
                 env[0].append(mean_nll(model(env0["image"]), tf.squeeze(tf.squeeze(env0["label"]))))
                 env[0].append(mean_accuracy(model(env0["image"]), tf.squeeze(tf.squeeze(env0["label"]))))
