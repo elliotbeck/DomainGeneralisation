@@ -239,9 +239,6 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
         # update mean-metric
         classification_loss(_classification_loss)
         accuracy(_accuracy)
-    for i, _ in enumerate(dataset1):
-        index = i
-    print(index)
         
     writer = tf.summary.create_file_writer(summary_directory)
     with writer.as_default(), tf.summary.record_if(True):
