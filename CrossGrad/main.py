@@ -390,7 +390,7 @@ def main():
 
     # Get datasets
     if DEBUG:
-        num_batches = 50
+        num_batches = 10
     else:
         num_batches = None
 
