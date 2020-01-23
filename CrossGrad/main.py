@@ -60,7 +60,7 @@ parser.add_argument('--dropout_rate', type=float, help='Dropout rate.')
 parser.add_argument('--use_dropout', type=int, help='Flag whether to use dropout.')
 parser.add_argument('--alpha', type=float, help='weighting factor of classification loss.')
 parser.add_argument('--lambda', type=float, help='weighting factor of generator.')
-
+parser.add_argument('--seed', type=int, help='Seed.')
 
 
 def loss_fn_domain(features1, features2, features3, model_domain, config, training):
@@ -292,7 +292,7 @@ def main():
     # parse args and get configs
     args = parser.parse_args()
     logging.set_verbosity(logging.INFO)
-
+    random.seed(args.seed)
     # reload model from checkpoint or train from scratch
     if args.reload_ckpt != "None":
         checkpoint_path = os.path.join(local_settings.MODEL_PATH, 
