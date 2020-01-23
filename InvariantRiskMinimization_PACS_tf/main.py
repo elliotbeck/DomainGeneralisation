@@ -213,7 +213,7 @@ for step in range(flags.epochs):
             loss = train_nll
             loss += flags.l2_regularizer_weight * weight_norm
             penalty_weight = (flags.penalty_weight 
-                if step >= flags.penalty_anneal_iters else 1.0)
+                if step >= flags.penalty_anneal_iters else 0.01)
             loss += penalty_weight * train_penalty
             if penalty_weight > 1.0:
                 # Rescale the entire loss to keep gradients in a reasonable range
