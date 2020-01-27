@@ -154,7 +154,7 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
     label_generated2 = label2
 
     X_generated1 = model_generator(inputs1, training=training)
-    image_test = tf.concat([X_generated1[0], tf.expand_dims(tf.zeros([14,14], dtype=tf.float64), axis=-1)], axis=-1)
+    image_test = tf.concat([tf.cast(X_generated1[0], dtype= tf.float64), tf.expand_dims(tf.zeros([14,14], dtype=tf.float64), axis=-1)], axis=-1)
     print(image_test.shape)
     plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT_mnist/images/fake.png', image_test)
     plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT_mnist/images/original.png', inputs1[0])
