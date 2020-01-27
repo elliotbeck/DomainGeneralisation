@@ -388,7 +388,7 @@ def main():
 
     # Get datasets
     if DEBUG:
-        num_batches = 125
+        num_batches = 250
     else:
         num_batches = None
 
