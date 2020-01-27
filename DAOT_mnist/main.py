@@ -29,7 +29,7 @@ import experiment_repo as repo
 import util
 import local_settings
 
-DEBUG = False
+DEBUG = True
 
 parser = argparse.ArgumentParser(description='Train my model.')
 parser.add_argument('--config', type=str, 
@@ -388,7 +388,7 @@ def main():
 
     # Get datasets
     if DEBUG:
-        num_batches = 5
+        num_batches = 125
     else:
         num_batches = None
 
