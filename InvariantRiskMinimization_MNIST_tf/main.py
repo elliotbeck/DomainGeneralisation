@@ -153,7 +153,7 @@ def penalty(logits, y):
 
 # define optimizer
 
-optimizer = tf.keras.optimizers.Adam(lr=flags.lr)
+optimizer = tf.keras.optimizers.Adam(lr=flags.lr, epsilon=1e-08)
 
 # define printing function
 
