@@ -86,7 +86,6 @@ def _preprocess_exampe(model, example, dataset_name, e):
         dtype=tf.float64)], axis=-1)
     example["image"] = image
     example["label"] = label
-
     return example
 
 
@@ -97,9 +96,6 @@ def _get_dataset(dataset_name, model, split, batch_size, e):
     dataset = dataset.map(lambda x: _preprocess_exampe(model, x, dataset_name, e))
     dataset = dataset.shuffle(flags.shuffle_buffer_size)
     dataset = dataset.batch(batch_size)
-
-
-
     return dataset
 
 
