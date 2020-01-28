@@ -133,14 +133,17 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
         tf.one_hot(tf.concat([label_generated1, label_generated2], 0), axis=-1, depth=config.num_classes),
         tf.concat([model_classifier_output_generated1, model_classifier_output_generated2], 0), from_logits=False)
     mean_classification_loss_generated = tf.math.reduce_mean(classification_loss_generated)
-    
+    print(mean_classification_loss_generated)
     divergence_intra1 = util.compute_divergence(X_critic_true1, X_critic_generated1)
     divergence_intra2 = util.compute_divergence(X_critic_true2, X_critic_generated2)
     divergence_intra = divergence_intra1 + divergence_intra2
     divergence_inter1 = util.compute_divergence(X_critic_generated1, X_critic_true2)
     divergence_inter2 = util.compute_divergence(X_critic_generated2, X_critic_true1)
     divergence_inter = divergence_inter1 + divergence_inter2
+    print(divergence_intra)
+    print(divergence_inter)
     loss_generator = mean_classification_loss_generated - divergence_intra - divergence_inter
+    print(loss_generator)
     return loss_generator 
 
 
@@ -156,7 +159,6 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
     X_generated1 = model_generator(inputs1, training=training)
     image_test = tf.concat([tf.cast(X_generated1[0], dtype= tf.float64), tf.expand_dims(tf.zeros([14,14], dtype=tf.float64), axis=-1)], axis=-1)
     inputs_test = tf.concat([tf.cast(inputs1[0], dtype= tf.float64), tf.expand_dims(tf.zeros([14,14], dtype=tf.float64), axis=-1)], axis=-1)
-    print(image_test[:,:,0:2])
     plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT_mnist/images/fake.png', image_test)
     plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT_mnist/images/original.png', inputs_test)
     plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT_mnist/images/peturbation.png', image_test-inputs_test)
@@ -204,10 +206,8 @@ def _train_step(model_classifier, model_generator, model_critic, features1, feat
         # get loss of generator 
         loss_generator = loss_fn_generator(model_classifier, model_critic, model_generator, features1, 
             features2, config, training=True)
-        print(loss_generator)
         # update weights of generator
         grads = tape_src.gradient(loss_generator, model_generator.trainable_variables)
-        print(grads)
         optimizer.apply_gradients(zip(grads, model_generator.trainable_variables))
 
         global_step.assign_add(1)
