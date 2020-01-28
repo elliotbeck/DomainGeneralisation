@@ -17,10 +17,10 @@ class model_domain(tf.keras.Model):
         self.model.add(tf.keras.layers.Flatten())
         self.model.add(tf.keras.layers.BatchNormalization())
         self.model.add(tf.keras.layers.Dense(2048, activation='relu'))
-        self.model.add(tf.keras.layers.Dropout(0.5))
+        self.model.add(tf.keras.layers.Dropout(config.dropout_rate))
         self.model.add(tf.keras.layers.BatchNormalization())
         self.model.add(tf.keras.layers.Dense(1024, activation='relu'))
-        self.model.add(tf.keras.layers.Dropout(0.5))
+        self.model.add(tf.keras.layers.Dropout(config.dropout_rate))
         self.model.add(tf.keras.layers.BatchNormalization())
         self.model.add(tf.keras.layers.Dense(num_classes_domain))
         self.model.build([None] + self.input_shape + [3])  # Batch input shape.
