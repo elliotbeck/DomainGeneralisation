@@ -204,9 +204,10 @@ def _train_step(model_classifier, model_generator, model_critic, features1, feat
         # get loss of generator 
         loss_generator = loss_fn_generator(model_classifier, model_critic, model_generator, features1, 
             features2, config, training=True)
-
+        print(loss_generator)
         # update weights of generator
         grads = tape_src.gradient(loss_generator, model_generator.trainable_variables)
+        print(grads)
         optimizer.apply_gradients(zip(grads, model_generator.trainable_variables))
 
         global_step.assign_add(1)
