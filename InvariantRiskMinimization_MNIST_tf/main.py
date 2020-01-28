@@ -19,7 +19,7 @@ parser.add_argument('--n_restarts', type=int, default=1)
 parser.add_argument('--penalty_anneal_iters', type=int, default=100)
 parser.add_argument('--penalty_weight', type=float, default=10000.0)
 parser.add_argument('--epochs', type=int, default=501)
-parser.add_argument('--batch_size', type=int, default=20000)
+parser.add_argument('--batch_size', type=int, default=40000)
 parser.add_argument('--shuffle_buffer_size', type=int, default=20000)
 parser.add_argument('--grayscale_model', action='store_true')
 parser.add_argument('--seed', type=int, default=1)
@@ -33,7 +33,7 @@ for k,v in sorted(vars(flags).items()):
 
 # build model
 
-class ResNet50(tf.keras.Model):
+class MLP(tf.keras.Model):
     INPUT_SHAPE = [14, 14]
 
     def __init__(self, num_classes=2, *args, **kwargs):
@@ -44,14 +44,8 @@ class ResNet50(tf.keras.Model):
         self.model = tf.keras.Sequential([
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(flags.hidden_dim, activation='relu'),
-            tf.keras.layers.Flatten(),
-            tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(flags.hidden_dim, activation='relu'),
-            tf.keras.layers.Dropout(0.5),
-            tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(flags.hidden_dim, activation='relu'),
-            tf.keras.layers.Dropout(0.5),
-            tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(num_classes, activation='softmax')
         ])
         self.model.build([None] + self.input_shape + [2])  # Batch input shape.
@@ -61,11 +55,11 @@ class ResNet50(tf.keras.Model):
 
     @property
     def input_shape(self):
-        return ResNet50.INPUT_SHAPE
+        return MLP.INPUT_SHAPE
 
 # initialize model
 
-model = ResNet50()
+model = MLP()
 
 # get datasets
 
@@ -96,7 +90,7 @@ def _preprocess_exampe(model, example, dataset_name, e):
 
 def _get_dataset(dataset_name, model, split, batch_size, e):
 
-    dataset, info = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
+    dataset, _ = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
         split=split, with_info=True)
     dataset = dataset.map(lambda x: _preprocess_exampe(model, x, dataset_name, e))
     dataset = dataset.shuffle(flags.shuffle_buffer_size)
@@ -228,7 +222,7 @@ for step in range(flags.epochs):
 
     if step == 0:    
         pretty_print('epoch', 'train nll', 'train acc', 'test acc')
-    if step % 1 == 0:
+    if step % 10 == 0:
         pretty_print(
             np.int32(step+1),
             train_loss.result().numpy(),
