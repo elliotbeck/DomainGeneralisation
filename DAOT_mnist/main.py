@@ -366,7 +366,7 @@ def main():
     learning_rate = tf.keras.optimizers.schedules.ExponentialDecay(
         config.learning_rate, config.decay_every, 
         config.decay_base, staircase=True)
-    optimizer = tf.keras.optimizers.SGD(config.learning_rate)
+    optimizer = tf.keras.optimizers.Adam(learning_rate, clipvalue=0.5)
 
 
     if args.reload_ckpt != "None":
