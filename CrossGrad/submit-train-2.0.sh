@@ -1,7 +1,7 @@
 
 #!/bin/bash -l
 
-bsub -J $JOB_NAME -W $ttime -R "rusage[mem=$mem_per_gpu, ngpus_excl_p=$num_gpu_per_job]" -R "select[gpu_model0==TeslaV100_SXM2_32GB]" \
+bsub -J $JOB_NAME -W $ttime -R "rusage[ngpus_excl_p=$num_gpu_per_job, mem=$mem_per_gpu]" -R "select[gpu_model0==TeslaV100_SXM2_32GB]" \
 python main.py \
 --config ${CONFIG} \
 --batch_size ${BATCH_SIZE} \

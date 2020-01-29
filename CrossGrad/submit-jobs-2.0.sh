@@ -20,7 +20,7 @@ export CONFIG="/cluster/home/ebeck/DomainGeneralisation/CrossGrad/configs/config
 
 export DECAY_EVERY=5000
 export NUM_EPOCHS=40
-export BATCH_SIZE=32
+export BATCH_SIZE=18
 
 
 for VAR_LEARN_RATE in 0.001 0.0001 0.00001
