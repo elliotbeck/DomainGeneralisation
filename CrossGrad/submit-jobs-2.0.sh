@@ -26,10 +26,10 @@ export BATCH_SIZE=18
 for VAR_LEARN_RATE in 0.001 0.0001 0.00001
 do
     export LEARN_RATE=$VAR_LEARN_RATE
-    for  VAR_DO_RATE in 0.1 0.2 0.3 0.4 0.5 
+    for  VAR_DO_RATE in 0.025 0.075 0.1 
     do
         export DO_RATE=$VAR_DO_RATE
-        for  VAR_L2_PEN in 0.0001 0.00001 0
+        for  VAR_L2_PEN in 0.0001 0.00001 0.000001 0
         do
             export L2_PEN=$VAR_L2_PEN 
             sh submit-train-2.0.sh
