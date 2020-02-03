@@ -59,7 +59,8 @@ parser.add_argument('--overwrite_configs', type=int,
 parser.add_argument('--dropout_rate', type=float, help='Dropout rate.')
 parser.add_argument('--use_dropout', type=int, help='Flag whether to use dropout.')
 parser.add_argument('--alpha', type=float, help='weighting factor of classification loss.')
-parser.add_argument('--lambda', type=float, help='weighting factor of generator.')
+parser.add_argument('--epsL', type=float, help='Multiple for labels.')
+parser.add_argument('--epsD', type=float, help='Multiple for domains.')
 parser.add_argument('--seed', type=int, help='Seed.')
 
 
@@ -147,16 +148,16 @@ def _train_step(model_label, model_domain, features1, features2,
         X_l1, X_l2 = {}, {}
 
 
-        X_l1["image"] = features1["image"] + 0.5*grads11
+        X_l1["image"] = features1["image"] + config.epsL*grads11
         X_l1["label"] = features1["label"]
         X_l1["domain"] = features1["domain"]
-        X_l2["image"] = features2["image"] + 0.5*grads12
+        X_l2["image"] = features2["image"] + config.epsL*grads12
         X_l2["label"] = features2["label"]
         X_l2["domain"] = features2["domain"]
-        X_d1["image"] = features1["image"] + 0.5*grads21
+        X_d1["image"] = features1["image"] + config.epsD*grads21
         X_d1["label"] = features1["label"]
         X_d1["domain"] = features1["domain"]
-        X_d2["image"] = features2["image"] + 0.5*grads22
+        X_d2["image"] = features2["image"] + config.epsD*grads22
         X_d2["label"] = features2["label"]
         X_d2["domain"] = features2["domain"]
 
@@ -166,8 +167,8 @@ def _train_step(model_label, model_domain, features1, features2,
         loss_d = loss_fn_domain(X_l1, X_l2, model_domain, config=config, training=True)
 
         # calculate gradients for both neural nets
-        grads3 = tape_src.gradient(0.9*loss_domain+0.1*loss_d, model_domain.trainable_variables)
-        grads4 = tape_src.gradient(0.9*total_loss+0.1*loss_l, model_label.trainable_variables)
+        grads3 = tape_src.gradient((1-config.alpha)*loss_domain+config.alpha*loss_d, model_domain.trainable_variables)
+        grads4 = tape_src.gradient((1-config.alpha)*total_loss+config.alpha*loss_l, model_label.trainable_variables)
 
         # apply gradient to both neural nets
         optimizer.apply_gradients(zip(grads3, model_domain.trainable_variables))
