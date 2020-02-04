@@ -128,7 +128,7 @@ def mean_nll(logits, y):
 
 def mean_accuracy(logits, y):
     accuracy = tf.math.reduce_mean(
-        tf.where(tf.equal(y, tf.cast(tf.argmax(logits, axis=-1), tf.float32)),
+        tf.where(tf.equal(y, tf.cast(tf.argmax(tf.nn.softmax(logits), axis=-1), tf.float32)),
                     tf.ones_like(y, dtype=tf.float16),
                     tf.zeros_like(y, dtype=tf.float16)))
     return accuracy
