@@ -8,7 +8,7 @@ export num_gpu_per_job=1
 # memory per job
 export mem_per_gpu=30000
 
-export JOB_NAME='elliot1'
+export JOB_NAME='CrossGrad_MNIST_gridsearch'
 
 # load python
 module load eth_proxy python_gpu/3.6.4
