@@ -176,7 +176,7 @@ for step in range(flags.epochs):
         with tf.GradientTape() as tape_src:
 
             env = [[], [], []]
-            print(tf.one_hot(tf.cast(env0["image"], dtype=tf.int32), depth = 2, axis = -1))
+            print(tf.one_hot(tf.cast(env0["label"], dtype=tf.int32), depth = 2, axis = -1))
             print(env0["label"].shape)
             print(tf.squeeze(env0["label"]))
             env[0].append(mean_nll(model(env0["image"]), env0["label"]))
