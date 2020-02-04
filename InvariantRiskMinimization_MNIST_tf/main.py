@@ -187,7 +187,9 @@ for step in range(flags.epochs):
 
             env[2].append(mean_nll(model(env2["image"]), env2["label"]))
             env[2].append(mean_accuracy(model(env2["image"]), env2["label"]))
-            train_nll = tf.reduce_mean(tf.concat([env[0][0], env[1][0]], 0))
+            print(env[0][1].shape)
+            print(env[1][1].shape)
+            train_nll = tf.reduce_mean(tf.concat([env[0][0], env[1][0]]))
             print(train_nll)
             print(env[0][1])
             print(env[1][1])
