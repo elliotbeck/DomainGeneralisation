@@ -127,6 +127,7 @@ def mean_nll(logits, y):
     return loss_object(tf.one_hot(tf.cast(y, dtype=tf.int32), depth = 2), logits)
 
 def mean_accuracy(logits, y):
+    print(logits)
     accuracy = tf.math.reduce_mean(
         tf.where(tf.equal(y, tf.cast(tf.argmax(logits, axis=-1), tf.float32)),
                     tf.ones_like(y, dtype=tf.float16),
