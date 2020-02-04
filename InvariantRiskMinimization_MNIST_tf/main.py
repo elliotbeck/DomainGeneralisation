@@ -122,7 +122,7 @@ envs = [
 # Define loss function helpers
 # not possible to use tf.keras.losses.SparseCategoricalCrossentropy due to:
 # https://github.com/tensorflow/tensorflow/issues/27875
-loss_object = tf.keras.losses.BinaryCrossentropy(from_logits=False) 
+loss_object = tf.keras.losses.BinaryCrossentropy(from_logits=True) 
 def mean_nll(logits, y):
     return loss_object(tf.one_hot(tf.cast(y, dtype=tf.int32), depth = 2), logits)
 
