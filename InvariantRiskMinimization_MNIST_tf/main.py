@@ -190,9 +190,11 @@ for step in range(flags.epochs):
             env[2].append(mean_accuracy(model(env2["image"]), tf.squeeze(tf.squeeze(env2["label"]))))
             env[2].append(penalty(model(env2["image"]), tf.squeeze(tf.squeeze(env2["label"]))))
 
-            train_nll = tf.reduce_mean([tf.cast(env[0][0], dtype=tf.float32), tf.cast(env[1][0], dtype=tf.float32)])
-            train_accuracy = tf.reduce_mean([env[0][1], env[1][1]])
-            train_penalty = tf.reduce_mean([env[0][2], env[1][2]])
+            train_nll = tf.reduce_mean(env[0][0].append(env[1][0]))
+            train_accuracy = tf.reduce_mean(env[0][1].append(env[1][1]))
+            train_penalty = tf.reduce_mean(env[0][2].append(env[1][2]))
+            # train_accuracy = tf.reduce_mean([env[0][1], env[1][1]])
+            # train_penalty = tf.reduce_mean([env[0][2], env[1][2]])
 
             test_accuracy = env[2][1]
 
