@@ -126,7 +126,7 @@ envs = [
 #loss_object = tf.keras.losses.categorical_crossentropy(from_logits=True)
 def mean_nll(preds, y):
     y_one_hot = tf.one_hot(tf.cast(y, dtype=tf.int32), depth = 2, axis = -1)
-    return tf.losses.binary_crossentropy(y_one_hot, preds, from_logits=True)
+    return tf.losses.binary_crossentropy(y_one_hot, preds, from_logits=False)
 
 def mean_accuracy(logits, y):
     accuracy = tf.math.reduce_mean(
