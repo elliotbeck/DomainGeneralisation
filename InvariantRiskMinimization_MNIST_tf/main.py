@@ -154,8 +154,7 @@ for step in range(flags.epochs):
             env[2].append(mean_accuracy(model(env2["image"]), env2["label"]))
             env[2].append(penalty(model(env2["image"]), env2["label"]))
             
-            print(env[0][0])
-            print(env[1][0])
+
             train_nll = tf.reduce_mean([env[0][0], env[1][0]])
             print(train_nll)
             train_accuracy = tf.reduce_mean([env[0][1], env[1][1]])
