@@ -47,7 +47,7 @@ class MLP(tf.keras.Model):
                                     kernel_initializer = tf.initializers.GlorotUniform()),
             tf.keras.layers.Dense(flags.hidden_dim, activation='relu', 
                                     kernel_initializer = tf.initializers.GlorotUniform()),
-            tf.keras.layers.Dense(num_classes, activation='softmax', kernel_initializer = tf.initializers.GlorotUniform())
+            tf.keras.layers.Dense(num_classes, activation='linear', kernel_initializer = tf.initializers.GlorotUniform())
         ])
         self.model.build([None] + self.input_shape + [2])  # Batch input shape.
 
@@ -177,6 +177,8 @@ for step in range(flags.epochs):
         with tf.GradientTape() as tape_src:
 
             env = [[], [], []]
+            print(tf.cast(tf.argmax(model(env0["image"]), axis=-1), tf.float32))
+            print(tf.cast(tf.nn.softmax(tf.argmax(model(env0["image"])), axis=-1), tf.float32))
             print(tf.one_hot(tf.cast(env0["label"], dtype=tf.int32), depth = 2, axis = -1))
             print(env0["label"].shape)
             env[0].append(mean_nll(model(env0["image"]), env0["label"]))
