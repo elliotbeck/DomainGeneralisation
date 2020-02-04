@@ -137,7 +137,8 @@ def mean_nll(preds, y):
 
 def mean_accuracy(logits, y):
     preds = tf.cast((logits > 0.), dtype=tf.float32)
-    print(preds)
+    print(preds.shape)
+    print(tf.reduce_mean(tf.math.abs(preds - y)))
     return tf.reduce_mean(tf.math.abs(preds - y))
 
 def penalty(logits, y):
@@ -182,7 +183,6 @@ for step in range(flags.epochs):
         with tf.GradientTape() as tape_src:
 
             env = [[], [], []]
-            print(env0["label"].shape)
             env[0].append(mean_nll(model(env0["image"]), env0["label"]))
             env[0].append(mean_accuracy(model(env0["image"]), env0["label"]))
             env[0].append(penalty(model(env0["image"]), env0["label"]))
