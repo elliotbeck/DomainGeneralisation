@@ -47,7 +47,7 @@ class MLP(tf.keras.Model):
                                     kernel_initializer = tf.initializers.GlorotUniform()),
             tf.keras.layers.Dense(flags.hidden_dim, activation='relu', 
                                     kernel_initializer = tf.initializers.GlorotUniform()),
-            tf.keras.layers.Dense(num_classes, activation='softmax', kernel_initializer = tf.initializers.GlorotUniform())
+            tf.keras.layers.Dense(num_classes, activation='linear', kernel_initializer = tf.initializers.GlorotUniform())
         ])
         self.model.build([None] + self.input_shape + [2])  # Batch input shape.
 
@@ -122,7 +122,8 @@ envs = [
 # Define loss function helpers
 # not possible to use tf.keras.losses.SparseCategoricalCrossentropy due to:
 # https://github.com/tensorflow/tensorflow/issues/27875
-loss_object = tf.keras.losses.BinaryCrossentropy(from_logits=True) 
+#loss_object = tf.keras.losses.BinaryCrossentropy(from_logits=True) 
+loss_object = tf.keras.losses.categorical_crossentropy(from_logits=True)
 def mean_nll(logits, y):
     return loss_object(tf.one_hot(tf.cast(y, dtype=tf.int32), depth = 2), logits)
 
