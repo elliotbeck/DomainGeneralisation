@@ -156,12 +156,9 @@ for step in range(flags.epochs):
             
 
             train_nll = tf.reduce_mean([env[0][0], env[1][0]])
-            print(train_nll)
             train_accuracy = tf.reduce_mean([env[0][1], env[1][1]])
-            print(train_accuracy)
             train_penalty = tf.reduce_mean([env[0][2], env[1][2]])
             test_accuracy = env[2][1]
-            print(test_accuracy)
             
             train_loss(train_nll)
             train_acc(train_accuracy)
@@ -185,9 +182,8 @@ for step in range(flags.epochs):
             optimizer.apply_gradients(zip(grads, model.trainable_variables))
     if step == 0:    
         pretty_print('epoch', 'train nll', 'train acc', 'test acc')
-    if step % 10 == 0:
-        pretty_print(
-            np.int32(step+1),
-            train_loss.result().numpy(),
-            (train_acc.result()*100).numpy(),
-            (test_acc.result()*100).numpy())
+    # if step % 10 == 0:
+    pretty_print(np.int32(step+1),
+                train_loss.result().numpy(),
+                (train_acc.result()*100).numpy(),
+                (test_acc.result()*100).numpy())
