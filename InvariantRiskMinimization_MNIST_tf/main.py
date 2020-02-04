@@ -127,12 +127,17 @@ envs = [
 def mean_nll(preds, y):
     return tf.keras.losses.binary_crossentropy(y, tf.squeeze(preds), from_logits=True)
 
+# def mean_accuracy(logits, y):
+#     accuracy = tf.math.reduce_mean(
+#         tf.where(tf.equal(y, tf.cast(tf.argmax(logits, axis=-1), tf.float32)),
+#                     tf.ones_like(y, dtype=tf.float16),
+#                     tf.zeros_like(y, dtype=tf.float16)))
+#     return accuracy
+
+
 def mean_accuracy(logits, y):
-    accuracy = tf.math.reduce_mean(
-        tf.where(tf.equal(y, tf.cast(tf.argmax(logits, axis=-1), tf.float32)),
-                    tf.ones_like(y, dtype=tf.float16),
-                    tf.zeros_like(y, dtype=tf.float16)))
-    return accuracy
+    preds = (logits > 0.)
+    return tf.reduce_mean(tf.math.abs(preds - y))
 
 def penalty(logits, y):
     with tf.GradientTape() as tape_src:
