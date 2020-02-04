@@ -206,7 +206,7 @@ for step in range(flags.epochs):
             for w in model.trainable_variables:
                 weight_norm += tf.norm(w)**2
 
-            loss = train_nll
+            loss = train_nll.result()
             loss += flags.l2_regularizer_weight * weight_norm
             penalty_weight = (flags.penalty_weight 
                 if step >= flags.penalty_anneal_iters else 100.0)
