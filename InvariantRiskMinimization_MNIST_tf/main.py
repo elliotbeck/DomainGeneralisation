@@ -189,9 +189,9 @@ for step in range(flags.epochs):
             env[2].append(mean_accuracy(model(env2["image"]), tf.squeeze(tf.squeeze(env2["label"]))))
             env[2].append(penalty(model(env2["image"]), tf.squeeze(tf.squeeze(env2["label"]))))
 
-            train_nll = tf.reduce_mean([env[0][0], env[1][0]])
-            train_accuracy = tf.reduce_mean([env[0][1], env[1][1]])
-            train_penalty = tf.reduce_mean([env[0][2], env[1][2]])
+            train_nll = tf.reduce_mean(env[0][0], env[1][0])
+            train_accuracy = tf.reduce_mean(env[0][1], env[1][1])
+            train_penalty = tf.reduce_mean(env[0][2], env[1][2])
 
             test_accuracy = env[2][1]
 
@@ -206,7 +206,7 @@ for step in range(flags.epochs):
             for w in model.trainable_variables:
                 weight_norm += tf.norm(w)**2
 
-            loss = train_nll.result()
+            loss = train_nll
             loss += flags.l2_regularizer_weight * weight_norm
             penalty_weight = (flags.penalty_weight 
                 if step >= flags.penalty_anneal_iters else 100.0)
