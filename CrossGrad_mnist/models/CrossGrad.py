@@ -13,7 +13,7 @@ class model_domain(tf.keras.Model):
         self.model = tf.keras.Sequential([
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(256, activation='relu'),
-            tf.keras.layers.Flatten(),
+            tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
             tf.keras.layers.Dense(256, activation='relu'),
             tf.keras.layers.Dropout(0.5),

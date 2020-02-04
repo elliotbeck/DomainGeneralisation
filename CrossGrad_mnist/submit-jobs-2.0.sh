@@ -15,8 +15,6 @@ module load eth_proxy python_gpu/3.6.4
 module load cuda/10.0.130
 module load cudnn/7.6.4
 
-
-export BATCH_SIZE=$VAR_BATCH_SIZE
 for  VAR_EPSD in 0.5 1 2 2.5
 do
     export EPSD=$VAR_EPSD
