@@ -176,11 +176,11 @@ for step in range(flags.epochs):
         with tf.GradientTape() as tape_src:
 
             env = [[], [], []]
-            print(tf.squeeze(tf.squeeze(env0["label"])))
+            print(env0["label"].shape)
             print(tf.squeeze(env0["label"]))
-            env[0].append(mean_nll(model(env0["image"]), tf.squeeze(env0["label"])))
-            env[0].append(mean_accuracy(model(env0["image"]), tf.squeeze(env0["label"])))
-            env[0].append(penalty(model(env0["image"]), tf.squeeze(env0["label"])))
+            env[0].append(mean_nll(model(env0["image"]), env0["label"]))
+            env[0].append(mean_accuracy(model(env0["image"]), env0["label"]))
+            env[0].append(penalty(model(env0["image"]), env0["label"]))
 
             env[1].append(mean_nll(model(env1["image"]), tf.squeeze(env1["label"])))
             env[1].append(mean_accuracy(model(env1["image"]), tf.squeeze(env1["label"])))
