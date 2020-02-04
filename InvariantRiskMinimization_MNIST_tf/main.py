@@ -136,7 +136,8 @@ def mean_nll(preds, y):
 
 
 def mean_accuracy(logits, y):
-    preds = int(logits > 0.)
+    preds = tf.cast((logits > 0.), dtype=tf.float32)
+    print(preds)
     return tf.reduce_mean(tf.math.abs(preds - y))
 
 def penalty(logits, y):
