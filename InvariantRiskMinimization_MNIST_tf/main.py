@@ -161,8 +161,10 @@ for step in range(flags.epochs):
             train_nll = tf.reduce_mean([env[0][0], env[1][0]])
             print(train_nll)
             train_accuracy = tf.reduce_mean([env[0][1], env[1][1]])
+            print(train_accuracy)
             train_penalty = tf.reduce_mean([env[0][2], env[1][2]])
             test_accuracy = env[2][1]
+            print(test_accuracy)
             train_loss(train_nll)
             train_acc(train_accuracy)
             test_acc(test_accuracy)
