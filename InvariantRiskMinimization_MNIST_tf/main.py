@@ -19,7 +19,7 @@ parser.add_argument('--n_restarts', type=int, default=1)
 parser.add_argument('--penalty_anneal_iters', type=int, default=100)
 parser.add_argument('--penalty_weight', type=float, default=10000.0)
 parser.add_argument('--epochs', type=int, default=501)
-parser.add_argument('--batch_size', type=int, default=40000)
+parser.add_argument('--batch_size', type=int, default=30000)
 parser.add_argument('--shuffle_buffer_size', type=int, default=20000)
 parser.add_argument('--grayscale_model', action='store_true')
 parser.add_argument('--seed', type=int, default=1)
@@ -47,7 +47,7 @@ class MLP(tf.keras.Model):
                                     kernel_initializer = tf.initializers.GlorotUniform()),
             tf.keras.layers.Dense(flags.hidden_dim, activation='relu', 
                                     kernel_initializer = tf.initializers.GlorotUniform()),
-            tf.keras.layers.Dense(num_classes, kernel_initializer = tf.initializers.GlorotUniform())
+            tf.keras.layers.Dense(num_classes, activation='softmax', kernel_initializer = tf.initializers.GlorotUniform())
         ])
         self.model.build([None] + self.input_shape + [2])  # Batch input shape.
 
@@ -131,11 +131,6 @@ def mean_accuracy(logits, y):
         tf.where(tf.equal(y, tf.cast(tf.argmax(logits, axis=-1), tf.float32)),
                     tf.ones_like(y, dtype=tf.float16),
                     tf.zeros_like(y, dtype=tf.float16)))
-    accuracy1 = tf.math.reduce_mean(
-        tf.where(tf.equal(y, tf.cast(tf.argmax(logits, axis=0), tf.float32)),
-                    tf.ones_like(y, dtype=tf.float16),
-                    tf.zeros_like(y, dtype=tf.float16)))
-    print(accuracy1)
     return accuracy
 
 def penalty(logits, y):
