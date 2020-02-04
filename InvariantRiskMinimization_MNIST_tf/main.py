@@ -191,8 +191,10 @@ for step in range(flags.epochs):
             print(tf.concat([env[0][0], env[1][0]], -1).shape)
             train_nll = tf.reduce_mean(tf.concat([env[0][0], env[1][0]], -1))
             print(train_nll)
-            train_accuracy = tf.reduce_mean(tf.concat([env[0][1], env[1][1]], -1))
-            train_penalty = tf.reduce_mean(tf.concat([env[0][2], env[1][2]], -1))
+            train_accuracy = tf.reduce_mean(tf.concat([env[0][1], env[1][1]], 0))
+            print(train_accuracy)
+            train_penalty = tf.reduce_mean(tf.concat([env[0][2], env[1][2]], 0))
+            print(train_penalty)
             # train_accuracy = tf.reduce_mean([env[0][1], env[1][1]])
             # train_penalty = tf.reduce_mean([env[0][2], env[1][2]])
 
