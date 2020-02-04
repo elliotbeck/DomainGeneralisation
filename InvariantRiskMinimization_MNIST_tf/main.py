@@ -47,7 +47,7 @@ class MLP(tf.keras.Model):
                                     kernel_initializer = tf.initializers.GlorotUniform()),
             tf.keras.layers.Dense(flags.hidden_dim, activation='relu', 
                                     kernel_initializer = tf.initializers.GlorotUniform()),
-            tf.keras.layers.Dense(num_classes, activation='softmax', kernel_initializer = tf.initializers.GlorotUniform())
+            tf.keras.layers.Dense(num_classes, activation='linear', kernel_initializer = tf.initializers.GlorotUniform())
         ])
         self.model.build([None] + self.input_shape + [2])  # Batch input shape.
 
