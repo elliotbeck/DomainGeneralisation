@@ -178,7 +178,7 @@ for step in range(flags.epochs):
 
             env = [[], [], []]
             print(tf.cast(tf.argmax(model(env0["image"]), axis=-1), tf.float32))
-            print(tf.cast(tf.nn.softmax(tf.argmax(model(env0["image"])), axis=-1), tf.float32))
+            print(tf.cast(tf.argmax(tf.nn.softmax(model(env0["image"])), axis=-1), tf.float32))
             print(tf.one_hot(tf.cast(env0["label"], dtype=tf.int32), depth = 2, axis = -1))
             print(env0["label"].shape)
             env[0].append(mean_nll(model(env0["image"]), env0["label"]))
