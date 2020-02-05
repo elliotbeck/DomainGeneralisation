@@ -31,7 +31,7 @@ for k,v in sorted(vars(flags).items()):
 # build model
 class MLP(tf.keras.Model):
     INPUT_SHAPE = [14, 14]
-    def __init__(self, num_classes=2, *args, **kwargs):
+    def __init__(self, num_classes=1, *args, **kwargs):
         super().__init__(*args, **kwargs)
         in_shape = self.input_shape + [2]
         self.model = tf.keras.Sequential([
@@ -104,15 +104,15 @@ envs = [
 # Define loss function helpers
 # not possible to use tf.keras.losses.SparseCategoricalCrossentropy due to:
 # https://github.com/tensorflow/tensorflow/issues/27875
-loss_object = tf.keras.losses.CategoricalCrossentropy(from_logits=False) 
+loss_object = tf.keras.losses.BinaryCrossentropy(from_logits=False) 
 def mean_nll(logits, y):
-    return loss_object(tf.one_hot(tf.cast(y, dtype=tf.int32), depth = 2), logits)
+    return loss_object(y, logits)
+
 def mean_accuracy(logits, y):
-    accuracy = tf.math.reduce_mean(
-        tf.where(tf.equal(y, tf.cast(tf.argmax(logits, axis=-1), tf.float32)),
-                    tf.ones_like(y, dtype=tf.float16),
-                    tf.zeros_like(y, dtype=tf.float16)))
+    preds = tf.cast(logits > 0., dtype=tf.float32)
+    accuracy = tf.reduce_mean(tf.cast(tf.abs(preds - y) < 1e-2, dtype=tf.float32))
     return accuracy
+
 def penalty(logits, y):
     with tf.GradientTape() as tape_src:
         scale = tf.ones(1,1)
@@ -120,8 +120,10 @@ def penalty(logits, y):
         loss = mean_nll(logits * scale, y)
         grad = tape_src.gradient(loss, scale)
     return tf.reduce_sum(grad**2)
+
 # define optimizer
 optimizer = tf.keras.optimizers.Adam(lr=flags.lr, epsilon=1e-08)
+
 # define printing function
 def pretty_print(*values):
     col_width = 13
