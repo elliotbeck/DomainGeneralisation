@@ -185,8 +185,8 @@ for step in range(flags.epochs):
             optimizer.apply_gradients(zip(grads, model.trainable_variables))
     if step == 0:    
         pretty_print('epoch', 'train nll', 'train acc', 'test acc')
-    if step+1 % 10 == 0:
-        pretty_print(np.int32(step+1),
+    # if step+1 % 10 == 0:
+    pretty_print(np.int32(step+1),
                     train_loss.result().numpy(),
                     (train_acc.result()*100).numpy(),
                     (test_acc.result()*100).numpy())
