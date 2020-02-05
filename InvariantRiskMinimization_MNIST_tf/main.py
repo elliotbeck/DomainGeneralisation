@@ -8,6 +8,7 @@ import local_settings
 import util
 import random
 
+# set flags
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 parser = argparse.ArgumentParser(description='Colored MNIST')
 parser.add_argument('--hidden_dim', type=int, default=256)
@@ -38,7 +39,7 @@ class MLP(tf.keras.Model):
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(flags.hidden_dim, activation='relu'),
              tf.keras.layers.Dense(flags.hidden_dim, activation='relu'),
-             tf.keras.layers.Dense(1, activation = 'linear')
+             tf.keras.layers.Dense(num_classes, activation = 'linear')
              ])
         self.model.build([None] + self.input_shape + [2])  # Batch input shape.
 
@@ -51,7 +52,7 @@ class MLP(tf.keras.Model):
 # initialize model
 model = MLP()
 
-# get datasets
+# define preprocess function for dataset
 def _preprocess_exampe(model, example, dataset_name, e):
     example["image"] = tf.cast(example["image"], dtype=tf.float64)/255.
     # 2x subsample for computational convenience
@@ -75,6 +76,7 @@ def _preprocess_exampe(model, example, dataset_name, e):
     example["label"] = tf.squeeze(label)
     return example
 
+# get datasets
 def _get_dataset(dataset_name, model, split, batch_size, e):
     dataset, _ = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
         split=split, with_info=True)
@@ -93,35 +95,31 @@ train_ds2 = _get_dataset('mnist', model,
 test_ds = _get_dataset('mnist', model, 
         split=tfds.Split.TEST, batch_size=flags.batch_size, 
         e = 0.9)
+
 # Build environments
 envs = [
     train_ds1,
     train_ds2,
     test_ds
   ]
+
 # Define loss function helpers
 # not possible to use tf.keras.losses.SparseCategoricalCrossentropy due to:
 # https://github.com/tensorflow/tensorflow/issues/27875
 # loss_object = tf.keras.losses.BinaryCrossentropy(from_logits=False) 
+# Also not possible to use tf.keras.losses.binary_crossentropy
 # def mean_nll(logits, y):
 #     return tf.keras.losses.binary_crossentropy(tf.one_hot(tf.cast(y, dtype=tf.int32), depth = 2), logits, from_logits=True)
 
 def mean_nll(logits, y):
     return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(y, tf.squeeze(logits)))
 
-# def mean_accuracy(logits, y):
-#     accuracy = tf.math.reduce_mean(
-#         tf.where(tf.equal(y, tf.cast(tf.argmax(logits, axis=-1), tf.float32)),
-#                     tf.ones_like(y, dtype=tf.float16),
-#                     tf.zeros_like(y, dtype=tf.float16)))
-#     return accuracy
-
 
 def mean_accuracy(logits, y):
     preds = tf.cast((logits > 0.), dtype=tf.float32)
     return tf.reduce_mean(tf.cast((tf.abs(tf.squeeze(preds) - y) < 1e-2), dtype=tf.float32))
 
-
+# define penality function
 def penalty(logits, y):
     with tf.GradientTape() as tape_src:
         scale = tf.ones(1,1)
@@ -155,6 +153,7 @@ for step in range(flags.epochs):
     for env0, env1, env2 in zip(envs[0], envs[1], envs[2]):
         with tf.GradientTape() as tape_src:
             env = [[], [], []]
+            # get metrics per domain
             env[0].append(mean_nll(model(env0["image"]), env0["label"]))
             env[0].append(mean_accuracy(model(env0["image"]), env0["label"]))
             env[0].append(penalty(model(env0["image"]), env0["label"]))
@@ -165,6 +164,7 @@ for step in range(flags.epochs):
             env[2].append(mean_accuracy(model(env2["image"]), env2["label"]))
             env[2].append(penalty(model(env2["image"]), env2["label"]))
 
+            # average over the domains
             train_nll = tf.reduce_mean([env[0][0], env[1][0]])
             train_accuracy = tf.reduce_mean([env[0][1], env[1][1]])
             train_penalty = tf.reduce_mean([env[0][2], env[1][2]])
@@ -174,6 +174,7 @@ for step in range(flags.epochs):
             train_acc(train_accuracy)
             test_acc(test_accuracy)
 
+            # apply gradients as in original code
             tape_src.watch(train_nll)
 
             weight_norm = tf.zeros(1,1)
@@ -190,6 +191,8 @@ for step in range(flags.epochs):
             # update weights of classifier
             grads = tape_src.gradient(loss, model.trainable_variables)
             optimizer.apply_gradients(zip(grads, model.trainable_variables))
+            
+    # print weights
     if step == 0:    
         pretty_print('epoch', 'train nll', 'train acc', 'test acc')
     # if step % 10 == 0:
