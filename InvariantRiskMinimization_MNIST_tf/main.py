@@ -37,8 +37,9 @@ class MLP(tf.keras.Model):
         self.model = tf.keras.Sequential([
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(flags.hidden_dim, activation='relu'),
-            tf.keras.layers.Dense(flags.hidden_dim, activation='relu'),
-            tf.keras.layers.Dense(1, activation ='linear')])
+             tf.keras.layers.Dense(flags.hidden_dim, activation='relu'),
+             tf.keras.layers.Dense(1, activation = 'linear')
+             ])
         self.model.build([None] + self.input_shape + [2])  # Batch input shape.
 
     def call(self, inputs, training=None, mask=None):
@@ -101,18 +102,25 @@ envs = [
 # Define loss function helpers
 # not possible to use tf.keras.losses.SparseCategoricalCrossentropy due to:
 # https://github.com/tensorflow/tensorflow/issues/27875
-# Also not possible to use tf.keras.losses.BinaryCrossentropy due to 
-# softmax activation 
 # loss_object = tf.keras.losses.BinaryCrossentropy(from_logits=False) 
 # def mean_nll(logits, y):
-#     return loss_object(y, logits)
+#     return tf.keras.losses.binary_crossentropy(tf.one_hot(tf.cast(y, dtype=tf.int32), depth = 2), logits, from_logits=True)
 
 def mean_nll(logits, y):
     return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(y, tf.squeeze(logits)))
 
+# def mean_accuracy(logits, y):
+#     accuracy = tf.math.reduce_mean(
+#         tf.where(tf.equal(y, tf.cast(tf.argmax(logits, axis=-1), tf.float32)),
+#                     tf.ones_like(y, dtype=tf.float16),
+#                     tf.zeros_like(y, dtype=tf.float16)))
+#     return accuracy
+
+
 def mean_accuracy(logits, y):
     preds = tf.cast((logits > 0.), dtype=tf.float32)
     return tf.reduce_mean(tf.cast((tf.abs(tf.squeeze(preds) - y) < 1e-2), dtype=tf.float32))
+
 
 def penalty(logits, y):
     with tf.GradientTape() as tape_src:
@@ -156,7 +164,6 @@ for step in range(flags.epochs):
             env[2].append(mean_nll(model(env2["image"]), env2["label"]))
             env[2].append(mean_accuracy(model(env2["image"]), env2["label"]))
             env[2].append(penalty(model(env2["image"]), env2["label"]))
-            
 
             train_nll = tf.reduce_mean([env[0][0], env[1][0]])
             train_accuracy = tf.reduce_mean([env[0][1], env[1][1]])
@@ -175,7 +182,7 @@ for step in range(flags.epochs):
             loss = train_nll
             loss += flags.l2_regularizer_weight * weight_norm
             penalty_weight = (flags.penalty_weight 
-                if step >= flags.penalty_anneal_iters else 100.0)
+                if step >= flags.penalty_anneal_iters else 1.0)
             loss += penalty_weight * train_penalty
             if penalty_weight > 1.0:
                 # Rescale the entire loss to keep gradients in a reasonable range
@@ -185,8 +192,8 @@ for step in range(flags.epochs):
             optimizer.apply_gradients(zip(grads, model.trainable_variables))
     if step == 0:    
         pretty_print('epoch', 'train nll', 'train acc', 'test acc')
-    # if step+1 % 10 == 0:
+    # if step % 10 == 0:
     pretty_print(np.int32(step+1),
-                    train_loss.result().numpy(),
-                    (train_acc.result()*100).numpy(),
-                    (test_acc.result()*100).numpy())
+                train_loss.result().numpy(),
+                (train_acc.result()*100).numpy(),
+                (test_acc.result()*100).numpy())
