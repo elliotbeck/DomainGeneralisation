@@ -1,4 +1,5 @@
 import torch
+import random
 from util import preprocess
 from torch import nn, optim
 import torchvision.datasets as datasets
@@ -17,12 +18,16 @@ parser.add_argument('--epochs_metatrain', type=int, default=10)
 parser.add_argument('--epochs_full', type=int, default=15)
 parser.add_argument('--num_classes', type=int, default=1)
 parser.add_argument('--meta_train_steps', type=int, default=20)
+parser.add_argument('--seed', type=int, default=1)
 flags = parser.parse_args()
 
 #print setup
 print('Flags:')
 for k,v in sorted(vars(flags).items()):
   print("\t{}: {}".format(k, v))
+
+# set seed
+random.seed(flags.seed)
 
 # load data
 mnist_train = datasets.MNIST(root='./data', train=True, download=True, transform=None)
