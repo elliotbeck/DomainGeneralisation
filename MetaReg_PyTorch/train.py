@@ -89,44 +89,42 @@ def train_step1(model_task1, model_task2, model_task3, input1, input2, input3, o
     model_task3_loss.backward()
     optimizer_task3.step()
 
-def train_step2(model1, model2, model3, model_regularizer, input1, input2, input3, 
+def train_step2(model_regularizer, input1, input2, input3, 
                 loss_function, learning_rate, models, random_domains):
     inputs1, labels1 = input1
     inputs2, labels2 = input2
     inputs3, labels3 = input3
 
-    optimizer1 = optim.SGD(model1.linear1.parameters(), lr=learning_rate, momentum=0.9)
-    optimizer2 = optim.SGD(model2.linear1.parameters(), lr=learning_rate, momentum=0.9)
-    optimizer3 = optim.SGD(model3.linear1.parameters(), lr=learning_rate, momentum=0.9)
+    optimizer1 = optim.SGD(models[0].linear1.parameters(), lr=learning_rate, momentum=0.9)
+    optimizer2 = optim.SGD(models[1].linear1.parameters(), lr=learning_rate, momentum=0.9)
+    optimizer3 = optim.SGD(models[2].linear1.parameters(), lr=learning_rate, momentum=0.9)
 
     # get loss for model_task1 
-    model1_loss = loss_function(model1(inputs1), torch.tensor(torch.squeeze(labels1), 
+    model1_loss = loss_function(models[0](inputs1), torch.tensor(torch.squeeze(labels1), 
                                     dtype=torch.long).cuda()) 
     # get loss for model_task2
-    model2_loss = loss_function(model2(inputs2), torch.tensor(torch.squeeze(labels2), 
+    model2_loss = loss_function(models[1](inputs2), torch.tensor(torch.squeeze(labels2), 
                                     dtype=torch.long).cuda()) 
     # get loss for model_task3
-    model3_loss = loss_function(model3(inputs3), torch.tensor(torch.squeeze(labels3), 
+    model3_loss = loss_function(models[2](inputs3), torch.tensor(torch.squeeze(labels3), 
                                     dtype=torch.long).cuda()) 
+                                    
     # save losses in list                                
     loss = [model1_loss, model2_loss, model3_loss]
     # random meta train loss
     meta_train_loss = loss[random_domains[0]]
     # random meta train model
     meta_train_model = models[random_domains[0]]
+    # get loss of regularizer 
+    loss_regularizer = model_regularizer(torch.abs(torch.flatten(meta_train_model.linear1.weight)))
+    # add the losses
+    meta_train_loss = meta_train_loss + loss_regularizer
     # choose the right optimizer
     optimizer = [optimizer1, optimizer2, optimizer3][random_domains[0]]
     # zero the parameter gradients
     optimizer.zero_grad()
     # perform gradient descent
     meta_train_loss.backward(retain_graph=True)
-    optimizer.step()
-    # get gradients of regularizer 
-    loss_regularizer = model_regularizer(torch.abs(torch.flatten(meta_train_model.linear1.weight)))
-    # zero the parameter gradients
-    optimizer.zero_grad()
-    # perform gradient descent
-    loss_regularizer.backward()
     optimizer.step()
 
 def train_step3(model_regularizer, input1, input2, input3, optimizer_reg, 
@@ -166,7 +164,7 @@ def train_one_epoch_metatrain(model_task1, model_task2, model_task3, model_regul
     meta_train_sample = util.sample(zip(train_input1, train_input2, train_input3), meta_train_steps)
     # TRAIN STEP 2, meta learning of regularizer (line 10-13 in MetaReg algo)
     for input1, input2, input3 in meta_train_sample:
-        train_step2(model1, model2, model3, model_regularizer, input1, input2, input3, loss_function, 
+        train_step2(model_regularizer, input1, input2, input3, loss_function, 
                     learning_rate, models=models, random_domains=random_domains)
 
     optimizer_reg = optim.SGD(model_regularizer.parameters(), lr=learning_rate, momentum=0.9)
