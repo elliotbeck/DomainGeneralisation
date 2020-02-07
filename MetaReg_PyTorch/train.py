@@ -121,18 +121,18 @@ def train_step2(model1, model2, model3, model_regularizer, input1, input2, input
     # perform gradient descent
     meta_train_loss.backward(retain_graph=True)
     optimizer.step()
-    # get gradients of regularizer (probably won't work instantly)
-    output = model_regularizer(torch.abs(torch.flatten(meta_train_model.linear1.weight)))
+    # get gradients of regularizer 
+    loss_regularizer = model_regularizer(torch.abs(torch.flatten(meta_train_model.linear1.weight)))
     # zero the parameter gradients
     optimizer.zero_grad()
     # perform gradient descent
-    meta_train_loss.backward()
+    loss_regularizer.backward()
     optimizer.step()
 
 def train_step3(model_regularizer, input1, input2, input3, optimizer_reg, 
                 loss_function, models ,random_domains):
     # get gradients and apply SGD
-    meta_test_model = models[random_domains[1]]
+    meta_test_model = models[random_domains[0]]
     inputs = [input1, input2, input3][random_domains[1]]
     meta_test_loss = loss_function(meta_test_model(inputs[0]), torch.tensor(torch.squeeze(inputs[1]), 
                                     dtype=torch.long).cuda())
