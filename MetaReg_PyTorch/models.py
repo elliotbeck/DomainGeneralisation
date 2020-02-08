@@ -5,12 +5,16 @@ class model_feature(nn.Module):
    def __init__(self, hidden_dim):
       super(model_feature, self).__init__()
       self.resnet50 = models.resnet50(pretrained=True)
+      self.linear_1 = nn.Linear(hidden_dim, hidden_dim) # test
+      self.linear_2 = nn.Linear(hidden_dim, hidden_dim) # test
       # for param in self.resnet50.parameters():
       #    param.requires_grad = False
       self.resnet50.fc = nn.Linear(self.resnet50.fc.in_features, hidden_dim)
 
    def logits(self, input):
       x = self.resnet50(input)
+      x = self.linear_1(x)
+      x = self.linear_2(x)
       return x
 
    def forward(self, input):
