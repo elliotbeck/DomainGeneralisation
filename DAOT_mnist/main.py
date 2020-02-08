@@ -62,9 +62,9 @@ parser.add_argument('--seed', type=float, help='weighting factor of generator.')
 def loss_fn_classifier(model_classifier, model_generator, features1, features2, config, training):
     # save features and labels from the two random training domains and concat them
     inputs1 = tf.cast(features1["image"], tf.float32)
-    label1 = tf.cast(features1["label"], tf.int32)
+    label1 = tf.cast(features1["label"], tf.float32)
     inputs2 = tf.cast(features2["image"], tf.float32)
-    label2 = tf.cast(features2["label"], tf.int32)
+    label2 = tf.cast(features2["label"], tf.float32)
     inputs = tf.concat([inputs1, inputs2], 0)
     label = tf.concat([label1, label2], 0)
     # get generated inputs, labels stay the same
@@ -106,9 +106,9 @@ def loss_fn_classifier(model_classifier, model_generator, features1, features2, 
 def loss_fn_generator(model_classifier, model_critic, model_generator, features1, 
         features2, config, training):
     inputs1 = tf.cast(features1["image"], tf.float32)
-    label1 = tf.cast(features1["label"], tf.int32)
+    label1 = tf.cast(features1["label"], tf.float32)
     inputs2 = tf.cast(features2["image"], tf.float32)
-    label2 = tf.cast(features2["label"], tf.int32)
+    label2 = tf.cast(features2["label"], tf.float32)
     label_generated1 = label1
     label_generated2 = label2
 
