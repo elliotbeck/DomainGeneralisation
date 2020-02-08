@@ -77,7 +77,7 @@ def trainer(model_task1, model_task2, model_task3, model_regularizer, model_fina
     # set optimizer for metalearning
     optimizer_final = optim.SGD(model_final.parameters(), lr=learning_rate, momentum=0.9)
 
-    # full training 
+    # final model training 
     print('Start Training of Full Model')
     for epoch in range(epochs_full):
         train_one_epoch_full(train_data_full, model_final, model_regularizer, loss_function, optimizer_final)
