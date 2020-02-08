@@ -28,7 +28,7 @@ class basic_nn(tf.keras.Model):
             tf.keras.layers.Dense(16, activation='relu'),
             tf.keras.layers.Dropout(0.5),
             tf.keras.layers.BatchNormalization(),
-            tf.keras.layers.Dense(num_classes, activation='softmax')
+            tf.keras.layers.Dense(num_classes, activation='linear')
         ])
         self.model.build([None] + self.input_shape + [2])  # Batch input shape.
 
