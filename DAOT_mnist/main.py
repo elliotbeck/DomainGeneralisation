@@ -85,11 +85,11 @@ def loss_fn_classifier(model_classifier, model_generator, features1, features2, 
     model_classifier_output_generated = tf.cast(model_classifier_output_generated, 
                                                 dtype = tf.float32)
     # get mean classification loss on original data                                        
-    classification_loss_original = tf.nn.sigmoid_cross_entropy_with_logits(label, 
+    classification_loss_original = tf.nn.sigmoid_cross_entropy_with_logits(tf.squeeze(label), 
                                             tf.squeeze(model_classifier_output_original))
     mean_classification_loss_original = tf.math.reduce_mean(classification_loss_original)
     # get mean classification loss on generated data
-    classification_loss_generated = tf.nn.sigmoid_cross_entropy_with_logits(label_generated,
+    classification_loss_generated = tf.nn.sigmoid_cross_entropy_with_logits(tf.squeeze(label_generated),
                                             tf.squeeze(model_classifier_output_generated))  
     mean_classification_loss_generated = tf.math.reduce_mean(classification_loss_generated)
     # get weighted total loss
@@ -98,7 +98,7 @@ def loss_fn_classifier(model_classifier, model_generator, features1, features2, 
         config.alpha * mean_classification_loss_generated
     # calculate accuracy 
     preds = tf.cast((model_classifier_output_original > 0.), dtype=tf.float32)
-    accuracy = tf.reduce_mean(tf.cast((tf.abs(tf.squeeze(preds) - label) < 1e-2), dtype=tf.float32))
+    accuracy = tf.reduce_mean(tf.cast((tf.abs(tf.squeeze(preds) - tf.squeeze(label)) < 1e-2), dtype=tf.float32))
 
     return mean_classification_loss_weighted, l2_regularizer, accuracy, classification_loss
 
@@ -126,12 +126,12 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
                                             training=training)
 
     # get mean classification loss on generated data
-    classification_loss_generated = tf.nn.sigmoid_cross_entropy_with_logits(tf.concat(
-                                                [label_generated1, label_generated2], 0), 
+    classification_loss_generated = tf.nn.sigmoid_cross_entropy_with_logits(tf.squeeze(tf.concat(
+                                                [label_generated1, label_generated2], 0)), 
                                             tf.squeeze(tf.concat([model_classifier_output_generated1, 
                                                 model_classifier_output_generated2], 0)))
     mean_classification_loss_generated = tf.math.reduce_mean(classification_loss_generated)
-    
+
     print(mean_classification_loss_generated)
     divergence_intra1 = util.compute_divergence(X_critic_true1, X_critic_generated1)
     divergence_intra2 = util.compute_divergence(X_critic_true2, X_critic_generated2)
