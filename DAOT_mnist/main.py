@@ -270,7 +270,7 @@ def _preprocess_exampe(model_classifier, example, dataset_name, e):
         image = tf.stack([example["image"], tf.zeros([14,14], 
         dtype=tf.float64)], axis=-1)
     example["image"] = image
-    example["label"] = label
+    example["label"] = tf.cast(label, dtype=tf.float32)
 
     return example
 
