@@ -141,7 +141,7 @@ def train_step3(model_regularizer, input1, input2, input3, optimizer_reg,
 # train one epoch of the metalearning step (not train the full model)
 def train_one_epoch_metatrain(model_task1, model_task2, model_task3, model_regularizer ,train_input1, 
                     train_input2, train_input3, optimizer_task1, optimizer_task2, optimizer_task3, 
-                    loss_function, learning_rate, meta_train_steps):
+                    optimizer_reg, loss_function, learning_rate, meta_train_steps):
 
     # TRAIN STEP 1, regular training (line 2-7 in MetaReg algo)
     for i, (input1, input2 ,input3) in enumerate(zip(train_input1, train_input2, train_input3)):
@@ -169,7 +169,6 @@ def train_one_epoch_metatrain(model_task1, model_task2, model_task3, model_regul
                      optimizer1, optimizer2, optimizer3, learning_rate, 
                      models=models, random_domains=random_domains)
 
-    optimizer_reg = optim.SGD(model_regularizer.parameters(), lr=learning_rate, momentum=0.9)
     # TRAIN STEP 3, update regularizer NN (line 16 in MetaReg algo)
     for input1, input2, input3 in meta_train_sample:
         train_step3(model_regularizer, input1, input2, input3, 

@@ -63,13 +63,14 @@ def trainer(model_task1, model_task2, model_task3, model_regularizer, model_fina
     optimizer_task1 = optim.SGD(model_task1.parameters(), lr=learning_rate, momentum=0.9)
     optimizer_task2 = optim.SGD(model_task2.parameters(), lr=learning_rate, momentum=0.9)
     optimizer_task3 = optim.SGD(model_task3.parameters(), lr=learning_rate, momentum=0.9)
+    optimizer_reg = optim.SGD(model_regularizer.parameters(), lr=learning_rate, momentum=0.9)
     
     # metatraining
     for epoch in range(epochs_metatrain):  
 
         train_one_epoch_metatrain(model_task1, model_task2, model_task3, model_regularizer, train_data1, 
                         train_data2, train_data3, optimizer_task1, optimizer_task2, optimizer_task3, 
-                    loss_function, learning_rate, flags.meta_train_steps)
+                        optimizer_reg, loss_function, learning_rate, flags.meta_train_steps)
         #print status         
         template = 'Step {} of {} of Meta Learning completed'
         print(template.format(epoch+1, epochs_metatrain)) 
