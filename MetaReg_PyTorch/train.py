@@ -89,8 +89,9 @@ def train_step1(model_task1, model_task2, model_task3, input1, input2, input3, o
     model_task3_loss.backward()
     optimizer_task3.step()
 
-def train_step2(model_regularizer, input1, input2, input3, optimizer1, optimizer2, optimizer3,
-                loss_function, learning_rate, models, random_domains):
+def train_step2(model_regularizer, input1, input2, input3, loss_function, 
+                optimizer1, optimizer2, optimizer3,
+                learning_rate, models, random_domains):
     inputs1, labels1 = input1
     inputs2, labels2 = input2
     inputs3, labels3 = input3
