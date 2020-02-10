@@ -203,6 +203,16 @@ def _train_step2(feature_network, feature_network_copy, task_network, task_netwo
             new_val = p + 0.001*q.grad
             p.copy_(new_val)
 
+    # get loss of critic
+    loss_global = loss_fn_global(input1, input2, input3, feature_network_copy, 
+                                task_network_copy)
+    loss_local = loss_fn_local(input1, input2, input3, embedding_network, eps)
+    loss_meta = loss_global + 0.005 * loss_local
+    loss_task = loss_fn_task(input1, input2, feature_network_copy, 
+                            task_network_copy, loss_function)
+    # get loss to update parameters
+    loss_critic = loss_meta + loss_task
+
     # other approach task network updates
     task_network_copy.zero_grad()
     loss_critic.backward()
