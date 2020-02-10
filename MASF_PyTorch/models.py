@@ -5,8 +5,6 @@ class model_feature(nn.Module):
     def __init__(self, hidden_dim):
         super(model_feature, self).__init__()
         self.resnet50 = models.resnet50(pretrained=True)
-        # for param in self.resnet50.parameters():
-        #    param.requires_grad = False
         self.resnet50.fc = nn.Linear(self.resnet50.fc.in_features, hidden_dim)
 
     def logits(self, input):
@@ -26,7 +24,7 @@ class model_task(nn.Module):
         self.linear2 = nn.Linear(hidden_dim, num_classes)
         self.model_feature = model_feature
         self.dropout = nn.Dropout(0.5)
-        self.relu = nn.LeakyReLU()
+        self.relu = nn.LeakyReLU(inplace=False)
 
     def logits(self, input):
         x = self.linear1(input)
@@ -45,7 +43,7 @@ class model_embedding(nn.Module):
         self.embedding_features = embedding_features
         self.linear1 = nn.Linear(hidden_dim, hidden_dim)
         self.linear2 = nn.Linear(hidden_dim, embedding_features)
-        self.lrelu = nn.LeakyReLU()
+        self.lrelu = nn.LeakyReLU(inplace=False)
         self.model_feature = model_feature
 
     def logits(self, input):
