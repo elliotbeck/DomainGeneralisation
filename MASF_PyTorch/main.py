@@ -12,7 +12,7 @@ from train import validate_epoch, train_one_epoch
 
 parser = argparse.ArgumentParser(description='PACS')
 parser.add_argument('--hidden_dim', type=int, default=1024)
-parser.add_argument('--batch_size', type=int, default=8)
+parser.add_argument('--batch_size', type=int, default=32)
 parser.add_argument('--lr', type=float, default=0.001)
 parser.add_argument('--epochs', type=int, default=15)
 parser.add_argument('--num_classes', type=int, default=7)
