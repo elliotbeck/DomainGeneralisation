@@ -138,8 +138,8 @@ def loss_fn_local(input1, input2, input3, embedding_network, eps):
     inputs1, labels1 = input1
     inputs2, labels2 = input2
     inputs3, labels3 = input3
-    inputs = torch.cat(torch.cat((inputs1, inputs2)), inputs3)
-    labels = torch.cat((torch.cat(labels1, labels2)), labels3)
+    inputs = torch.cat((torch.cat((inputs1, inputs2)), inputs3))
+    labels = torch.cat((torch.cat((labels1, labels2)), labels3))
     print(inputs.shape)
     # get the embedding vectors 
     embeddings = torch.squeeze(embedding_network(inputs))
