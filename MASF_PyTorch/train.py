@@ -220,8 +220,6 @@ def _train_step2(feature_network, feature_network_copy, task_network, task_netwo
         for i, (p, g) in enumerate(zip(task_network.parameters(), task_network_copy.parameters())):
             new_val = p + 0.0001*g.grad
             p.copy_(new_val)
-            print(p.shape)
-            print(g.shape)
             if i == 3:
                 break
 
