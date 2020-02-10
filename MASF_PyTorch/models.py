@@ -24,11 +24,12 @@ class model_task(nn.Module):
         self.linear2 = nn.Linear(hidden_dim, num_classes)
         self.model_feature = model_feature
         self.dropout = nn.Dropout(0.5)
-        self.relu = nn.LeakyReLU(inplace=False)
+        self.lrelu = nn.LeakyReLU(inplace=False)
 
     def logits(self, input):
-        x = self.linear1(input)
-        x = self.relu(x)
+        x = self.lrelu(input)
+        x = self.linear1(x)
+        x = self.lrelu(x)
         x = self.dropout(x)
         x = self.linear2(x)
         return x
