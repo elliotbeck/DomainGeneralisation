@@ -11,7 +11,7 @@ from train import validate_epoch, train_one_epoch
 #from train import validate_epoch, train_one_epoch_metatrain, train_one_epoch_full
 
 parser = argparse.ArgumentParser(description='PACS')
-parser.add_argument('--hidden_dim', type=int, default=256)
+parser.add_argument('--hidden_dim', type=int, default=1024)
 parser.add_argument('--batch_size', type=int, default=8)
 parser.add_argument('--lr', type=float, default=0.001)
 parser.add_argument('--epochs', type=int, default=15)
