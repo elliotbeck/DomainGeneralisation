@@ -140,7 +140,6 @@ def loss_fn_local(input1, input2, input3, embedding_network, eps):
     inputs3, labels3 = input3
     inputs = torch.cat((torch.cat((inputs1, inputs2)), inputs3))
     labels = torch.cat((torch.cat((labels1, labels2)), labels3))
-    print(inputs.shape)
     # get the embedding vectors 
     embeddings = torch.squeeze(embedding_network(inputs))
 
@@ -217,7 +216,6 @@ def _train_step2(feature_network, feature_network_copy, task_network, task_netwo
     # perform gradient descent
     loss_local.backward()
     optimizer_embedding.step()
-    print("batch finished")
 
 
 def train_one_epoch(feature_network, task_network, embedding_network, train_input1, train_input2, 
