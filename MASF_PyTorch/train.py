@@ -205,7 +205,8 @@ def _train_step2(feature_network, feature_network_copy, task_network, task_netwo
 
     # other approach task network updates
     task_network_copy.zero_grad()
-    loss_critic.backward()
+    with torch.autograd.set_detect_anomaly(True):
+        loss_critic.backward()
     with torch.no_grad():
         for p, q in zip(task_network.parameters(), task_network_copy.parameters()):
             new_val = p + 0.001*q.grad
