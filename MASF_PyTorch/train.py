@@ -254,8 +254,14 @@ def train_one_epoch(feature_network, task_network, embedding_network, train_inpu
     task_network = task_network.train()
 
     # get a copy of original model
-    feature_network_copy = copy.deepcopy(feature_network) 
-    task_network_copy = copy.deepcopy(task_network)
+    # feature_network_copy = copy.deepcopy(feature_network) 
+    # task_network_copy = copy.deepcopy(task_network)
+
+    feature_network_copy = type(feature_network)() # get a new instance
+    feature_network_copy.load_state_dict(feature_network.state_dict()) # copy weights and stuff
+
+    task_network_copy = type(task_network)() # get a new instance
+    task_network_copy.load_state_dict(task_network_copy.state_dict()) # copy weights and stuff
 
     # set optimizers for copied networks
     optimizer_feature_copy = optim.SGD(feature_network_copy.parameters(), lr=learning_rate, momentum=0.9)
