@@ -197,21 +197,11 @@ def _train_step2(feature_network, feature_network_copy, task_network, task_netwo
 
     # other approach feature network updates
     feature_network_copy.zero_grad()
-    loss_critic.backward()
+    loss_critic.backward(retain_graph=True)
     with torch.no_grad():
         for p, q in zip(feature_network.parameters(), feature_network_copy.parameters()):
             new_val = p + 0.0001*q.grad
             p.copy_(new_val)
-
-    # get loss of critic
-    loss_global = loss_fn_global(input1, input2, input3, feature_network_copy, 
-                                task_network_copy)
-    loss_local = loss_fn_local(input1, input2, input3, embedding_network, eps)
-    loss_meta = torch.add(loss_global,  0.005 * loss_local)
-    loss_task = loss_fn_task(input1, input2, feature_network_copy, 
-                            task_network_copy, loss_function)
-    # get loss to update parameters
-    loss_critic = torch.add(loss_meta, loss_task)
 
     # other approach task network updates
     task_network_copy.zero_grad()
@@ -220,8 +210,8 @@ def _train_step2(feature_network, feature_network_copy, task_network, task_netwo
         for i, (p, g) in enumerate(zip(task_network.parameters(), task_network_copy.parameters())):
             new_val = p + 0.0001*g.grad
             p.copy_(new_val)
-            if i == 3:
-                break
+            # if i == 3:
+            #     break
 
 
     # # update parametersof feature network
