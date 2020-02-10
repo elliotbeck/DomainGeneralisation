@@ -197,7 +197,7 @@ def _train_step2(feature_network, feature_network_copy, task_network, task_netwo
 
     # other approach feature network updates
     feature_network_copy.zero_grad()
-    loss_critic.backward(retain_graph=True)
+    loss_critic.backward()
     with torch.no_grad():
         for p, q in zip(feature_network.parameters(), feature_network_copy.parameters()):
             new_val = p + 0.001*q.grad
@@ -205,8 +205,7 @@ def _train_step2(feature_network, feature_network_copy, task_network, task_netwo
 
     # other approach task network updates
     task_network_copy.zero_grad()
-    with torch.autograd.set_detect_anomaly(True):
-        loss_critic.backward()
+    loss_critic.backward()
     with torch.no_grad():
         for p, q in zip(task_network.parameters(), task_network_copy.parameters()):
             new_val = p + 0.001*q.grad
@@ -227,13 +226,13 @@ def _train_step2(feature_network, feature_network_copy, task_network, task_netwo
     # loss_critic.backward()
     # optimizer_task.step()
 
-    # # update parameters of embedding network
-    # loss_local = loss_fn_local(input1, input2, input3, embedding_network, eps)
-    # # zero the parameter gradients, update feature network
-    # optimizer_embedding.zero_grad()
-    # # perform gradient descent
-    # loss_local.backward()
-    # optimizer_embedding.step()
+    # update parameters of embedding network
+    loss_local = loss_fn_local(input1, input2, input3, embedding_network, eps)
+    # zero the parameter gradients, update feature network
+    optimizer_embedding.zero_grad()
+    # perform gradient descent
+    loss_local.backward()
+    optimizer_embedding.step()
 
 
 def train_one_epoch(feature_network, task_network, embedding_network, train_input1, train_input2, 
