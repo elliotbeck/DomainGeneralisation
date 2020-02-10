@@ -207,7 +207,7 @@ def _train_step2(feature_network, feature_network_copy, task_network, task_netwo
     loss_global = loss_fn_global(input1, input2, input3, feature_network_copy, 
                                 task_network_copy)
     loss_local = loss_fn_local(input1, input2, input3, embedding_network, eps)
-    loss_meta = torch.sum(loss_global,  0.005 * loss_local)
+    loss_meta = torch.sum((loss_global,  0.005 * loss_local))
     loss_task = loss_fn_task(input1, input2, feature_network_copy, 
                             task_network_copy, loss_function)
     # get loss to update parameters
