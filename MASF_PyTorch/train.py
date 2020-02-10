@@ -219,11 +219,11 @@ def _train_step2(feature_network, feature_network_copy, task_network, task_netwo
     task_network_copy.zero_grad()
     loss_critic.backward()
     with torch.no_grad():
-        for p, g in zip(task_network.parameters(), task_network_copy.parameters()):
-            print(p.shape)
+        for i, (p, g) in enumerate(zip(task_network.parameters(), task_network_copy.parameters())):
             new_val = p + 0.001*g.grad
             p.copy_(new_val)
-            print("success")
+            if i == 3:
+                break
 
 
     # # update parametersof feature network
