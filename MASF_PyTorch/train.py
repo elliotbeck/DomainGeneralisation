@@ -133,41 +133,25 @@ def loss_fn_global(input1, input2, input3, feature_network, task_network):
     loss_global = torch.mean(torch.stack([loss_global1_mean, loss_global2_mean]))
     return loss_global
 
-def loss_fn_local(input1, input2, embedding_network, eps):
-    inputs1, labels1 = input1
-    inputs2, labels2 = input2
+def loss_fn_local(train_input_full, embedding_network, eps):
+    # get inputs and labels
+    inputs, labels = train_input_full
+    # get the embedding vectors 
+    embeddings = torch.squeeze(embedding_network(inputs))
 
-    embedding_output1 = torch.squeeze(embedding_network(inputs1))
-    embedding_output2 = torch.squeeze(embedding_network(inputs2))
+    # initialize loss instance
+    loss_triplet = util.TripletLoss(margin=eps)
 
-    # source domain 1
-    loss_local1 = []
-    for i in range(embedding_output1.shape[0]):
+    # initialize triplet selector
+    selector = util.BatchHardTripletSelector()
 
-        all_comnbinations = list(itertools.permutations(range(0, embedding_output1.shape[0]),2))
-        without_i = [x for x in all_comnbinations if i != x[0]]
+    # get the triplets 
+    anchor, pos, neg = selector(embeddings, labels)
 
-        results = [None] * len(without_i)
-        for j, (x, y) in enumerate(without_i):
-            results[j] = util.triple_loss(embedding_output1[i], embedding_output1[x], embedding_output2[y], margin=eps)
-        loss_local1.append(torch.mean(torch.stack(results)))
-
-    # source domain 2
-    loss_local2 = []
-    for i in range(embedding_output2.shape[0]):
-
-        all_comnbinations = list(itertools.permutations(range(0, embedding_output2.shape[0]),2))
-        without_i = [x for x in all_comnbinations if i != x[0]]
-
-        results = [None] * len(without_i)
-
-        for j, (x,y) in enumerate(without_i):
-            y_pred = [embedding_output2[i], embedding_output2[x], embedding_output1[y]]
-            results[j] = util.triple_loss(embedding_output2[i], embedding_output2[x], embedding_output1[y], margin=eps)
-        loss_local2.append(torch.mean(torch.stack(results)))
-
-    loss_local_total = (loss_local1 + loss_local2)
-    return torch.mean(torch.stack(loss_local_total))
+    # calculate the loss 
+    loss_local = loss_triplet(anchor, pos, neg)
+    
+    return loss_local
 
 def _train_step1(feature_network_copy, task_network_copy, input1, input2,
                  optimizer_feature_copy, optimizer_task_copy, loss_function):
@@ -193,14 +177,14 @@ def _train_step1(feature_network_copy, task_network_copy, input1, input2,
 
 
 def _train_step2(feature_network, feature_network_copy, task_network, task_network_copy, 
-                embedding_network, input1, input2, input3, optimizer_feature, optimizer_task, 
-                optimizer_embedding, eps, loss_function):
+                embedding_network, input1, input2, input3, train_input_full, optimizer_feature, 
+                optimizer_task, optimizer_embedding, eps, loss_function):
 
 
     # get loss of critic
     loss_global = loss_fn_global(input1, input2, input3, feature_network_copy, 
                                 task_network_copy)
-    loss_local = loss_fn_local(input1, input2, embedding_network, eps)
+    loss_local = loss_fn_local(train_input_full, embedding_network, eps)
     loss_meta = loss_global + 0.005 * loss_local
     loss_task = loss_fn_task(input1, input2, feature_network_copy, 
                             task_network_copy, loss_function)
@@ -222,7 +206,7 @@ def _train_step2(feature_network, feature_network_copy, task_network, task_netwo
     optimizer_task.step()
 
     # update parameters of embedding network
-    loss_local = loss_fn_local(input1, input2, embedding_network, eps)
+    loss_local = loss_fn_local(train_input_full, embedding_network, eps)
     # zero the parameter gradients, update feature network
     optimizer_embedding.zero_grad()
     # perform gradient descent
@@ -232,7 +216,7 @@ def _train_step2(feature_network, feature_network_copy, task_network, task_netwo
 
 
 def train_one_epoch(feature_network, task_network, embedding_network, train_input1, train_input2, 
-                    train_input3, optimizer_feature, optimizer_task, optimizer_embedding, eps, 
+                    train_input3, train_input_full, optimizer_feature, optimizer_task, optimizer_embedding, eps, 
                     learning_rate, loss_function):
     # set model status to train
     feature_network = feature_network.train()
@@ -252,8 +236,8 @@ def train_one_epoch(feature_network, task_network, embedding_network, train_inpu
 
     for input1, input2, input3 in zip(train_input1, train_input2, train_input3):
         _train_step2(feature_network, feature_network_copy, task_network, task_network_copy, 
-                    embedding_network, input1, input2, input3, optimizer_feature, optimizer_task, 
-                    optimizer_embedding, eps, loss_function)
+                    embedding_network, input1, input2, input3, train_input_full, optimizer_feature, 
+                    optimizer_task, optimizer_embedding, eps, loss_function)
 
 # define accuracy function 
 def mean_accuracy(logits, y):

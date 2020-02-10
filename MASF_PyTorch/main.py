@@ -72,7 +72,7 @@ def trainer(feature_network, task_network, embedding_network, train_data_full, t
         train_input1, train_input2, train_input3 = train_domain_data[random[0]], train_domain_data[random[1]], train_domain_data[random[2]]
         # train one epoch
         train_one_epoch(feature_network, task_network, embedding_network, train_input1, train_input2, 
-                                    train_input3, optimizer_feature, optimizer_task, optimizer_embedding, eps, 
+                                    train_input3, train_data_full, optimizer_feature, optimizer_task, optimizer_embedding, eps, 
                                     learning_rate, loss_function)
 
         # validate epoch on validation set
