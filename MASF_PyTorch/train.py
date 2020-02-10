@@ -203,10 +203,7 @@ def _train_step2(feature_network, feature_network_copy, task_network, task_netwo
         for p, q in zip(feature_network.parameters(), feature_network_copy.parameters()):
             new_val = p + 0.0001*q.grad
             p.copy_(new_val)
-        for param in task_network.parameters():
-            print(param.shape)
-        for param in task_network_copy.parameters():
-            print(param.shape)
+
         for p, g in zip(task_network.parameters(), task_network_copy.parameters()):
             new_val = p + 0.0001*g.grad
             p.copy_(new_val)
