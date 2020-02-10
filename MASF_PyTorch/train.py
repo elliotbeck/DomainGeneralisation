@@ -85,7 +85,7 @@ def loss_fn_global(input1, input2, input3, feature_network, task_network):
     for c in range(0,7):
         inputs = features_classes_domain1[c]
         if len(inputs) == 0:
-            domain1_output.append(torch.zeros(256).cuda())
+            domain1_output.append(torch.zeros(1024).cuda())
         else:
             inputs = torch.stack(inputs)
             domain1_output.append(feature_network(inputs))
@@ -96,7 +96,7 @@ def loss_fn_global(input1, input2, input3, feature_network, task_network):
     for c in range(0,7):
         inputs = features_classes_domain2[c]
         if len(inputs) == 0:
-            domain2_output.append(torch.zeros(256).cuda())
+            domain2_output.append(torch.zeros(1024).cuda())
         else:
             inputs = torch.stack(inputs)
             domain2_output.append(feature_network(inputs))
@@ -107,7 +107,7 @@ def loss_fn_global(input1, input2, input3, feature_network, task_network):
     for c in range(0,7):
         inputs = features_classes_domain3[c]
         if len(inputs) == 0:
-            domain3_output.append(torch.zeros(256).cuda())
+            domain3_output.append(torch.zeros(1024).cuda())
         else:
             inputs = torch.stack(inputs)
             domain3_output.append(feature_network(inputs))
