@@ -195,27 +195,44 @@ def _train_step2(feature_network, feature_network_copy, task_network, task_netwo
     # get loss to update parameters
     loss_critic = loss_meta + loss_task
 
-    # update parametersof feature network
-    # zero the parameter gradients, update feature network
-    optimizer_feature.zero_grad()
-    # perform gradient descent
+    # other approach feature network updates
+    feature_network_copy.zero_grad()
     loss_critic.backward(retain_graph=True)
-    optimizer_feature.step()
+    with torch.no_grad():
+        for p, q in zip(feature_network.parameters()), feature_network_copy.parameters():
+            new_val = p + 0.001*q.grad
+            p.copy_(new_val)
 
-    # update parameters of task network
-    # zero the parameter gradients, update feature network
-    optimizer_task.zero_grad()
-    # perform gradient descent
+    # other approach task network updates
+    task_network_copy.zero_grad()
     loss_critic.backward()
-    optimizer_task.step()
+    with torch.no_grad():
+        for p, q in zip(task_network.parameters()), task_network_copy.parameters():
+            new_val = p + 0.001*q.grad
+            p.copy_(new_val)
 
-    # update parameters of embedding network
-    loss_local = loss_fn_local(input1, input2, input3, embedding_network, eps)
-    # zero the parameter gradients, update feature network
-    optimizer_embedding.zero_grad()
-    # perform gradient descent
-    loss_local.backward()
-    optimizer_embedding.step()
+
+    # # update parametersof feature network
+    # # zero the parameter gradients, update feature network
+    # optimizer_feature.zero_grad()
+    # # perform gradient descent
+    # loss_critic.backward(retain_graph=True)
+    # optimizer_feature.step()
+
+    # # update parameters of task network
+    # # zero the parameter gradients, update feature network
+    # optimizer_task.zero_grad()
+    # # perform gradient descent
+    # loss_critic.backward()
+    # optimizer_task.step()
+
+    # # update parameters of embedding network
+    # loss_local = loss_fn_local(input1, input2, input3, embedding_network, eps)
+    # # zero the parameter gradients, update feature network
+    # optimizer_embedding.zero_grad()
+    # # perform gradient descent
+    # loss_local.backward()
+    # optimizer_embedding.step()
 
 
 def train_one_epoch(feature_network, task_network, embedding_network, train_input1, train_input2, 
