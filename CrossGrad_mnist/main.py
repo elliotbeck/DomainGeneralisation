@@ -64,8 +64,9 @@ parser.add_argument('--epsD', type=float, help='Multiple for domains.')
 parser.add_argument('--seed', type=int, help='Seed.')
 
 
-
+# loss function for domain classifier
 def loss_fn_domain(features1, features2, model_domain, config, training):
+    # get input features and labels 
     inputs1 = features1["image"]
     label1 = tf.squeeze(features1["label"])
     domain1 = tf.squeeze(features1["domain"])
@@ -73,16 +74,20 @@ def loss_fn_domain(features1, features2, model_domain, config, training):
     label2 = tf.squeeze(features2["label"])
     domain2 = tf.squeeze(features2["domain"])
 
+    # get loss on both input domains
     domain_loss1 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = tf.one_hot(domain1, axis=-1, 
                                 depth=config.num_classes_domain), 
                                 logits = model_domain(inputs1, training=training)), name='domain_loss1')
     domain_loss2 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = tf.one_hot(domain2, axis=-1, 
                                 depth=config.num_classes_domain), 
                                 logits = model_domain(inputs2, training=training)), name='domain_loss2')
+    # get mean loss over both domains                                
     domain_loss = tf.reduce_mean([domain_loss1,domain_loss2])
     return domain_loss
 
+# loss function for label classifer
 def loss_fn_label(features1, features2, model_label, config, training):
+    # get input features and labels 
     inputs1 = features1["image"]
     label1 = tf.squeeze(features1["label"])
     inputs2 = features2["image"]
@@ -92,18 +97,21 @@ def loss_fn_label(features1, features2, model_label, config, training):
     l2_regularizer = tf.add_n([tf.nn.l2_loss(v) for v in 
         model_label.trainable_variables if 'bias' not in v.name])
 
+    # get predictions on inputs
     model_label_output1 = model_label(inputs1, training=training)
     model_label_output2 = model_label(inputs2, training=training)
 
-
+    # get label loss per domain
     label_loss1 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = tf.one_hot(label1, axis=-1, 
                                 depth=config.num_classes_label), 
                                 logits = model_label_output1), name='Label_loss1')
     label_loss2 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = tf.one_hot(label2, axis=-1, 
                                 depth=config.num_classes_label), 
-                                logits = model_label_output2), name='Label_loss2')                         
+                                logits = model_label_output2), name='Label_loss2')          
+    # get mean label loss               
     label_loss = tf.reduce_mean([label_loss1,label_loss2])
-
+    
+    # calculate accuracy per domain
     accuracy1 = tf.reduce_mean(
         tf.where(tf.equal(label1, tf.argmax(model_label_output1, axis=-1)),
                     tf.ones_like(label1, dtype=tf.float32),
@@ -114,6 +122,7 @@ def loss_fn_label(features1, features2, model_label, config, training):
                     tf.ones_like(label2, dtype=tf.float32),
                     tf.zeros_like(label2, dtype=tf.float32)))
 
+    # get mean accuracy over both source domains
     accuracy = tf.reduce_mean([accuracy1, accuracy2])
     return label_loss, accuracy, l2_regularizer
 
