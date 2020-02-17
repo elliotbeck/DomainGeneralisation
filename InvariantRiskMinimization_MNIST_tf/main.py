@@ -39,6 +39,7 @@ class MLP(tf.keras.Model):
             tf.keras.layers.Flatten(),
             tf.keras.layers.Dense(flags.hidden_dim, activation='relu'),
              tf.keras.layers.Dense(flags.hidden_dim, activation='relu'),
+             # if numclasses = 2, won't converge
              tf.keras.layers.Dense(num_classes, activation = 'linear')
              ])
         self.model.build([None] + self.input_shape + [2])  # Batch input shape.
