@@ -7,7 +7,7 @@ with open('configs/config_class_daot.json', 'r') as myfile:
 config_dic2 = json.loads(data)
 config_seed = config_dic2["seed"]
 
-
+# classifier network
 class ResNet50(tf.keras.Model):
     INPUT_SHAPE = [227, 227]
 
@@ -43,7 +43,7 @@ class ResNet50(tf.keras.Model):
     def input_shape(self):
         return ResNet50.INPUT_SHAPE
 
-
+# generator network
 class generator(tf.keras.Model):
     INPUT_SHAPE = [227, 227]
 
@@ -75,6 +75,7 @@ class generator(tf.keras.Model):
     def input_shape(self):
         return generator.INPUT_SHAPE
 
+# critic network
 class critic(tf.keras.Model):
     INPUT_SHAPE = [227, 227]
 
