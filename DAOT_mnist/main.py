@@ -105,15 +105,19 @@ def loss_fn_classifier(model_classifier, model_generator, features1, features2, 
 # loss function for generator
 def loss_fn_generator(model_classifier, model_critic, model_generator, features1, 
         features2, config, training):
+    # save features and labels from the two random training domains
     inputs1 = tf.cast(features1["image"], tf.float32)
     label1 = tf.cast(features1["label"], tf.float32)
     inputs2 = tf.cast(features2["image"], tf.float32)
     label2 = tf.cast(features2["label"], tf.float32)
+
+    # get generated inputs, labels stay the same
     label_generated1 = label1
     label_generated2 = label2
-
     X_generated1 = model_generator(inputs1, training=training)
     X_generated2 = model_generator(inputs2, training=training)
+    
+    # get emeddings for all features
     X_critic_true1 = model_critic(inputs1, training=training)
     X_critic_true2 = model_critic(inputs2, training=training)
     X_critic_generated1 = model_critic(X_generated1, training=training)
@@ -132,51 +136,62 @@ def loss_fn_generator(model_classifier, model_critic, model_generator, features1
                                                 model_classifier_output_generated2], 0)))
     mean_classification_loss_generated = tf.math.reduce_mean(classification_loss_generated)
 
-    print(mean_classification_loss_generated)
+
+    # get divergence measures according to paper
     divergence_intra1 = util.compute_divergence(X_critic_true1, X_critic_generated1)
     divergence_intra2 = util.compute_divergence(X_critic_true2, X_critic_generated2)
     divergence_intra = divergence_intra1 + divergence_intra2
     divergence_inter1 = util.compute_divergence(X_critic_generated1, X_critic_true2)
     divergence_inter2 = util.compute_divergence(X_critic_generated2, X_critic_true1)
     divergence_inter = divergence_inter1 + divergence_inter2
-    print(divergence_intra)
-    print(divergence_inter)
+
+    # combine all losses 
     loss_generator = mean_classification_loss_generated - divergence_intra - divergence_inter
-    print(loss_generator)
+
     return loss_generator 
 
 
 # loss function for critic
 def loss_fn_critic(model_critic, model_generator, features1, features2, config, training):
+    # save features and labels from the two random training domains
     inputs1 = tf.cast(features1["image"], tf.float32)
     label1 = tf.cast(features1["label"], tf.int32)
     inputs2 = tf.cast(features2["image"], tf.float32)
     label2 = tf.cast(features2["label"], tf.int32)
+
+    # get generated inputs, labels stay the same    
     label_generated1 = label1
     label_generated2 = label2
-
     X_generated1 = model_generator(inputs1, training=training)
-    image_test = tf.concat([tf.cast(X_generated1[0], dtype= tf.float64), tf.expand_dims(tf.zeros([14,14], dtype=tf.float64), axis=-1)], axis=-1)
-    inputs_test = tf.concat([tf.cast(inputs1[0], dtype= tf.float64), tf.expand_dims(tf.zeros([14,14], dtype=tf.float64), axis=-1)], axis=-1)
-    plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT_mnist/images/fake.png', image_test)
-    plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT_mnist/images/original.png', inputs_test)
-    plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT_mnist/images/peturbation.png', image_test-inputs_test)
     X_generated2 = model_generator(inputs2, training=training)
+
+
+    # # uncomment this if generated images should be extracted
+    # image_test = tf.concat([tf.cast(X_generated1[0], dtype= tf.float64), tf.expand_dims(tf.zeros([14,14], dtype=tf.float64), axis=-1)], axis=-1)
+    # inputs_test = tf.concat([tf.cast(inputs1[0], dtype= tf.float64), tf.expand_dims(tf.zeros([14,14], dtype=tf.float64), axis=-1)], axis=-1)^
+    # plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT_mnist/images/fake.png', image_test)
+    # plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT_mnist/images/original.png', inputs_test)
+    # plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT_mnist/images/peturbation.png', image_test-inputs_test)
+
+    # get emeddings for all features
     X_critic_true1 = model_critic(inputs1, training=training)
     X_critic_true2 = model_critic(inputs2, training=training)
     X_critic_generated1 = model_critic(X_generated1, training=training)  
     X_critic_generated2 = model_critic(X_generated2, training=training)
 
+    # get divergence measures according to paper
     divergence_intra1 = util.compute_divergence(X_critic_true1, X_critic_generated1)
     divergence_intra2 = util.compute_divergence(X_critic_true2, X_critic_generated2)
     divergence_inter1 = util.compute_divergence(X_critic_true1, X_critic_true2)
 
+    # combine all losses
     loss_critic = divergence_intra1 + divergence_intra2 - divergence_inter1
-    #print(loss_critic)
+
     return loss_critic
 
 def _train_step(model_classifier, model_generator, model_critic, features1, features2, 
                 optimizer, global_step, config):
+    # first step of iteration
     with tf.GradientTape() as tape_src:
         # get loss of classifier
         mean_classification_loss_weighted, l2_regularizer, accuracy, _ = loss_fn_classifier(
@@ -193,6 +208,7 @@ def _train_step(model_classifier, model_generator, model_critic, features1, feat
         grads = tape_src.gradient(total_loss, model_classifier.trainable_variables)
         optimizer.apply_gradients(zip(grads, model_classifier.trainable_variables))
 
+    # second step of iteration
     with tf.GradientTape() as tape_src:
         # get loss of critic
         loss_critic = loss_fn_critic(model_critic, model_generator, features1, features2, config, training=True)
@@ -201,6 +217,7 @@ def _train_step(model_classifier, model_generator, model_critic, features1, feat
         grads = tape_src.gradient(loss_critic, model_critic.trainable_variables)
         optimizer.apply_gradients(zip(grads, model_critic.trainable_variables))
 
+    # third step of iteration
     with tf.GradientTape() as tape_src:
         # get loss of generator 
         loss_generator = loss_fn_generator(model_classifier, model_critic, model_generator, features1, 
@@ -214,7 +231,7 @@ def _train_step(model_classifier, model_generator, model_critic, features1, feat
 
 def train_one_epoch(model_classifier, model_generator, model_critic, train_input1, train_input2,
                     optimizer, global_step, config):
-
+    # loop through all training batches
     for _input1, _input2 in zip(train_input1, train_input2):
         _train_step(model_classifier, model_generator, model_critic, _input1, _input2, optimizer,
          global_step, config)

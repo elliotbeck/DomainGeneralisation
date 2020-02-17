@@ -7,7 +7,7 @@ with open('configs/config_class_daot_mnist.json', 'r') as myfile:
 config_dic2 = json.loads(data)
 config_seed = config_dic2["seed"]
 
-
+# classifier network
 class basic_nn(tf.keras.Model):
     INPUT_SHAPE = [14, 14]
 
@@ -39,7 +39,7 @@ class basic_nn(tf.keras.Model):
     def input_shape(self):
         return basic_nn.INPUT_SHAPE
 
-
+# generator network
 class generator(tf.keras.Model):
     INPUT_SHAPE = [14, 14]
 
@@ -73,6 +73,7 @@ class generator(tf.keras.Model):
     def input_shape(self):
         return generator.INPUT_SHAPE
 
+# critic network
 class critic(tf.keras.Model):
     INPUT_SHAPE = [14, 14]
 
