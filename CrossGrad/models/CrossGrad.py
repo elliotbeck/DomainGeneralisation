@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-
+# domain network
 class model_domain(tf.keras.Model):
     INPUT_SHAPE = [227, 227]
 
@@ -32,7 +32,7 @@ class model_domain(tf.keras.Model):
     def input_shape(self):
         return model_domain.INPUT_SHAPE
 
-
+# class network
 class model_label(tf.keras.Model):
     INPUT_SHAPE = [227, 227]
 

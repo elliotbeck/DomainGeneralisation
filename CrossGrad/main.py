@@ -62,8 +62,9 @@ parser.add_argument('--alpha', type=float, help='weighting factor of classificat
 parser.add_argument('--lambda', type=float, help='weighting factor of generator.')
 parser.add_argument('--seed', type=int, help='Seed.')
 
-
+# loss function for the domain network
 def loss_fn_domain(features1, features2, features3, model_domain, config, training):
+    # get data
     inputs1 = features1["image"]
     label1 = tf.squeeze(features1["label"])
     domain1 = tf.squeeze(features1["domain"])
@@ -74,6 +75,7 @@ def loss_fn_domain(features1, features2, features3, model_domain, config, traini
     label3 = tf.squeeze(features3["label"])
     domain3 = tf.squeeze(features3["domain"])
 
+    # calculate loss per source domain
     domain_loss1 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = tf.one_hot(domain1, axis=-1, 
                                 depth=config.num_classes_domain), 
                                 logits = model_domain(inputs1, training=training)), name='domain_loss1')
@@ -83,10 +85,13 @@ def loss_fn_domain(features1, features2, features3, model_domain, config, traini
     domain_loss3 = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(labels = tf.one_hot(domain3, axis=-1, 
                                 depth=config.num_classes_domain), 
                                 logits = model_domain(inputs3, training=training)), name='domain_loss3')
+    # get mean of all source domain losses                             
     domain_loss = tf.reduce_mean([domain_loss1, domain_loss2, domain_loss3])
     return domain_loss
 
+# loss function for the class network
 def loss_fn_label(features1, features2, features3, model_label, config, training):
+    # get data
     inputs1 = features1["image"]
     label1 = tf.squeeze(features1["label"])
     inputs2 = features2["image"]
@@ -98,19 +103,24 @@ def loss_fn_label(features1, features2, features3, model_label, config, training
     l2_regularizer = tf.add_n([tf.nn.l2_loss(v) for v in 
         model_label.trainable_variables if 'bias' not in v.name])
 
+    # get predictions on all source domains
     model_label_output1 = model_label(inputs1, training=training)
     model_label_output2 = model_label(inputs2, training=training)
     model_label_output3 = model_label(inputs3, training=training)
 
+    # get label loss per domain
     label_loss1 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels = label1,
                                 logits = model_label_output1))
 
     label_loss2 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels = label2, 
                                 logits = model_label_output2))
     label_loss3 = tf.reduce_mean(tf.nn.sparse_softmax_cross_entropy_with_logits(labels = label3, 
-                                logits = model_label_output3))                          
+                                logits = model_label_output3))  
+
+    # get mean loss over all domains                        
     label_loss = tf.reduce_mean([label_loss1,label_loss2,label_loss3])
 
+    # calculate accuracy per source domain
     accuracy1 = tf.reduce_mean(
         tf.where(tf.equal(label1, tf.argmax(model_label_output1, axis=-1)),
                     tf.ones_like(label1, dtype=tf.float32),
@@ -125,8 +135,9 @@ def loss_fn_label(features1, features2, features3, model_label, config, training
         tf.where(tf.equal(label3, tf.argmax(model_label_output3, axis=-1)),
                     tf.ones_like(label3, dtype=tf.float32),
                     tf.zeros_like(label3, dtype=tf.float32)))
-
+    # get mean accuracy over all source domains
     accuracy = tf.reduce_mean([accuracy1, accuracy2, accuracy3])
+
     return label_loss, accuracy, l2_regularizer
 
 def _train_step(model_label, model_domain, features1, features2, features3,
@@ -257,6 +268,7 @@ def _preprocess_exampe(model_label, example, dataset_name, config):
     example["image"] = tf.image.resize(example["image"], size=(model_label.input_shape[0], model_label.input_shape[1]))
     example["label"] = example["attributes"]["label"]
     example["domain"] = example["attributes"]["domain"]
+    # encode source domains as 0,1,2
     domain = example["domain"]
     if domain == config.training_domains[0]:
         example["domain"] = tf.constant(0)
