@@ -1,6 +1,6 @@
 import torchvision.models as models
 from torch import nn
-
+# ResNet50 as feature network
 class model_feature(nn.Module):
    def __init__(self, hidden_dim):
       super(model_feature, self).__init__()
@@ -18,6 +18,7 @@ class model_feature(nn.Module):
       x = self.logits(input)
       return x
 
+# task network contains one hidden layer 
 class model_task(nn.Module):
    def __init__(self, model_feature, hidden_dim, num_classes):
       super(model_task, self).__init__()
@@ -38,6 +39,7 @@ class model_task(nn.Module):
       x = self.logits(input)
       return x
 
+# regularizer network takes hidden_dims*num_classes as input 
 class model_regularizer(nn.Module):
    def __init__(self, hidden_dim, num_classes):
       super(model_regularizer, self).__init__()
