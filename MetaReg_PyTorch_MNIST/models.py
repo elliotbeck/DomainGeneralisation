@@ -2,6 +2,7 @@ import torchvision.models as models
 import torch
 from torch import nn
 
+# feature model same structure as in IRM
 class model_feature(nn.Module):
    def __init__(self, hidden_dim):
       super(model_feature, self).__init__()
@@ -21,6 +22,7 @@ class model_feature(nn.Module):
       x = self.logits(input)
       return x
 
+# task model = last hidden layer of IRM paper
 class model_task(nn.Module):
    def __init__(self, model_feature, hidden_dim, num_classes):
       super(model_task, self).__init__()
@@ -39,6 +41,7 @@ class model_task(nn.Module):
       # x = torch.squeeze(x)
       return x
 
+# regularizer network takes hidden_dim * num_classes as input
 class model_regularizer(nn.Module):
    def __init__(self, hidden_dim, num_classes):
       super(model_regularizer, self).__init__()
