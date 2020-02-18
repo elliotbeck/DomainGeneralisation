@@ -141,7 +141,7 @@ def loss_fn_label(features1, features2, features3, model_label, config, training
     return label_loss, accuracy, l2_regularizer
 
 def _train_step(model_label, model_domain, features1, features2, features3,
-                optimizer, global_step, config):
+                optimizer1, optimizer2, global_step, config):
     with tf.GradientTape(persistent=True) as tape_src:
 
         tape_src.watch(features1["image"])
@@ -218,18 +218,19 @@ def _train_step(model_label, model_domain, features1, features2, features3,
         grads4 = tape_src.gradient(loss4, model_label.trainable_variables)
 
         # apply gradient to both neural nets
-        optimizer.apply_gradients(zip(grads3, model_domain.trainable_variables))
-        optimizer.apply_gradients(zip(grads4, model_label.trainable_variables))
+        optimizer1.apply_gradients(zip(grads3, model_domain.trainable_variables))
+        optimizer2.apply_gradients(zip(grads4, model_label.trainable_variables))
 
 
 
 def train_one_epoch(model_domain, model_label, train_input1, train_input2, train_input3,
-                    optimizer,  global_step, config):
+                    optimizer1, optimizer2, global_step, config):
     train_input1.shuffle(buffer_size=10000)
     train_input2.shuffle(buffer_size=10000)
     train_input3.shuffle(buffer_size=10000)
     for _input1, _input2, _input3 in zip(train_input1, train_input2, train_input3):
-        _train_step(model_label, model_domain, _input1, _input2, _input3, optimizer, global_step, config)
+        _train_step(model_label, model_domain, _input1, _input2, _input3, optimizer1, 
+        optimizer2, global_step, config)
 
 
 # compute the mean of all examples for a specific set (eval, validation, out-of-distribution, etc)
@@ -377,7 +378,8 @@ def main():
     #     config.decay_base, staircase=True)
     
     # learning rate = 0.02 in paper
-    optimizer = tf.keras.optimizers.SGD(learning_rate=config.learning_rate, momentum=0.0)
+    optimizer1 = tf.keras.optimizers.SGD(learning_rate=config.learning_rate, momentum=0.9)
+    optimizer2 = tf.keras.optimizers.SGD(learning_rate=config.learning_rate, momentum=0.9)
 
 
 
@@ -457,7 +459,7 @@ def main():
             start_time = time.time()
 
             train_one_epoch(model_domain = model_domain, model_label=model_label, train_input1=ds_train1, 
-                train_input2=ds_train2, train_input3=ds_train3 ,optimizer=optimizer, 
+                train_input2=ds_train2, train_input3=ds_train3, optimizer1=optimizer1, optimizer2=optimizer2, 
                 global_step=global_step, config=config)
 
             train_metr = eval_one_epoch(model_label=model_label, dataset=ds_train_complete,
