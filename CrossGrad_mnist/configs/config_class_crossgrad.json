@@ -3,8 +3,8 @@
     
     "dataset": "mnist", 
     "alpha": 0.25,
-    "epsL": 10000,
-    "epsD": 10000,
+    "epsL": 5000,
+    "epsD": 5000,
     "local_json_dir_name": "tmp",
     
     "learning_rate": 0.0001,
