@@ -151,8 +151,6 @@ def _train_step(model_label, model_domain, features1, features2,
         grads12 = tape_src.gradient(total_loss, features2["image"])
         grads21 = tape_src.gradient(loss_domain, features1["image"])
         grads22 = tape_src.gradient(loss_domain, features2["image"])
-        print(grads21[0].shape)
-        print(grads21[0])
         # create the new features as defined in the paper
         X_d1, X_d2 = {}, {}
         X_l1, X_l2 = {}, {}
@@ -170,6 +168,7 @@ def _train_step(model_label, model_domain, features1, features2,
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad_mnist/images/fake.png', image_test)
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad_mnist/images/original.png', inputs_test)
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad_mnist/images/peturbation.png', tf.math.subtract(image_test,inputs_test))
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad_mnist/images/peturbation2.png', grads21[0])
         X_d1["label"] = features1["label"]
         X_d1["domain"] = features1["domain"]
         X_d2["image"] = features2["image"] + config.epsD*grads22
