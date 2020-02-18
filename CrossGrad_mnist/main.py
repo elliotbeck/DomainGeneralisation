@@ -32,7 +32,7 @@ import util
 import local_settings
 from collections import defaultdict
 
-DEBUG = False
+DEBUG = True
 
 
 parser = argparse.ArgumentParser(description='Train my model.')
@@ -151,7 +151,8 @@ def _train_step(model_label, model_domain, features1, features2,
         grads12 = tape_src.gradient(total_loss, features2["image"])
         grads21 = tape_src.gradient(loss_domain, features1["image"])
         grads22 = tape_src.gradient(loss_domain, features2["image"])
-
+        print(grads21[0].shape)
+        print(grads21[0])
         # create the new features as defined in the paper
         X_d1, X_d2 = {}, {}
         X_l1, X_l2 = {}, {}
@@ -166,9 +167,9 @@ def _train_step(model_label, model_domain, features1, features2,
         X_d1["image"] = features1["image"] + config.epsD*grads21
         image_test = tf.concat([tf.cast(X_d1["image"][0], dtype= tf.float64), tf.expand_dims(tf.zeros([14,14], dtype=tf.float64), axis=-1)], axis=-1)
         inputs_test = tf.concat([tf.cast(features1["image"][0], dtype= tf.float64), tf.expand_dims(tf.zeros([14,14], dtype=tf.float64), axis=-1)], axis=-1)
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad_mnist/images/fake.png', image_test)
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad_mnist/images/original.png', inputs_test)
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad_mnist/images/images/peturbation.png', image_test-inputs_test)
+        # plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad_mnist/images/fake.png', image_test)
+        # plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad_mnist/images/original.png', inputs_test)
+        # plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad_mnist/images/images/peturbation.png', image_test-inputs_test)
         X_d1["label"] = features1["label"]
         X_d1["domain"] = features1["domain"]
         X_d2["image"] = features2["image"] + config.epsD*grads22
