@@ -164,9 +164,11 @@ def _train_step(model_label, model_domain, features1, features2,
         X_l2["label"] = features2["label"]
         X_l2["domain"] = features2["domain"]
         X_d1["image"] = features1["image"] + config.epsD*grads21
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad_mnist/images/fake.png', X_d1["image"][0])
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad_mnist/images/original.png', features1["image"][0])
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad_mnist/images/peturbation.png', X_d1["image"][0]-features1["image"][0])
+        image_test = tf.concat([tf.cast(X_d1["image"][0], dtype= tf.float64), tf.expand_dims(tf.zeros([14,14], dtype=tf.float64), axis=-1)], axis=-1)
+        inputs_test = tf.concat([tf.cast(features1["image"][0], dtype= tf.float64), tf.expand_dims(tf.zeros([14,14], dtype=tf.float64), axis=-1)], axis=-1)
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad_mnist/images/fake.png', image_test)
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad_mnist/images/original.png', inputs_test)
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT_mnist/images/peturbation.png', image_test-inputs_test)
         X_d1["label"] = features1["label"]
         X_d1["domain"] = features1["domain"]
         X_d2["image"] = features2["image"] + config.epsD*grads22

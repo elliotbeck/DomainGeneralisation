@@ -168,7 +168,7 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
 
     # # uncomment this if generated images should be extracted
     # image_test = tf.concat([tf.cast(X_generated1[0], dtype= tf.float64), tf.expand_dims(tf.zeros([14,14], dtype=tf.float64), axis=-1)], axis=-1)
-    # inputs_test = tf.concat([tf.cast(inputs1[0], dtype= tf.float64), tf.expand_dims(tf.zeros([14,14], dtype=tf.float64), axis=-1)], axis=-1)^
+    # inputs_test = tf.concat([tf.cast(inputs1[0], dtype= tf.float64), tf.expand_dims(tf.zeros([14,14], dtype=tf.float64), axis=-1)], axis=-1)
     # plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT_mnist/images/fake.png', image_test)
     # plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT_mnist/images/original.png', inputs_test)
     # plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT_mnist/images/peturbation.png', image_test-inputs_test)
