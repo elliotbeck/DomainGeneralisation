@@ -2,9 +2,9 @@
     "seed": 6,
     
     "dataset": "mnist", 
-    "alpha": 0.0001,
-    "epsL": 0.0001,
-    "epsD": 0.0001,
+    "alpha": 0.1,
+    "epsL": 0.5,
+    "epsD": 0.5,
     "local_json_dir_name": "tmp",
     
     "learning_rate": 0.0001,
