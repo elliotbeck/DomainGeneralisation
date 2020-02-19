@@ -378,8 +378,8 @@ def main():
     #     config.decay_base, staircase=True)
     
     # learning rate = 0.02 in paper
-    optimizer1 = tf.keras.optimizers.SGD(learning_rate=config.learning_rate, momentum=0.9)
-    optimizer2 = tf.keras.optimizers.SGD(learning_rate=config.learning_rate, momentum=0.9)
+    optimizer1 = tf.keras.optimizers.SGD(learning_rate=config.learning_rate, momentum=0.0)
+    optimizer2 = tf.keras.optimizers.SGD(learning_rate=config.learning_rate, momentum=0.0)
 
 
 
