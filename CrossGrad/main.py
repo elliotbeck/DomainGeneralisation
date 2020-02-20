@@ -451,7 +451,7 @@ def main():
         num_batches = None
 
     ds_train_complete = _get_dataset(config.dataset, model_label, config.test_domain,
-        split=tfds.Split.TRAIN, batch_size=tf.cast(config.batch_size, tf.int64), config = config,
+        split=tfds.Split.TRAIN, batch_size=tf.cast(config.batch_size/3, tf.int64), config = config,
         num_batches=num_batches)
 
     ds_train1 = _get_dataset(config.dataset, model_label, config.test_domain,
