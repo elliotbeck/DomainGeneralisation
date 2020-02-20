@@ -32,7 +32,7 @@ import util
 import local_settings
 from collections import defaultdict
 
-DEBUG = True
+DEBUG = False
 
 
 parser = argparse.ArgumentParser(description='Train my model.')
@@ -263,9 +263,10 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
     results_dict = {"accuracy": accuracy.result(), 
         "loss": classification_loss.result()}
 
+
+    # print pictures
     for _input1, _input2, _input3 in zip(dataset1,dataset2,dataset3):
 
-        # print pictures
         with tf.GradientTape(persistent=True) as tape_src:
 
             tape_src.watch(_input1["image"])
