@@ -288,10 +288,10 @@ def picture(dataset, model_label, config):
             X_l1 = {}
 
             X_l1["image"] = _input1["image"] + config.epsL*grads11
-            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake1.png', X_l1["image"][0])
-            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original1.png', _input1["image"][0])
-            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation1.png', X_l1["image"][0]-_input1["image"][0])
-        if i==3:
+            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake.png', X_l1["image"][2])
+            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original.png', _input1["image"][2])
+            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation.png', X_l1["image"][2]-_input1["image"][2])
+        if i==0:
             break
 
 
