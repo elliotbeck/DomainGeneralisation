@@ -181,15 +181,15 @@ def _train_step(model_label, model_domain, features1, features2, features3,
         X_l1["label"] = features1["label"]
         X_l1["domain"] = features1["domain"]
         X_l2["image"] = features2["image"] + 0.5*grads12
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake1.png', X_l2["image"][0])
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original1.png', features2["image"][0])
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation1.png', X_l2["image"][0]-features2["image"][0])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake2.png', X_l2["image"][0])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original2.png', features2["image"][0])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation2.png', X_l2["image"][0]-features2["image"][0])
         X_l2["label"] = features2["label"]
         X_l2["domain"] = features2["domain"]
         X_l3["image"] = features3["image"] + 0.5*grads13
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake1.png', X_l3["image"][0])
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original1.png', features3["image"][0])
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation1.png', X_l3["image"][0]-features3["image"][0])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake3.png', X_l3["image"][0])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original3.png', features3["image"][0])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation3.png', X_l3["image"][0]-features3["image"][0])
         X_l3["label"] = features3["label"]
         X_l3["domain"] = features3["domain"]
         X_d1["image"] = features1["image"] + 0.5*grads21
