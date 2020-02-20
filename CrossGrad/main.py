@@ -305,7 +305,7 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake3.png', X_l3["image"][0])
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original3.png', _input3["image"][0])
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation3.png', X_l3["image"][0]-_input3["image"][0])
-        if i==0:
+        if i==1:
             break
     return results_dict
 
