@@ -249,7 +249,7 @@ def picture(dataset, model_generator):
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/fake.png', X_generated1[0])
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original.png', _input1[0])
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/peturbation.png', X_generated1[0]-_input1[0])
-        if i==5:
+        if i==7:
             break
 
 def _preprocess_exampe(model_classifier, example, dataset_name):
@@ -381,7 +381,7 @@ def main():
 
     # Get datasets
     if DEBUG:
-        num_batches = 50
+        num_batches = 10
     else:
         num_batches = None
 
