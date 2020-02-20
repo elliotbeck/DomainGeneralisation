@@ -60,6 +60,8 @@ parser.add_argument('--dropout_rate', type=float, help='Dropout rate.')
 parser.add_argument('--use_dropout', type=int, help='Flag whether to use dropout.')
 parser.add_argument('--alpha', type=float, help='weighting factor of classification loss.')
 parser.add_argument('--lambda', type=float, help='weighting factor of generator.')
+parser.add_argument('--epsL', type=float, help='Multiple for labels.')
+parser.add_argument('--epsD', type=float, help='Multiple for domains.')
 parser.add_argument('--seed', type=int, help='Seed.')
 
 # loss function for the domain network
@@ -174,31 +176,31 @@ def _train_step(model_label, model_domain, features1, features2, features3,
         X_l1, X_l2, X_l3 = {}, {}, {}
 
 
-        X_l1["image"] = features1["image"] + 0.5*grads11
+        X_l1["image"] = features1["image"] + config.epsL*grads11
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake1.png', X_l1["image"][0])
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original1.png', features1["image"][0])
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation1.png', X_l1["image"][0]-features1["image"][0])
         X_l1["label"] = features1["label"]
         X_l1["domain"] = features1["domain"]
-        X_l2["image"] = features2["image"] + 0.5*grads12
+        X_l2["image"] = features2["image"] + config.epsL*grads12
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake2.png', X_l2["image"][0])
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original2.png', features2["image"][0])
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation2.png', X_l2["image"][0]-features2["image"][0])
         X_l2["label"] = features2["label"]
         X_l2["domain"] = features2["domain"]
-        X_l3["image"] = features3["image"] + 0.5*grads13
+        X_l3["image"] = features3["image"] + config.epsL*grads13
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake3.png', X_l3["image"][0])
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original3.png', features3["image"][0])
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation3.png', X_l3["image"][0]-features3["image"][0])
         X_l3["label"] = features3["label"]
         X_l3["domain"] = features3["domain"]
-        X_d1["image"] = features1["image"] + 0.5*grads21
+        X_d1["image"] = features1["image"] + config.epsD*grads21
         X_d1["label"] = features1["label"]
         X_d1["domain"] = features1["domain"]
-        X_d2["image"] = features2["image"] + 0.5*grads22
+        X_d2["image"] = features2["image"] + config.epsD*grads22
         X_d2["label"] = features2["label"]
         X_d2["domain"] = features2["domain"]
-        X_d3["image"] = features3["image"] + 0.5*grads23
+        X_d3["image"] = features3["image"] + config.epsD*grads23
         X_d3["label"] = features3["label"]
         X_d3["domain"] = features3["domain"]
 

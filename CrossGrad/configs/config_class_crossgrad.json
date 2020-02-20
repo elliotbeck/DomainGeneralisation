@@ -12,6 +12,8 @@
     "decay_base": 0.85,
     "batch_size": 18,
     "num_epochs": 1,
+    "epsL": 5000,
+    "epsD": 5000,
 
     
     "l2_penalty_weight": 0,
