@@ -31,7 +31,7 @@ import experiment_repo as repo
 import util
 import local_settings
 
-DEBUG = True
+DEBUG = False
 random.seed(DAOT.config_seed)
 
 parser = argparse.ArgumentParser(description='Train my model.')
@@ -246,9 +246,9 @@ def picture(dataset, model_generator):
     for i, _input1 in enumerate(dataset):
         _input1 = _input1["image"]
         X_generated1 = model_generator(_input1, training=False)
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/fake.png', X_generated1[2])
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original.png', _input1[2])
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/peturbation.png', X_generated1[2]-_input1[2])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/fake.png', X_generated1[5])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original.png', _input1[5])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/peturbation.png', X_generated1[5]-_input1[5])
         if i==0:
             break
 
