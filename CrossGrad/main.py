@@ -291,7 +291,7 @@ def picture(dataset, model_label, config):
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake1.png', X_l1["image"][0])
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original1.png', _input1["image"][0])
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation1.png', X_l1["image"][0]-_input1["image"][0])
-        if i==7:
+        if i==8:
             break
 
 
