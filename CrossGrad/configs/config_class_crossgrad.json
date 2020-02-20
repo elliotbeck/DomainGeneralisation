@@ -2,8 +2,8 @@
     "seed": 1,
     
     "dataset": "pacs",
-    "test_domain": ["photo"], 
-    "training_domains": ["cartoon", "art", "sketch"],    
+    "test_domain": ["art_painting"], 
+    "training_domains": ["cartoon", "photo", "sketch"],    
 
     "local_json_dir_name": "tmp",
     
@@ -12,8 +12,8 @@
     "decay_base": 0.85,
     "batch_size": 18,
     "num_epochs": 1,
-    "epsL": 5000,
-    "epsD": 5000,
+    "epsL": 0.5,
+    "epsD": 0.5,
 
     
     "l2_penalty_weight": 0,
