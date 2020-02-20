@@ -152,13 +152,7 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
     label_generated2 = label2
 
     X_generated1 = model_generator(inputs1, training=training)
-    plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/fake.png', X_generated1[0])
-    plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original.png', inputs1[0])
-    plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/peturbation.png', X_generated1[0]-inputs1[0])
     X_generated2 = model_generator(inputs2, training=training)
-    plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/fake1.png', X_generated2[0])
-    plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original1.png', inputs2[0])
-    plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/peturbation1.png', X_generated2[0]-inputs2[0])
     X_critic_true1 = model_critic(inputs1, training=training)
     X_critic_true2 = model_critic(inputs2, training=training)
     X_critic_generated1 = model_critic(X_generated1, training=training)  
@@ -245,6 +239,17 @@ def eval_one_epoch(model_classifier, model_generator, dataset, summary_directory
 
     results_dict = {"accuracy": accuracy.result(), 
         "loss": classification_loss.result()}
+    
+    # plot images
+    for _input1, _input2 in zip(dataset1,dataset2):
+        X_generated1 = model_generator(_input1, training=training)
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/fake.png', X_generated1[0])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original.png', _input1[0])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/peturbation.png', X_generated1[0]-_input1[0])
+        X_generated2 = model_generator(_input2, training=training)
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/fake1.png', X_generated2[0])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original1.png', _input2[0])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/peturbation1.png', X_generated2[0]-_input2[0])
 
     return results_dict
 
