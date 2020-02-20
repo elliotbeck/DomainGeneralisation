@@ -241,7 +241,7 @@ def eval_one_epoch(model_classifier, model_generator, dataset, summary_directory
         "loss": classification_loss.result()}
     
     # plot images
-    for _input1, _input2 in zip(dataset1,dataset2):
+    for i, (_input1, _input2) in enumerate(zip(dataset1,dataset2)):
         _input1 = _input1["image"]
         _input2 = _input2["image"]
         X_generated1 = model_generator(_input1, training=training)
@@ -252,6 +252,8 @@ def eval_one_epoch(model_classifier, model_generator, dataset, summary_directory
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/fake1.png', X_generated2[0])
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original1.png', _input2[0])
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/peturbation1.png', X_generated2[0]-_input2[0])
+        if i==0:
+            break
 
     return results_dict
 
