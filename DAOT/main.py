@@ -420,7 +420,7 @@ def main():
         num_batches=num_batches)
 
     ds_test_out = _get_dataset(config.dataset, model_classifier, config.test_domain,
-        split="test_out", batch_size=tf.cast(config.batch_size/2, tf.int64),
+        split="test_out", batch_size=tf.cast(config.batch_size/6, tf.int64),
         num_batches=num_batches)
 
     # TODO: add test set - done
