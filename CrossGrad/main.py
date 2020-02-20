@@ -264,9 +264,8 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
         "loss": classification_loss.result()}
 
 
-    dataset1, dataset2 = dataset.shard(2, 0), dataset.shard(2, 1)
     # print pictures
-    for i, (_input1, _input2) in enumerate(zip(dataset1, dataset2)):
+    for i, _input1 in enumerate(dataset):
 
         with tf.GradientTape(persistent=True) as tape_src:
 
@@ -283,23 +282,18 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
 
             # get gradients wrt to inputs
             grads11 = tape_src.gradient(total_loss, _input1["image"])
-            grads12 = tape_src.gradient(total_loss, _input2["image"])
+
 
             # create the new features as defined in the paper
-            X_l1, X_l2 = {}, {}
+            X_l1 = {}
 
             X_l1["image"] = _input1["image"] + config.epsL*grads11
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake1.png', X_l1["image"][0])
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original1.png', _input1["image"][0])
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation1.png', X_l1["image"][0]-_input1["image"][0])
-
-            X_l2["image"] = _input2["image"] + config.epsL*grads12
-            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake2.png', X_l2["image"][0])
-            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original2.png', _input2["image"][0])
-            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation2.png', X_l2["image"][0]-_input2["image"][0])
-
         if i==1:
             break
+
     return results_dict
 
 
