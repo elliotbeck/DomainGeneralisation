@@ -241,7 +241,7 @@ def main(_):
 
     for example in dataset_utils.as_numpy(train):
         import pdb; pdb.set_trace()
-
+        print(example["attributes"]["label"])
 
 if __name__ == '__main__':
     app.run(main)

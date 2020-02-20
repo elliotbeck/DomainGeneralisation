@@ -242,6 +242,8 @@ def eval_one_epoch(model_classifier, model_generator, dataset, summary_directory
     
     # plot images
     for _input1, _input2 in zip(dataset1,dataset2):
+        _input1 = _input1["image"]
+        _input2 = _input2["image"]
         X_generated1 = model_generator(_input1, training=training)
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/fake.png', X_generated1[0])
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original.png', _input1[0])
