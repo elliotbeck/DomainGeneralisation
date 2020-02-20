@@ -239,19 +239,18 @@ def eval_one_epoch(model_classifier, model_generator, dataset, summary_directory
 
     results_dict = {"accuracy": accuracy.result(), 
         "loss": classification_loss.result()}
-    
-    # plot images
+
+    return results_dict
+
+def picture(dataset, model_generator):
     for i, _input1 in enumerate(dataset):
         _input1 = _input1["image"]
-        X_generated1 = model_generator(_input1, training=training)
+        X_generated1 = model_generator(_input1, training=False)
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/fake.png', X_generated1[0])
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original.png', _input1[0])
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/peturbation.png', X_generated1[0]-_input1[0])
         if i==5:
             break
-
-    return results_dict
-
 
 def _preprocess_exampe(model_classifier, example, dataset_name):
     example["image"] = tf.cast(example["image"], dtype=tf.float64)/255.
@@ -474,6 +473,7 @@ def main():
                 summary_directory=os.path.join(manager._directory, "test_out"),
                 global_step=global_step, config=config, training=False)
 
+            picture(ds_test_out, model_generator=model_generator)
 
             manager.save()
 
