@@ -2,8 +2,8 @@
     "seed": 1,
     
     "dataset": "pacs",
-    "test_domain": ["art_painting"], 
-    "training_domains": ["cartoon", "photo", "sketch"],    
+    "test_domain": ["photo"], 
+    "training_domains": ["cartoon", "art_painting", "sketch"],    
 
     "local_json_dir_name": "tmp",
     

@@ -264,47 +264,47 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
         "loss": classification_loss.result()}
 
 
-    # # print pictures
-    # for _input1, _input2, _input3 in zip(dataset1,dataset2,dataset3):
+    # print pictures
+    for _input1, _input2, _input3 in zip(dataset1,dataset2,dataset3):
 
-    #     with tf.GradientTape(persistent=True) as tape_src:
+        with tf.GradientTape(persistent=True) as tape_src:
 
-    #         tape_src.watch(_input1["image"])
-    #         tape_src.watch(_input2["image"])
-    #         tape_src.watch(_input3["image"])
+            tape_src.watch(_input1["image"])
+            tape_src.watch(_input2["image"])
+            tape_src.watch(_input3["image"])
 
-    #         # get loss of labels
-    #         mean_classification_loss, accuracy, l2_regularizer = loss_fn_label(
-    #             _input1, _input2, _input3, model_label ,config=config, training=True)
-
-
-    #         total_loss = mean_classification_loss + \
-    #             config.l2_penalty_weight*l2_regularizer
+            # get loss of labels
+            mean_classification_loss, accuracy, l2_regularizer = loss_fn_label(
+                _input1, _input2, _input3, model_label ,config=config, training=True)
 
 
-    #         # get gradients wrt to inputs
-    #         grads11 = tape_src.gradient(total_loss, _input1["image"])
-    #         grads12 = tape_src.gradient(total_loss, _input2["image"])
-    #         grads13 = tape_src.gradient(total_loss, _input3["image"])
+            total_loss = mean_classification_loss + \
+                config.l2_penalty_weight*l2_regularizer
 
 
-    #         # create the new features as defined in the paper
-    #         X_l1, X_l2, X_l3 = {}, {}, {}
+            # get gradients wrt to inputs
+            grads11 = tape_src.gradient(total_loss, _input1["image"])
+            grads12 = tape_src.gradient(total_loss, _input2["image"])
+            grads13 = tape_src.gradient(total_loss, _input3["image"])
 
-    #         X_l1["image"] = _input1["image"] + config.epsL*grads11
-    #         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake1.png', X_l1["image"][0])
-    #         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original1.png', _input1["image"][0])
-    #         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation1.png', X_l1["image"][0]-_input1["image"][0])
 
-    #         X_l2["image"] = _input2["image"] + config.epsL*grads12
-    #         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake2.png', X_l2["image"][0])
-    #         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original2.png', _input2["image"][0])
-    #         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation2.png', X_l2["image"][0]-_input2["image"][0])
+            # create the new features as defined in the paper
+            X_l1, X_l2, X_l3 = {}, {}, {}
 
-    #         X_l3["image"] = _input3["image"] + config.epsL*grads13
-    #         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake3.png', X_l3["image"][0])
-    #         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original3.png', _input3["image"][0])
-    #         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation3.png', X_l3["image"][0]-_input3["image"][0])
+            X_l1["image"] = _input1["image"] + config.epsL*grads11
+            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake1.png', X_l1["image"][0])
+            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original1.png', _input1["image"][0])
+            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation1.png', X_l1["image"][0]-_input1["image"][0])
+
+            X_l2["image"] = _input2["image"] + config.epsL*grads12
+            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake2.png', X_l2["image"][0])
+            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original2.png', _input2["image"][0])
+            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation2.png', X_l2["image"][0]-_input2["image"][0])
+
+            X_l3["image"] = _input3["image"] + config.epsL*grads13
+            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake3.png', X_l3["image"][0])
+            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original3.png', _input3["image"][0])
+            plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation3.png', X_l3["image"][0]-_input3["image"][0])
 
     return results_dict
 
