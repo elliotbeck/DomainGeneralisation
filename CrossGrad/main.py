@@ -249,6 +249,10 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
         config=config, training=training)
         # losses.append(_classification_loss.numpy())
         # accuracies.append(_accuracy.numpy())
+        
+        # update mean-metric
+        classification_loss(_classification_loss)
+        accuracy(_accuracy)
 
         # print pictures
         with tf.GradientTape(persistent=True) as tape_src:
@@ -293,9 +297,7 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
 
 
 
-        # update mean-metric
-        classification_loss(_classification_loss)
-        accuracy(_accuracy)
+        
         
     writer = tf.summary.create_file_writer(summary_directory)
     with writer.as_default(), tf.summary.record_if(True):
