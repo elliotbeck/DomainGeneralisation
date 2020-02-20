@@ -32,7 +32,7 @@ import util
 import local_settings
 from collections import defaultdict
 
-DEBUG = False
+DEBUG = True
 
 
 parser = argparse.ArgumentParser(description='Train my model.')
@@ -265,7 +265,7 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
 
 
     # print pictures
-    for _input1, _input2, _input3 in zip(dataset1,dataset2,dataset3):
+    for i, (_input1, _input2, _input3) in enumerate(zip(dataset1,dataset2,dataset3)):
 
         with tf.GradientTape(persistent=True) as tape_src:
 
@@ -305,7 +305,8 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake3.png', X_l3["image"][0])
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original3.png', _input3["image"][0])
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation3.png', X_l3["image"][0]-_input3["image"][0])
-
+        if i==0:
+            break
     return results_dict
 
 
