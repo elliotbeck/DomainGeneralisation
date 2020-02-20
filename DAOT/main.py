@@ -156,6 +156,9 @@ def loss_fn_critic(model_critic, model_generator, features1, features2, config, 
     plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original.png', inputs1[0])
     plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/peturbation.png', X_generated1[0]-inputs1[0])
     X_generated2 = model_generator(inputs2, training=training)
+    plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/fake1.png', X_generated2[0])
+    plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original1.png', inputs2[0])
+    plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/peturbation1.png', X_generated2[0]-inputs2[0])
     X_critic_true1 = model_critic(inputs1, training=training)
     X_critic_true2 = model_critic(inputs2, training=training)
     X_critic_generated1 = model_critic(X_generated1, training=training)  
@@ -266,7 +269,7 @@ def _get_dataset(dataset_name, model_classifier, validation_split, split, batch_
     dataset, info = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
         split=split, builder_kwargs=builder_kwargs, with_info=True)
     dataset = dataset.map(lambda x: _preprocess_exampe(model_classifier, x, dataset_name))
-    dataset = dataset.shuffle(512)
+    #dataset = dataset.shuffle(512)
     dataset = dataset.batch(batch_size)
     if num_batches is not None:
         dataset = dataset.take(num_batches)

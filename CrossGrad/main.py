@@ -32,7 +32,7 @@ import util
 import local_settings
 from collections import defaultdict
 
-DEBUG = False
+DEBUG = True
 
 
 parser = argparse.ArgumentParser(description='Train my model.')
@@ -175,12 +175,21 @@ def _train_step(model_label, model_domain, features1, features2, features3,
 
 
         X_l1["image"] = features1["image"] + 0.5*grads11
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake1.png', X_l1["image"][0])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original1.png', features1["image"][0])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation1.png', X_l1["image"][0]-features1["image"][0])
         X_l1["label"] = features1["label"]
         X_l1["domain"] = features1["domain"]
         X_l2["image"] = features2["image"] + 0.5*grads12
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake1.png', X_l2["image"][0])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original1.png', features2["image"][0])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation1.png', X_l2["image"][0]-features2["image"][0])
         X_l2["label"] = features2["label"]
         X_l2["domain"] = features2["domain"]
         X_l3["image"] = features3["image"] + 0.5*grads13
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake1.png', X_l3["image"][0])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original1.png', features3["image"][0])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation1.png', X_l3["image"][0]-features3["image"][0])
         X_l3["label"] = features3["label"]
         X_l3["domain"] = features3["domain"]
         X_d1["image"] = features1["image"] + 0.5*grads21
@@ -291,7 +300,7 @@ def _get_dataset(dataset_name, model_label, validation_split, split, batch_size,
     dataset, _ = tfds.load(dataset_name, data_dir=local_settings.TF_DATASET_PATH, 
         split=split, builder_kwargs=builder_kwargs, with_info=True)
     dataset = dataset.map(lambda x: _preprocess_exampe(model_label, x, dataset_name, config))
-    dataset = dataset.shuffle(512)
+    #dataset = dataset.shuffle(512)
     dataset = dataset.batch(batch_size)
     if num_batches is not None:
         dataset = dataset.take(num_batches)
@@ -401,7 +410,7 @@ def main():
 
     # Get datasets
     if DEBUG:
-        num_batches = 10
+        num_batches = 5
     else:
         num_batches = None
 
