@@ -467,19 +467,19 @@ def main():
         num_batches=num_batches)
 
     ds_val_in = _get_dataset(config.dataset, model_label, config.test_domain, config = config,
-        split="val_in", batch_size=tf.cast(config.batch_size, tf.int64),
+        split="val_in", batch_size=tf.cast(config.batch_size/3, tf.int64),
         num_batches=num_batches)
 
     ds_val_out = _get_dataset(config.dataset, model_label, config.test_domain, config = config,
-        split="val_out", batch_size=tf.cast(config.batch_size, tf.int64),
+        split="val_out", batch_size=tf.cast(config.batch_size/3, tf.int64),
         num_batches=num_batches)
 
     ds_test_in = _get_dataset(config.dataset, model_label, config.test_domain, config = config,
-        split="test_in", batch_size=tf.cast(config.batch_size, tf.int64), 
+        split="test_in", batch_size=tf.cast(config.batch_size/3, tf.int64), 
         num_batches=num_batches)
 
     ds_test_out = _get_dataset(config.dataset, model_label, config.test_domain, config = config, 
-        split="test_out", batch_size=tf.cast(config.batch_size, tf.int64),
+        split="test_out", batch_size=tf.cast(config.batch_size/3, tf.int64),
         num_batches=num_batches)
 
     # TODO: add test set - done
