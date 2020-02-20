@@ -273,7 +273,7 @@ def _get_dataset(dataset_name, model_classifier, validation_split, split, batch_
         split=split, builder_kwargs=builder_kwargs, with_info=True)
     dataset = dataset.map(lambda x: _preprocess_exampe(model_classifier, x, dataset_name))
     #dataset = dataset.shuffle(512)
-    dataset = dataset.batch(batch_size)
+    dataset = dataset.batch(batch_size, drop_remainder=True)
     if num_batches is not None:
         dataset = dataset.take(num_batches)
 
