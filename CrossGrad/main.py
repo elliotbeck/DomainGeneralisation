@@ -263,16 +263,16 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
     results_dict = {"accuracy": accuracy.result(), 
         "loss": classification_loss.result()}
 
+    return results_dict
 
-    # print pictures
-    for i, _input1 in enumerate(dataset):
 
+def picture(dataset, model_label, config):
+    dataset1, dataset2, dataset3 = dataset.shard(3, 0), dataset.shard(3, 1), dataset.shard(3, 2)
+    for i, (_input1, _input2, _input3) in enumerate(zip(dataset1, dataset2, dataset3)):
         with tf.GradientTape(persistent=True) as tape_src:
 
             tape_src.watch(_input1["image"])
-            tape_src.watch(_input2["image"])
-
-
+        
             # get loss of labels
             mean_classification_loss, accuracy, l2_regularizer = loss_fn_label(
                 _input1, _input2, _input3, model_label ,config=config, training=True)
@@ -293,8 +293,6 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation1.png', X_l1["image"][0]-_input1["image"][0])
         if i==5:
             break
-
-    return results_dict
 
 
 def _preprocess_exampe(model_label, example, dataset_name, config):
@@ -434,7 +432,7 @@ def main():
 
     # Get datasets
     if DEBUG:
-        num_batches = 50
+        num_batches = 5
     else:
         num_batches = None
 
@@ -514,6 +512,8 @@ def main():
             test_out_metr = eval_one_epoch(model_label=model_label, dataset=ds_test_out,
                 summary_directory=os.path.join(manager._directory, "test_out"),
                 global_step=global_step, config=config, training=False)
+            
+            picture(dataset=ds_test_out, model_label=model_label, config=config)
 
 
             manager.save()
