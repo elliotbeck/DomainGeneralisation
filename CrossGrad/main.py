@@ -291,7 +291,7 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/fake1.png', X_l1["image"][0])
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original1.png', _input1["image"][0])
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation1.png', X_l1["image"][0]-_input1["image"][0])
-        if i==2:
+        if i==5:
             break
 
     return results_dict
@@ -434,7 +434,7 @@ def main():
 
     # Get datasets
     if DEBUG:
-        num_batches = 5
+        num_batches = 50
     else:
         num_batches = None
 
