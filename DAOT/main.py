@@ -247,7 +247,7 @@ def eval_one_epoch(model_classifier, model_generator, dataset, summary_directory
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/fake.png', X_generated1[0])
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original.png', _input1[0])
         plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/peturbation.png', X_generated1[0]-_input1[0])
-        if i==1:
+        if i==2:
             break
 
     return results_dict
