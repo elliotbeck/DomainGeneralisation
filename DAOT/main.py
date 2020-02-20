@@ -246,10 +246,10 @@ def picture(dataset, model_generator):
     for i, _input1 in enumerate(dataset):
         _input1 = _input1["image"]
         X_generated1 = model_generator(_input1, training=False)
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/fake.png', X_generated1[0])
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original.png', _input1[0])
-        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/peturbation.png', X_generated1[0]-_input1[0])
-        if i==7:
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/fake.png', X_generated1[2])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/original.png', _input1[2])
+        plt.imsave('/cluster/home/ebeck/DomainGeneralisation/DAOT/images/peturbation.png', X_generated1[2]-_input1[2])
+        if i==0:
             break
 
 def _preprocess_exampe(model_classifier, example, dataset_name):
