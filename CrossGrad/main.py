@@ -291,10 +291,14 @@ def eval_one_epoch(model_label, dataset, summary_directory, global_step, config,
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/original3.png', _input3["image"][0])
             plt.imsave('/cluster/home/ebeck/DomainGeneralisation/CrossGrad/images/peturbation3.png', X_l3["image"][0]-_input3["image"][0])
 
+        _classification_loss, _accuracy, _ = loss_fn_label(
+            features1=_input1, features2=_input2, features3=_input3, model_label = model_label, 
+            config=config, training=training)
+            
         # update mean-metric
         classification_loss(_classification_loss)
         accuracy(_accuracy)
-        
+
     writer = tf.summary.create_file_writer(summary_directory)
     with writer.as_default(), tf.summary.record_if(True):
         tf.summary.scalar("classification_loss", classification_loss.result(), 
