@@ -473,7 +473,8 @@ def main():
                 summary_directory=os.path.join(manager._directory, "test_out"),
                 global_step=global_step, config=config, training=False)
 
-            picture(ds_test_out, model_generator=model_generator)
+            # # uncomment if pictures should be saved in images folder
+            # picture(ds_test_out, model_generator=model_generator)
 
             manager.save()
 

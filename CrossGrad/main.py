@@ -512,8 +512,8 @@ def main():
             test_out_metr = eval_one_epoch(model_label=model_label, dataset=ds_test_out,
                 summary_directory=os.path.join(manager._directory, "test_out"),
                 global_step=global_step, config=config, training=False)
-            
-            picture(dataset=ds_test_out, model_label=model_label, config=config)
+            # # uncomment if pictures should be saved in images folder
+            # picture(dataset=ds_test_out, model_label=model_label, config=config)
 
 
             manager.save()
